@@ -1,0 +1,41 @@
+version: '3.8'
+
+volumes:
+  online-consultation:
+    external: false
+
+services:
+  online-consultation:
+    container_name: online-consultation
+    image: praveennagaraj/online-consultation
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - 4000:4000
+    env_file:
+      - .env
+    environment:
+      - PORT=${PORT}
+      - ENVIRONMENT=${ENVIRONMENT}
+      - MONGO_URI=${MONGO_URI}
+      - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID}
+      - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN}
+      - TWILIO_FROM_NUMBER=${TWILIO_FROM_NUMBER}
+      - ACCESS_SECRET=${ACCESS_SECRET}
+    volumes:
+      - .:/src/app
+    restart: unless-stopped
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo
+    restart: unless-stopped
+    ports:
+      - 27017:27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASS}
+    volumes:
+      - online-consultation:/data/db
