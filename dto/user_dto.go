@@ -23,3 +23,9 @@ type UpdateUserDTO struct {
 	Gender       string `json:"gender,omitempty" form:"gender,omitempty" bson:"gender,omitempty"`
 	RefreshToken string `json:"-" form:"-" bson:"refresh_token,omitempty"`
 }
+
+type SignInWithPhoneDTO struct {
+	VerificationId string `json:"verify_code" form:"verify_code"`
+	PhoneCode      string `json:"phone_code" form:"phone_code"`
+	PhoneNumber    string `json:"phone_number" form:"phone_number"`
+}

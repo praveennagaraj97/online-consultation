@@ -93,3 +93,25 @@ func (r *UserRepository) checkIfUserExistsWithEmailOrPhone(email, number, code s
 	return count > 0
 
 }
+
+func (r *UserRepository) FindByPhoneNumber(number, code string) (*usermodel.UserEntity, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	filter := bson.M{"$and": bson.A{bson.M{"phone_number.number": number, "phone_number.code": code}}}
+
+	doc := r.collection.FindOne(ctx, filter)
+
+	if doc.Err() != nil {
+		return nil, errors.New("Couldn't find any user")
+	}
+
+	var payload *usermodel.UserEntity
+
+	if err := doc.Decode(&payload); err != nil {
+		return nil, err
+	}
+
+	return payload, nil
+
+}

@@ -1,11 +1,8 @@
 package userapi
 
 import (
-	"encoding/base64"
 	"fmt"
 	"net/http"
-	"net/url"
-	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -142,30 +139,4 @@ func (a *UserAPI) VerifyCode() gin.HandlerFunc {
 		})
 
 	}
-}
-
-func decodeVerificationID(verification_query_str string) (*primitive.ObjectID, *interfaces.PhoneType, error) {
-
-	decodedStr, err := base64.StdEncoding.DecodeString(verification_query_str)
-	if err != nil {
-
-		return nil, nil, err
-	}
-
-	parsedQuery, err := url.ParseQuery(string(decodedStr))
-	if err != nil {
-		return nil, nil, err
-	}
-
-	objectId, err := primitive.ObjectIDFromHex(parsedQuery.Get("_id"))
-	if err != nil {
-		return nil, nil, err
-	}
-
-	phone := interfaces.PhoneType{
-		Code:   strings.Replace("+"+parsedQuery.Get("phone_code"), " ", "", 1),
-		Number: parsedQuery.Get("phone_number"),
-	}
-
-	return &objectId, &phone, nil
 }

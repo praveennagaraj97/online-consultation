@@ -49,3 +49,32 @@ func ValidateRegisterDTO(payload *userdto.RegisterDTO) *serialize.ErrorResponse 
 
 	return nil
 }
+
+func ValidateSignInWithPhoneDTO(payload *userdto.SignInWithPhoneDTO) *serialize.ErrorResponse {
+
+	errors := map[string]string{}
+
+	if payload.PhoneCode == "" {
+		errors["phone_code"] = "Phone code cannot be empty"
+	}
+
+	if payload.PhoneNumber == "" {
+		errors["phone_number"] = "Phone number cannot be empty"
+	}
+
+	if payload.VerificationId == "" {
+		errors["verification_id"] = "Verification ID cannot be empty"
+	}
+
+	if len(errors) != 0 {
+		return &serialize.ErrorResponse{
+			Errors: &errors,
+			Response: serialize.Response{
+				StatusCode: http.StatusUnprocessableEntity,
+				Message:    "Given data is invalid",
+			},
+		}
+	}
+
+	return nil
+}

@@ -1,6 +1,9 @@
 package usermodel
 
 import (
+	"time"
+
+	"github.com/praveennagaraj97/online-consultation/constants"
 	"github.com/praveennagaraj97/online-consultation/interfaces"
 	"github.com/praveennagaraj97/online-consultation/pkg/tokens"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -17,10 +20,19 @@ type UserEntity struct {
 	EmailVerified bool                 `json:"email_verified" bson:"email_verified"`
 }
 
-func (u *UserEntity) GetAccessAndRefreshToken() (string, string, error) {
-	access, err := tokens.GenerateTokenWithExpiryTimeAndType(u.ID.Hex(), 100, "access", "user")
-	refresh, err := tokens.GenerateTokenWithExpiryTimeAndType(u.ID.Hex(), 100, "refresh", "user")
+func (u *UserEntity) GetAccessAndRefreshToken(acessExpires bool) (string, string, error) {
+
+	var access, refresh string
+	var err error
+
+	if acessExpires {
+		access, err = tokens.GenerateTokenWithExpiryTimeAndType(u.ID.Hex(),
+			time.Now().Local().Add(time.Minute*constants.JWT_AccessTokenExpiry).Unix(),
+			"access", "user")
+	} else {
+		access, err = tokens.GenerateNoExpiryTokenWithCustomType(u.ID.Hex(), "access", "user")
+	}
+	refresh, err = tokens.GenerateNoExpiryTokenWithCustomType(u.ID.Hex(), "refresh", "user")
 
 	return access, refresh, err
-
 }
