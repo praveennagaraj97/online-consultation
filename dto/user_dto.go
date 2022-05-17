@@ -29,3 +29,12 @@ type SignInWithPhoneDTO struct {
 	PhoneCode      string `json:"phone_code" form:"phone_code"`
 	PhoneNumber    string `json:"phone_number" form:"phone_number"`
 }
+
+type SignInWithEmailLinkDTO struct {
+	Email string `json:"email" form:"email"`
+}
+
+type RequestEmailVerifyDTO struct {
+	Email      string `json:"email" form:"email"`
+	RedirectTo string `json:"redirect_to" form:"redirect_to"`
+}

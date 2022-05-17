@@ -28,7 +28,6 @@ func (router *Router) ListenAndServe(conf *app.ApplicationConfig) {
 	router.engine = r
 
 	// Initialize Routes
-	r.Use(gin.Logger())
 	r.Use(router.middlewares.CORSMiddleware())
 
 	// User and Auth Routes

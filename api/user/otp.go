@@ -20,7 +20,7 @@ import (
 func (a *UserAPI) SendVerificationCode() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
-		var payload *interfaces.PhoneType
+		var payload interfaces.PhoneType
 
 		if err := ctx.ShouldBind(&payload); err != nil {
 			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
@@ -32,7 +32,7 @@ func (a *UserAPI) SendVerificationCode() gin.HandlerFunc {
 		// Generate OTP
 		verifyCode := utils.GenerateRandomCode(6)
 
-		res, err := a.otpRepo.CreateOne(payload, &verifyCode)
+		res, err := a.otpRepo.CreateOne(&payload, &verifyCode)
 
 		if err != nil {
 			api.SendErrorResponse(ctx, "Internal Server Error", http.StatusInternalServerError, nil)
@@ -69,7 +69,7 @@ func (a *UserAPI) VerifyCode() gin.HandlerFunc {
 			return
 		}
 
-		var payload *userdto.VerifyCodeDTO
+		var payload userdto.VerifyCodeDTO
 
 		if err = ctx.ShouldBind(&payload); err != nil || payload.VerifyCode == "" {
 			api.SendErrorResponse(ctx, "Verification code is missing", http.StatusUnprocessableEntity, nil)

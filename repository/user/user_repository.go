@@ -106,12 +106,34 @@ func (r *UserRepository) FindByPhoneNumber(number, code string) (*usermodel.User
 		return nil, errors.New("Couldn't find any user")
 	}
 
-	var payload *usermodel.UserEntity
+	var payload usermodel.UserEntity
 
 	if err := doc.Decode(&payload); err != nil {
 		return nil, err
 	}
 
-	return payload, nil
+	return &payload, nil
+
+}
+
+func (r *UserRepository) FindByEmail(email string) (*usermodel.UserEntity, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	filter := bson.M{"email": email}
+
+	doc := r.collection.FindOne(ctx, filter)
+
+	if doc.Err() != nil {
+		return nil, errors.New("Couldn't find any user")
+	}
+
+	var payload usermodel.UserEntity
+
+	if err := doc.Decode(&payload); err != nil {
+		return nil, err
+	}
+
+	return &payload, nil
 
 }

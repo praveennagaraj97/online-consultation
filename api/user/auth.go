@@ -1,8 +1,11 @@
 package userapi
 
 import (
+	"fmt"
+	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/praveennagaraj97/online-consultation/api"
@@ -10,6 +13,10 @@ import (
 	userdto "github.com/praveennagaraj97/online-consultation/dto"
 	"github.com/praveennagaraj97/online-consultation/interfaces"
 	usermodel "github.com/praveennagaraj97/online-consultation/models/user"
+	mailer "github.com/praveennagaraj97/online-consultation/pkg/email"
+	"github.com/praveennagaraj97/online-consultation/pkg/env"
+	"github.com/praveennagaraj97/online-consultation/pkg/tokens"
+	"github.com/praveennagaraj97/online-consultation/pkg/validator"
 	authvalidator "github.com/praveennagaraj97/online-consultation/pkg/validator/auth"
 	"github.com/praveennagaraj97/online-consultation/serialize"
 )
@@ -17,7 +24,7 @@ import (
 // Register user.
 func (a *UserAPI) Register() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var payload *userdto.RegisterDTO
+		var payload userdto.RegisterDTO
 
 		if err := ctx.ShouldBind(&payload); err != nil {
 			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
@@ -25,7 +32,7 @@ func (a *UserAPI) Register() gin.HandlerFunc {
 		defer ctx.Request.Body.Close()
 
 		// Validate
-		if err := authvalidator.ValidateRegisterDTO(payload); err != nil {
+		if err := authvalidator.ValidateRegisterDTO(&payload); err != nil {
 			api.SendErrorResponse(ctx, err.Message, err.StatusCode, err.Errors)
 			return
 		}
@@ -39,7 +46,7 @@ func (a *UserAPI) Register() gin.HandlerFunc {
 		}
 
 		// Store to database
-		res, err := a.userRepo.CreateUser(payload)
+		res, err := a.userRepo.CreateUser(&payload)
 		if err != nil {
 			api.SendErrorResponse(ctx, err.Error(), http.StatusBadRequest, nil)
 			return
@@ -72,6 +79,11 @@ func (a *UserAPI) Register() gin.HandlerFunc {
 			return
 		}
 
+		td := mailer.GetRegisterEmailTemplateData(res.Name)
+		if err = a.appConf.EmailClient.SendNoReplyMail([]string{res.Email}, "Welcome to Online Consultation", "verify-email", "base", td); err != nil {
+			log.Println("Register email failed to send")
+		}
+
 		ctx.JSON(http.StatusCreated, serialize.AuthResponse{
 			AccessToken:  access,
 			RefreshToken: refresh,
@@ -87,28 +99,19 @@ func (a *UserAPI) Register() gin.HandlerFunc {
 	}
 }
 
-// Send Login Email link to user.
-func (a *UserAPI) SendLoginLink() gin.HandlerFunc {
-	return func(ctx *gin.Context) {}
-}
-
-// Verify email after register
-func (a *UserAPI) VerifyEmail() gin.HandlerFunc {
-	return func(ctx *gin.Context) {}
-}
-
 // Login with Phone Number.
 func (a *UserAPI) SignInWithPhoneNumber() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
-		var payload *userdto.SignInWithPhoneDTO
+		var payload userdto.SignInWithPhoneDTO
 
 		if err := ctx.ShouldBind(&payload); err != nil {
 			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
 			return
 		}
+		defer ctx.Request.Body.Close()
 
-		if err := authvalidator.ValidateSignInWithPhoneDTO(payload); err != nil {
+		if err := authvalidator.ValidateSignInWithPhoneDTO(&payload); err != nil {
 			api.SendErrorResponse(ctx, err.Message, err.StatusCode, err.Errors)
 			return
 		}
@@ -167,6 +170,105 @@ func (a *UserAPI) SignInWithPhoneNumber() gin.HandlerFunc {
 					Message:    "Logged in successfully",
 				},
 			},
+		})
+
+	}
+}
+
+// Send Login Email link to user.
+func (a *UserAPI) SignInWithEmailLink() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+
+		var payload userdto.SignInWithEmailLinkDTO
+
+		if err := ctx.ShouldBind(&payload); err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+			return
+		}
+		defer ctx.Request.Body.Close()
+
+		if payload.Email == "" {
+			api.SendErrorResponse(ctx, "Email cannot be empty", http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		if err := validator.ValidateEmail(payload.Email); err != nil {
+			api.SendErrorResponse(ctx, "Provided email is invalid", http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		// Check if user exists with email
+		res, err := a.userRepo.FindByEmail(payload.Email)
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusUnauthorized, nil)
+			return
+		}
+
+		// Check if email is verified.
+		if !res.EmailVerified {
+			api.SendErrorResponse(ctx, "Your email verification is still pending", http.StatusNotAcceptable, nil)
+			return
+		}
+
+		fmt.Println(res)
+
+	}
+}
+
+// Request email verify link
+func (a *UserAPI) RequestEmailVerifyLink() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		var payload userdto.RequestEmailVerifyDTO
+
+		if err := ctx.ShouldBind(&payload); err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+			return
+		}
+		defer ctx.Request.Body.Close()
+
+		if payload.Email == "" {
+			api.SendErrorResponse(ctx, "Email cannot be empty", http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		if err := validator.ValidateEmail(payload.Email); err != nil {
+			api.SendErrorResponse(ctx, "Provided email is invalid", http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		// Check if user exists with email
+		res, err := a.userRepo.FindByEmail(payload.Email)
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusUnauthorized, nil)
+			return
+		}
+
+		// Check if email is verified.
+		if res.EmailVerified {
+			api.SendErrorResponse(ctx, "Your email is already verified", http.StatusNotAcceptable, nil)
+			return
+		}
+
+		token, err := tokens.GenerateTokenWithExpiryTimeAndType(res.ID.Hex(),
+			time.Now().Local().Add(time.Hour*48).Unix(),
+			"verify_email", "user")
+
+		if err != nil {
+			api.SendErrorResponse(ctx, "Internal server error", http.StatusInternalServerError, nil)
+			return
+		}
+
+		emailLink := fmt.Sprintf("%s?redirectTo=%s&verifyCode=%s",
+			env.GetEnvVariable("CLIENT_VERIFY_EMAIL_LINK"),
+			payload.RedirectTo,
+			token)
+
+		td := mailer.GetVerifyEmailTemplateData(res.Name, emailLink)
+		a.appConf.EmailClient.SendNoReplyMail([]string{res.Email}, "Verify email address", "verify-email", "base", td)
+
+		ctx.JSON(200, map[string]interface{}{
+			"res":  token,
+			"link": emailLink,
 		})
 
 	}

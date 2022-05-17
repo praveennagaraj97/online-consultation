@@ -1,6 +1,7 @@
 package app
 
 import (
+	mailer "github.com/praveennagaraj97/online-consultation/pkg/email"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -13,4 +14,5 @@ type ApplicationConfig struct {
 		MONGO_DBNAME string
 	}
 	MongoClient *mongo.Client
+	EmailClient *mailer.Mailer
 }
