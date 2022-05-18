@@ -10,15 +10,20 @@ import (
 )
 
 type Repository struct {
-	userRepo       *userrepository.UserRepository
-	otpRepo        *onetimepasswordrepository.OneTimePasswordRepository
-	specialityRepo *specialityrepo.SpecialityRepository
+	userRepo         *userrepository.UserRepository
+	userRelativeRepo *userrepository.UserRelativesRepository
+	otpRepo          *onetimepasswordrepository.OneTimePasswordRepository
+	specialityRepo   *specialityrepo.SpecialityRepository
 }
 
 func (r *Repository) Initialize(mgoClient *mongo.Client, dbName string) {
 	// User Repo
 	r.userRepo = &userrepository.UserRepository{}
 	r.userRepo.InitializeRepository(db.OpenCollection(mgoClient, dbName, "user"))
+
+	// User relatives repo
+	r.userRelativeRepo = &userrepository.UserRelativesRepository{}
+	r.userRelativeRepo.InitializeRepository(db.OpenCollection(mgoClient, dbName, "user_relative"))
 
 	// One Time Password Repo
 	r.otpRepo = &onetimepasswordrepository.OneTimePasswordRepository{}
@@ -33,6 +38,10 @@ func (r *Repository) Initialize(mgoClient *mongo.Client, dbName string) {
 
 func (r *Repository) GetUserRepository() *userrepository.UserRepository {
 	return r.userRepo
+}
+
+func (r *Repository) GetUserRelativeRepository() *userrepository.UserRelativesRepository {
+	return r.userRelativeRepo
 }
 
 func (r *Repository) GetOneTimePasswordRepository() *onetimepasswordrepository.OneTimePasswordRepository {

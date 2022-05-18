@@ -19,6 +19,7 @@ func (a *UserAPI) CheckUserExistsByEmail() gin.HandlerFunc {
 			api.SendErrorResponse(ctx, "Given input is invalid", http.StatusUnprocessableEntity, nil)
 			return
 		}
+		defer ctx.Request.Body.Close()
 
 		if payload.Email == "" {
 			api.SendErrorResponse(ctx, "Email cannot be empty", http.StatusUnprocessableEntity, nil)
@@ -52,6 +53,7 @@ func (a *UserAPI) CheckUserExistsByPhoneNumber() gin.HandlerFunc {
 			api.SendErrorResponse(ctx, "Given input is invalid", http.StatusUnprocessableEntity, nil)
 			return
 		}
+		defer ctx.Request.Body.Close()
 
 		if payload.Code == "" || payload.Number == "" {
 			api.SendErrorResponse(ctx, "Provide phone number is invalid", http.StatusUnprocessableEntity, nil)

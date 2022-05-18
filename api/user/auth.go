@@ -49,7 +49,7 @@ func (a *UserAPI) Register() gin.HandlerFunc {
 		// Store to database
 		res, err := a.userRepo.CreateUser(&payload)
 		if err != nil {
-			api.SendErrorResponse(ctx, err.Error(), http.StatusBadRequest, nil)
+			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
 			return
 		}
 
@@ -59,7 +59,7 @@ func (a *UserAPI) Register() gin.HandlerFunc {
 			shouldExp = false
 		}
 
-		access, refresh, err := res.GetAccessAndRefreshToken(!shouldExp)
+		access, refresh, accessTime, err := res.GetAccessAndRefreshToken(!shouldExp)
 
 		a.userRepo.UpdateById(&res.ID, &userdto.UpdateUserDTO{
 			RefreshToken: refresh,
@@ -68,12 +68,12 @@ func (a *UserAPI) Register() gin.HandlerFunc {
 		// Set Access Token
 		ctx.SetCookie(string(constants.AUTH_TOKEN),
 			access,
-			constants.CookieAccessExpiryTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
+			accessTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
 
 		// Set Refresh Token
 		ctx.SetCookie(string(constants.REFRESH_TOKEN),
 			access,
-			constants.CookieAccessExpiryTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
+			constants.CookieRefreshExpiryTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
 
 		if err != nil {
 			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, nil)
@@ -149,7 +149,7 @@ func (a *UserAPI) SignInWithPhoneNumber() gin.HandlerFunc {
 			shouldExp = false
 		}
 
-		access, refresh, err := res.GetAccessAndRefreshToken(!shouldExp)
+		access, refresh, accessTime, err := res.GetAccessAndRefreshToken(!shouldExp)
 
 		a.userRepo.UpdateById(&res.ID, &userdto.UpdateUserDTO{
 			RefreshToken: refresh,
@@ -158,12 +158,12 @@ func (a *UserAPI) SignInWithPhoneNumber() gin.HandlerFunc {
 		// Set Access Token
 		ctx.SetCookie(string(constants.AUTH_TOKEN),
 			access,
-			constants.CookieAccessExpiryTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
+			accessTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
 
 		// Set Refresh Token
 		ctx.SetCookie(string(constants.REFRESH_TOKEN),
 			access,
-			constants.CookieAccessExpiryTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
+			constants.CookieRefreshExpiryTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
 
 		if err != nil {
 			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, nil)
@@ -295,7 +295,7 @@ func (a UserAPI) SendLoginCredentialsForEmailLink() gin.HandlerFunc {
 			shouldExp = false
 		}
 
-		access, refresh, err := res.GetAccessAndRefreshToken(!shouldExp)
+		access, refresh, accessTime, err := res.GetAccessAndRefreshToken(!shouldExp)
 
 		a.userRepo.UpdateById(&res.ID, &userdto.UpdateUserDTO{
 			RefreshToken: refresh,
@@ -304,12 +304,12 @@ func (a UserAPI) SendLoginCredentialsForEmailLink() gin.HandlerFunc {
 		// Set Access Token
 		ctx.SetCookie(string(constants.AUTH_TOKEN),
 			access,
-			constants.CookieAccessExpiryTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
+			accessTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
 
 		// Set Refresh Token
 		ctx.SetCookie(string(constants.REFRESH_TOKEN),
 			access,
-			constants.CookieAccessExpiryTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
+			constants.CookieRefreshExpiryTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
 
 		if err != nil {
 			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, nil)
@@ -521,7 +521,7 @@ func (a *UserAPI) RefreshToken() gin.HandlerFunc {
 			return
 		}
 
-		access, refresh, err := user.GetAccessAndRefreshToken(true)
+		access, refresh, accessTime, err := user.GetAccessAndRefreshToken(true)
 
 		a.userRepo.UpdateById(&user.ID, &userdto.UpdateUserDTO{
 			RefreshToken: refresh,
@@ -530,12 +530,12 @@ func (a *UserAPI) RefreshToken() gin.HandlerFunc {
 		// Set Access Token
 		c.SetCookie(string(constants.AUTH_TOKEN),
 			access,
-			constants.CookieAccessExpiryTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
+			accessTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
 
 		// Set Refresh Token
 		c.SetCookie(string(constants.REFRESH_TOKEN),
 			access,
-			constants.CookieAccessExpiryTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
+			constants.CookieRefreshExpiryTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
 
 		if err != nil {
 			api.SendErrorResponse(c, "Something went wrong", http.StatusInternalServerError, nil)

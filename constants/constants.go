@@ -18,3 +18,6 @@ const CookieRefreshExpiryTime int = 2.628e+6
 
 // Token - 30 min
 const JWT_AccessTokenExpiry = 30
+
+// Pagination options - PerPage default
+const DefaultPerPageResults = 10

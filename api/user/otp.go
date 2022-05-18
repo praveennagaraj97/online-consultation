@@ -75,6 +75,7 @@ func (a *UserAPI) VerifyCode() gin.HandlerFunc {
 			api.SendErrorResponse(ctx, "Verification code is missing", http.StatusUnprocessableEntity, nil)
 			return
 		}
+		defer ctx.Request.Body.Close()
 
 		// Check OTP with database
 		res, err := a.otpRepo.FindById(objectId)

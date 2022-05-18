@@ -20,19 +20,21 @@ type UserEntity struct {
 	EmailVerified bool                 `json:"email_verified" bson:"email_verified"`
 }
 
-func (u *UserEntity) GetAccessAndRefreshToken(acessExpires bool) (string, string, error) {
+func (u *UserEntity) GetAccessAndRefreshToken(acessExpires bool) (string, string, int, error) {
 
 	var access, refresh string
 	var err error
+	var accessTime int = constants.CookieRefreshExpiryTime
 
 	if acessExpires {
+		accessTime = constants.CookieAccessExpiryTime
 		access, err = tokens.GenerateTokenWithExpiryTimeAndType(u.ID.Hex(),
-			time.Now().Local().Add(time.Minute*constants.JWT_AccessTokenExpiry).Unix(),
-			"access", "user")
+			time.Now().Local().Add(time.Minute*constants.JWT_AccessTokenExpiry).Unix(), "access", "user")
 	} else {
 		access, err = tokens.GenerateNoExpiryTokenWithCustomType(u.ID.Hex(), "access", "user")
+
 	}
 	refresh, err = tokens.GenerateNoExpiryTokenWithCustomType(u.ID.Hex(), "refresh", "user")
 
-	return access, refresh, err
+	return access, refresh, accessTime, err
 }
