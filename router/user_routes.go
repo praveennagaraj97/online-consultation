@@ -21,4 +21,6 @@ func (r *Router) userRoutes() {
 	authRoutes.POST("/check_email_taken", userAPI.CheckUserExistsByEmail())
 	authRoutes.POST("/check_phone_taken", userAPI.CheckUserExistsByPhoneNumber())
 
+	authRoutes.GET("/refresh_token", r.middlewares.IsAuthorized(), r.middlewares.UserRole([]string{"user"}), userAPI.RefreshToken())
+
 }

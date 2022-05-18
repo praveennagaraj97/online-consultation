@@ -446,3 +446,109 @@ func (a *UserAPI) ConfirmEmail() gin.HandlerFunc {
 
 	}
 }
+
+// Logout - Removes user token from Entity and disables token from used further.
+func (a *UserAPI) Logout() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id, err := api.GetUserIdFromContext(c)
+		if err != nil {
+			api.SendErrorResponse(c, err.Error(), http.StatusUnauthorized, nil)
+			return
+		}
+
+		err = a.userRepo.UpdateById(id, &userdto.UpdateUserDTO{
+			RefreshToken: "",
+		})
+
+		if err != nil {
+			api.SendErrorResponse(c, err.Error(), http.StatusUnauthorized, nil)
+			return
+		}
+
+		c.SetCookie(string(constants.AUTH_TOKEN), "", 0, "/", a.appConf.Domain, false, true)
+		c.SetCookie(string(constants.REFRESH_TOKEN), "", 0, "/", a.appConf.Domain, false, true)
+
+		c.JSON(http.StatusOK, serialize.Response{
+			StatusCode: http.StatusOK,
+			Message:    "Logged out successfully",
+		})
+
+	}
+}
+
+// Refresh access token using refresh token.
+// Can be force refreshed by passing force param set to true.
+func (a *UserAPI) RefreshToken() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		token, refreshToken, err := a.getAccessAndRefreshTokenFromRequest(c)
+		if err != nil {
+			api.SendErrorResponse(c, err.Error(), http.StatusUnauthorized, nil)
+			return
+		}
+
+		// check if force refresh is requested
+		isForce, _ := strconv.ParseBool(c.Request.URL.Query().Get("force"))
+
+		// parse auth Token
+		_, err = tokens.DecodeJSONWebToken(token)
+		if err == nil && !isForce {
+			api.SendErrorResponse(c, "Token is not expired", http.StatusNotAcceptable, nil)
+			return
+		}
+
+		// parse refresh token
+		claimedRefreshToken, err := tokens.DecodeJSONWebToken(refreshToken)
+		if err != nil {
+			api.SendErrorResponse(c, "Revalidate token malformed", http.StatusNotAcceptable, nil)
+			return
+		}
+
+		userId, err := primitive.ObjectIDFromHex(claimedRefreshToken.ID)
+		if err != nil {
+			api.SendErrorResponse(c, "Something went wrong", http.StatusNotAcceptable, nil)
+			return
+		}
+
+		// cross check refresh token with db.
+		user, err := a.userRepo.FindById(&userId)
+		if err != nil {
+			api.SendErrorResponse(c, "Couldn't find any user for this refresh token", http.StatusNotFound, nil)
+			return
+		}
+
+		if user.RefreshToken != refreshToken {
+			api.SendErrorResponse(c, "Revalidate token Malformed", http.StatusUnauthorized, nil)
+			return
+		}
+
+		access, refresh, err := user.GetAccessAndRefreshToken(true)
+
+		a.userRepo.UpdateById(&user.ID, &userdto.UpdateUserDTO{
+			RefreshToken: refresh,
+		})
+
+		// Set Access Token
+		c.SetCookie(string(constants.AUTH_TOKEN),
+			access,
+			constants.CookieAccessExpiryTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
+
+		// Set Refresh Token
+		c.SetCookie(string(constants.REFRESH_TOKEN),
+			access,
+			constants.CookieAccessExpiryTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
+
+		if err != nil {
+			api.SendErrorResponse(c, "Something went wrong", http.StatusInternalServerError, nil)
+			return
+		}
+
+		c.JSON(http.StatusOK, &serialize.RefreshResponse{
+			Response: serialize.Response{
+				StatusCode: http.StatusOK,
+				Message:    "Token refreshed successfully",
+			},
+			Token:        token,
+			RefreshToken: refreshToken,
+		})
+	}
+}
