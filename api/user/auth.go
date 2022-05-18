@@ -80,8 +80,17 @@ func (a *UserAPI) Register() gin.HandlerFunc {
 			return
 		}
 
-		td := mailer.GetRegisterEmailTemplateData(res.Name)
-		if err = a.appConf.EmailClient.SendNoReplyMail([]string{res.Email}, "Welcome to Online Consultation", "verify-email", "base", td); err != nil {
+		token, err := tokens.GenerateTokenWithExpiryTimeAndType(res.ID.Hex(),
+			time.Now().Local().Add(time.Hour*48).Unix(),
+			"verify_email", "user")
+
+		emailLink := fmt.Sprintf("%s?verifyCode=%s",
+			env.GetEnvVariable("CLIENT_VERIFY_EMAIL_LINK"), token)
+
+		td := mailer.GetRegisterEmailTemplateData(res.Name, emailLink)
+		if err = a.appConf.EmailClient.SendNoReplyMail([]string{res.Email},
+			"Welcome to Online Consultation", "verify-email",
+			"base", td); err != nil {
 			log.Println("Register email failed to send")
 		}
 

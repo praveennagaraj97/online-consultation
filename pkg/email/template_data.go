@@ -2,8 +2,6 @@ package mailer
 
 import (
 	"fmt"
-
-	"github.com/praveennagaraj97/online-consultation/pkg/env"
 )
 
 type EmailMetaInfoTemplateData struct {
@@ -20,7 +18,7 @@ type ConfirmEmailTemplateData struct {
 	ButtonName             string
 }
 
-func GetRegisterEmailTemplateData(name string) *ConfirmEmailTemplateData {
+func GetRegisterEmailTemplateData(name, verifyLink string) *ConfirmEmailTemplateData {
 
 	return &ConfirmEmailTemplateData{
 		MetaInfo: &EmailMetaInfoTemplateData{
@@ -32,7 +30,7 @@ func GetRegisterEmailTemplateData(name string) *ConfirmEmailTemplateData {
                   didn't create an account with
                   Online Consultation, you can safely delete
                   this email.`,
-		VerifyLink:    env.GetEnvVariable("CLIENT_VERIFY_EMAIL_LINK"),
+		VerifyLink:    verifyLink,
 		FooterMessage: `You received this email because you registered to Online consultation.`,
 		ButtonName:    "Confirm Email Address",
 	}
