@@ -65,7 +65,7 @@ func DecodeJSONWebToken(tokenString string) (*SignedClaims, error) {
 		})
 
 	if err != nil || !token.Valid {
-		return nil, errors.New("token_is_expired")
+		return nil, errors.New("Provided token is expired or invalid")
 	}
 
 	claims := token.Claims.(*SignedClaims)

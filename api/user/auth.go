@@ -19,6 +19,7 @@ import (
 	"github.com/praveennagaraj97/online-consultation/pkg/validator"
 	authvalidator "github.com/praveennagaraj97/online-consultation/pkg/validator/auth"
 	"github.com/praveennagaraj97/online-consultation/serialize"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // Register user.
@@ -266,9 +267,62 @@ func (a *UserAPI) RequestEmailVerifyLink() gin.HandlerFunc {
 		td := mailer.GetVerifyEmailTemplateData(res.Name, emailLink)
 		a.appConf.EmailClient.SendNoReplyMail([]string{res.Email}, "Verify email address", "verify-email", "base", td)
 
-		ctx.JSON(200, map[string]interface{}{
-			"res":  token,
-			"link": emailLink,
+		ctx.JSON(http.StatusOK, serialize.Response{
+			StatusCode: http.StatusOK,
+			Message:    "Email has been successfully sent",
+		})
+
+	}
+}
+
+func (a *UserAPI) ConfirmEmail() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		token, exists := ctx.Params.Get("token")
+		if !exists {
+			api.SendErrorResponse(ctx, "Couldn't find any token", http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		claimedInfo, err := tokens.DecodeJSONWebToken(token)
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		if claimedInfo.Type != "verify_email" {
+			api.SendErrorResponse(ctx, "Provided token is invalid", http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		objectId, err := primitive.ObjectIDFromHex(claimedInfo.ID)
+
+		if err != nil {
+			api.SendErrorResponse(ctx, "Token is malformed", http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		// Get user By ID
+		user, err := a.userRepo.FindById(&objectId)
+		if err != nil {
+			api.SendErrorResponse(ctx, "Provided token is invalid", http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		if user.EmailVerified {
+			api.SendErrorResponse(ctx, "Email is already verified", http.StatusBadRequest, nil)
+			return
+		}
+
+		if err = a.userRepo.UpdateById(&objectId, &userdto.UpdateUserDTO{EmailVerified: true}); err != nil {
+			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, &map[string]string{
+				"reason": err.Error(),
+			})
+			return
+		}
+
+		ctx.JSON(http.StatusOK, serialize.Response{
+			StatusCode: http.StatusOK,
+			Message:    "Email verified successfully",
 		})
 
 	}

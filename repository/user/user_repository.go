@@ -137,3 +137,23 @@ func (r *UserRepository) FindByEmail(email string) (*usermodel.UserEntity, error
 	return &payload, nil
 
 }
+
+func (r *UserRepository) FindById(id *primitive.ObjectID) (*usermodel.UserEntity, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	doc := r.collection.FindOne(ctx, bson.M{"_id": id})
+
+	if doc.Err() != nil {
+		return nil, errors.New("Couldn't find any user")
+	}
+
+	var payload usermodel.UserEntity
+
+	if err := doc.Decode(&payload); err != nil {
+		return nil, err
+	}
+
+	return &payload, nil
+
+}

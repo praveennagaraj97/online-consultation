@@ -16,4 +16,5 @@ func (r *Router) userRoutes() {
 	authRoutes.POST("/signin_with_phonenumber", userAPI.SignInWithPhoneNumber())
 	authRoutes.POST("/signin_with_emaillink", userAPI.SignInWithEmailLink())
 	authRoutes.POST("/request_email_verify", userAPI.RequestEmailVerifyLink())
+	authRoutes.GET("/verify_email/:token", userAPI.ConfirmEmail())
 }
