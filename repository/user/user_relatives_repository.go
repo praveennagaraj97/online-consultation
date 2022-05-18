@@ -37,6 +37,10 @@ func (r *UserRelativesRepository) InitializeRepository(colln *mongo.Collection) 
 	utils.CreateIndex(colln, bson.D{
 		{Key: "parent_id", Value: 1}},
 		"Parent ID", false)
+
+	utils.CreateIndex(colln, bson.D{
+		{Key: "parent_id", Value: 1}, {Key: "_id", Value: 1}},
+		"ParentId and Doc Id", false)
 }
 
 func (r *UserRelativesRepository) CreateOne(payload *userdto.AddOrEditRelativeDTO) (*usermodel.RelativeEntity, error) {
@@ -94,8 +98,9 @@ func (r *UserRelativesRepository) checkIfRelativeExist(email string, phone inter
 
 func (r *UserRelativesRepository) FindAll(
 	pgnOpt *api.PaginationOptions,
-	parentId *primitive.ObjectID,
-	keySetSortby string) (*[]usermodel.RelativeEntity, error) {
+	sortOpts *map[string]int8,
+	filterOpts *map[string]primitive.M,
+	keySetSortby string, parentId *primitive.ObjectID) ([]usermodel.RelativeEntity, error) {
 
 	opt := &options.FindOptions{}
 
@@ -109,6 +114,18 @@ func (r *UserRelativesRepository) FindAll(
 	if pgnOpt != nil {
 		opt.Limit = options.Find().SetLimit(int64(pgnOpt.PerPage)).Limit
 		opt.Skip = options.Find().SetSkip(int64((pgnOpt.PageNum - 1) * int(pgnOpt.PerPage))).Skip
+	}
+
+	if sortOpts != nil {
+		opt.Sort = options.Find().SetSort(sortOpts).Sort
+	} else {
+		opt.Sort = options.Find().SetSort(bson.M{"created_at": -1}).Sort
+	}
+
+	if filterOpts != nil {
+		for key, value := range *filterOpts {
+			filters[key] = value
+		}
 	}
 
 	if pgnOpt.PaginateId != nil {
@@ -130,6 +147,24 @@ func (r *UserRelativesRepository) FindAll(
 
 	defer cur.Close(ctx)
 
-	return &results, nil
+	return results, nil
 
+}
+
+func (r *UserRelativesRepository) GetDocumentsCount(parentId *primitive.ObjectID, filterOpts *map[string]primitive.M) (int64, error) {
+
+	filters := map[string]bson.M{
+		"parent_id": {"$eq": parentId},
+	}
+
+	if filterOpts != nil {
+		for key, value := range *filterOpts {
+			filters[key] = value
+		}
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	return r.colln.CountDocuments(ctx, filters)
 }
