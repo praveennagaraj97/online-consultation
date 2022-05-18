@@ -32,7 +32,8 @@ type SignInWithPhoneDTO struct {
 }
 
 type SignInWithEmailLinkDTO struct {
-	Email string `json:"email" form:"email"`
+	Email      string `json:"email" form:"email"`
+	RedirectTo string `json:"redirect_to" form:"redirect_to"`
 }
 
 type RequestEmailVerifyDTO struct {

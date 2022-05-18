@@ -52,8 +52,17 @@ func (m *Mailer) SendNoReplyMail(to []string, subject string, templateName strin
 
 	var body bytes.Buffer
 
+	var recievers interface{}
+
+	if len(to) == 1 {
+		recievers = to[0]
+	} else {
+		recievers = to
+
+	}
+
 	mimeHeaders := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
-	body.Write([]byte(fmt.Sprintf("To: %v \nFrom: %s \nSubject: %s \n%s\n\n", to,
+	body.Write([]byte(fmt.Sprintf("To: %v \nFrom: %s \nSubject: %s \n%s\n\n", recievers,
 		m.noreply, subject, mimeHeaders)))
 
 	err := t.ExecuteTemplate(&body, baseTemplateNam, td)

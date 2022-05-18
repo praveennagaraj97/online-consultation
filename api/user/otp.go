@@ -35,7 +35,7 @@ func (a *UserAPI) SendVerificationCode() gin.HandlerFunc {
 		res, err := a.otpRepo.CreateOne(&payload, &verifyCode)
 
 		if err != nil {
-			api.SendErrorResponse(ctx, "Internal Server Error", http.StatusInternalServerError, nil)
+			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, nil)
 			return
 		}
 

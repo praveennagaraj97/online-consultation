@@ -220,8 +220,113 @@ func (a *UserAPI) SignInWithEmailLink() gin.HandlerFunc {
 			return
 		}
 
-		fmt.Println(res)
+		shouldExp, err := strconv.ParseBool(ctx.Query("remember_me"))
 
+		if err != nil {
+			shouldExp = false
+		}
+
+		token, err := tokens.GenerateTokenWithExpiryTimeAndType(res.ID.Hex(),
+			time.Now().Local().Add(time.Minute*5).Unix(),
+			"sign-in-email", "user")
+
+		if err != nil {
+			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, nil)
+			return
+		}
+
+		emailLink := fmt.Sprintf("%s?redirectTo=%s&remember_me=%v&verifyCode=%s",
+			env.GetEnvVariable("CLIENT_EMAIL_SIGNIN_LINK"),
+			payload.RedirectTo,
+			shouldExp, token)
+
+		td := mailer.GetSignWithEmailLinkTemplateData(res.Name, emailLink)
+		if err = a.appConf.EmailClient.SendNoReplyMail([]string{res.Email}, "Sign in to your online consultation account", "verify-email", "base", td); err != nil {
+			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, nil)
+			return
+		}
+
+		ctx.JSON(http.StatusOK, serialize.Response{
+			StatusCode: http.StatusOK,
+			Message:    "An email with login link has been sent to your email address.",
+		})
+
+	}
+}
+
+// Login Credentials for email link
+func (a UserAPI) SendLoginCredentialsForEmailLink() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		token, exists := ctx.Params.Get("token")
+		if !exists {
+			api.SendErrorResponse(ctx, "Couldn't find any token", http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		claimedInfo, err := tokens.DecodeJSONWebToken(token)
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		if claimedInfo.Type != "sign-in-email" {
+			api.SendErrorResponse(ctx, "Provided token is invalid", http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		objectId, err := primitive.ObjectIDFromHex(claimedInfo.ID)
+
+		if err != nil {
+			api.SendErrorResponse(ctx, "Token is malformed", http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		// Find by phone number
+		res, err := a.userRepo.FindById(&objectId)
+
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusBadRequest, nil)
+			return
+		}
+
+		shouldExp, err := strconv.ParseBool(ctx.Query("remember_me"))
+
+		if err != nil {
+			shouldExp = false
+		}
+
+		access, refresh, err := res.GetAccessAndRefreshToken(!shouldExp)
+
+		a.userRepo.UpdateById(&res.ID, &userdto.UpdateUserDTO{
+			RefreshToken: refresh,
+		})
+
+		// Set Access Token
+		ctx.SetCookie(string(constants.AUTH_TOKEN),
+			access,
+			constants.CookieAccessExpiryTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
+
+		// Set Refresh Token
+		ctx.SetCookie(string(constants.REFRESH_TOKEN),
+			access,
+			constants.CookieAccessExpiryTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
+
+		if err != nil {
+			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, nil)
+			return
+		}
+
+		ctx.JSON(http.StatusOK, serialize.AuthResponse{
+			AccessToken:  access,
+			RefreshToken: refresh,
+			DataResponse: serialize.DataResponse[*usermodel.UserEntity]{
+				Data: res,
+				Response: serialize.Response{
+					StatusCode: http.StatusOK,
+					Message:    "Logged in successfully",
+				},
+			},
+		})
 	}
 }
 
@@ -264,7 +369,7 @@ func (a *UserAPI) RequestEmailVerifyLink() gin.HandlerFunc {
 			"verify_email", "user")
 
 		if err != nil {
-			api.SendErrorResponse(ctx, "Internal server error", http.StatusInternalServerError, nil)
+			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, nil)
 			return
 		}
 
@@ -274,16 +379,21 @@ func (a *UserAPI) RequestEmailVerifyLink() gin.HandlerFunc {
 			token)
 
 		td := mailer.GetVerifyEmailTemplateData(res.Name, emailLink)
-		a.appConf.EmailClient.SendNoReplyMail([]string{res.Email}, "Verify email address", "verify-email", "base", td)
+		if err = a.appConf.EmailClient.SendNoReplyMail([]string{res.Email},
+			"Verify email address", "verify-email", "base", td); err != nil {
+			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, nil)
+			return
+		}
 
 		ctx.JSON(http.StatusOK, serialize.Response{
 			StatusCode: http.StatusOK,
-			Message:    "Email has been successfully sent",
+			Message:    "An email with link to verify your email address has been sent to your email address.",
 		})
 
 	}
 }
 
+// Confirm Email address after register or manual verify request
 func (a *UserAPI) ConfirmEmail() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		token, exists := ctx.Params.Get("token")
