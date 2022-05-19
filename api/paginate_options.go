@@ -23,6 +23,8 @@ type PaginationOptions struct {
 	PageNum int
 	// Key set page id
 	PaginateId *primitive.ObjectID
+
+	// Cached Endpoint Ref
 }
 
 func GetPaginateOptions(docCount int64, pgOpts *PaginationOptions, docLen int64, lastResID *primitive.ObjectID) (*uint64, *bool, *bool, *string) {

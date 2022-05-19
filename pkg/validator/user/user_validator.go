@@ -77,3 +77,48 @@ func CompareAndValidateRelativeDTOWithUserData(payload *userdto.AddOrEditRelativ
 	return nil
 
 }
+
+func ValidateUserDeliveryAddressDTO(payload *userdto.AddOrEditDeliveryAddressDTO) *serialize.ErrorResponse {
+
+	var errors = map[string]string{}
+
+	if payload.Name == "" {
+		errors["name"] = "Name cannot be empty"
+	}
+
+	if payload.Address == "" {
+		errors["address"] = "Address cannot be empty"
+	}
+
+	if payload.State == "" {
+		errors["state"] = "state cannot be empty"
+	}
+
+	if payload.Locality == "" {
+		errors["locality"] = "Locality / Town cannot be empty"
+	}
+
+	if payload.PinCode == "" {
+		errors["pincode"] = "Pincode cannot be empty"
+	}
+
+	if payload.PhoneCode == "" {
+		errors["phone_code"] = "Phone code cannot be empty"
+	}
+
+	if payload.PhoneNumber == "" {
+		errors["phone_number"] = "Phone number cannot be empty"
+	}
+
+	if len(errors) > 0 {
+		return &serialize.ErrorResponse{
+			Errors: &errors,
+			Response: serialize.Response{
+				StatusCode: http.StatusUnprocessableEntity,
+				Message:    "Given data is invalid",
+			},
+		}
+	}
+
+	return nil
+}

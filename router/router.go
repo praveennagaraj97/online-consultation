@@ -17,6 +17,8 @@ type Router struct {
 	middlewares *middlewares.Middlewares
 }
 
+//
+
 func (router *Router) ListenAndServe(conf *app.ApplicationConfig) {
 
 	router.app = conf
@@ -30,6 +32,8 @@ func (router *Router) ListenAndServe(conf *app.ApplicationConfig) {
 	// Initialize Routes
 	r.Use(gin.Logger())
 	r.Use(router.middlewares.CORSMiddleware())
+
+	r.Static("/static", "./static")
 
 	// User and Auth Routes
 	router.userRoutes()

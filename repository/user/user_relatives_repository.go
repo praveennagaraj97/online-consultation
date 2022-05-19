@@ -100,7 +100,9 @@ func (r *UserRelativesRepository) FindAll(
 	pgnOpt *api.PaginationOptions,
 	sortOpts *map[string]int8,
 	filterOpts *map[string]primitive.M,
-	keySetSortby string, UserId *primitive.ObjectID) ([]usermodel.RelativeEntity, error) {
+	keySetSortby string,
+	userId *primitive.ObjectID,
+) ([]usermodel.RelativeEntity, error) {
 
 	opt := &options.FindOptions{}
 
@@ -108,7 +110,7 @@ func (r *UserRelativesRepository) FindAll(
 	defer cancel()
 
 	filters := map[string]bson.M{
-		"user_id": {"$eq": UserId},
+		"user_id": {"$eq": userId},
 	}
 
 	if pgnOpt != nil {
@@ -169,11 +171,11 @@ func (r *UserRelativesRepository) GetDocumentsCount(UserId *primitive.ObjectID, 
 	return r.colln.CountDocuments(ctx, filters)
 }
 
-func (r *UserRelativesRepository) FindById(UserId *primitive.ObjectID, id *primitive.ObjectID) (*usermodel.RelativeEntity, error) {
+func (r *UserRelativesRepository) FindById(userId *primitive.ObjectID, id *primitive.ObjectID) (*usermodel.RelativeEntity, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
-	cur := r.colln.FindOne(ctx, bson.D{{Key: "$and", Value: bson.A{bson.M{"user_id": UserId}, bson.M{"_id": id}}}})
+	cur := r.colln.FindOne(ctx, bson.D{{Key: "$and", Value: bson.A{bson.M{"user_id": userId}, bson.M{"_id": id}}}})
 
 	if cur.Err() != nil {
 		return nil, errors.New("Couldn't find any matching result for given id")
@@ -188,12 +190,12 @@ func (r *UserRelativesRepository) FindById(UserId *primitive.ObjectID, id *primi
 	return &data, nil
 }
 
-func (r *UserRelativesRepository) UpdateByID(UserId, id *primitive.ObjectID, payload *userdto.AddOrEditRelativeDTO) error {
+func (r *UserRelativesRepository) UpdateByID(userId, id *primitive.ObjectID, payload *userdto.AddOrEditRelativeDTO) error {
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
-	filter := bson.M{"$and": bson.A{bson.M{"_id": id, "user_id": UserId}}}
+	filter := bson.M{"$and": bson.A{bson.M{"_id": id, "user_id": userId}}}
 
 	if _, err := r.colln.UpdateOne(ctx, filter, bson.M{"$set": payload}); err != nil {
 		return err
@@ -202,12 +204,12 @@ func (r *UserRelativesRepository) UpdateByID(UserId, id *primitive.ObjectID, pay
 	return nil
 }
 
-func (r *UserRelativesRepository) DeleteByID(UserId, id *primitive.ObjectID) error {
+func (r *UserRelativesRepository) DeleteByID(userId, id *primitive.ObjectID) error {
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
-	filter := bson.M{"$and": bson.A{bson.M{"_id": id, "user_id": UserId}}}
+	filter := bson.M{"$and": bson.A{bson.M{"_id": id, "user_id": userId}}}
 
 	if _, err := r.colln.DeleteOne(ctx, filter); err != nil {
 		return err

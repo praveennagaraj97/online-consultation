@@ -53,3 +53,15 @@ type AddOrEditRelativeDTO struct {
 	Relation    string             `json:"relation,omitempty" form:"relation,omitempty"`
 	UserId      primitive.ObjectID `json:"-,omitempty" form:"-,omitempty"`
 }
+
+type AddOrEditDeliveryAddressDTO struct {
+	Name        string             `json:"name,omitempty" form:"name,omitempty"`
+	Address     string             `json:"address,omitempty" form:"address,omitempty"`
+	State       string             `json:"state,omitempty" form:"state,omitempty"`
+	Locality    string             `json:"locality,omitempty" form:"locality,omitempty"`
+	PinCode     string             `json:"pincode,omitempty" form:"pincode,omitempty"`
+	PhoneCode   string             `json:"phone_code,omitempty" form:"phone_code,omitempty"`
+	PhoneNumber string             `json:"phone_number,omitempty" form:"phone_number,omitempty"`
+	IsDefault   bool               `json:"is_default,omitempty" form:"is_default,omitempty"`
+	UserId      primitive.ObjectID `json:"-,omitempty" form:"-,omitempty"`
+}
