@@ -51,5 +51,5 @@ type AddOrEditRelativeDTO struct {
 	DateOfBirth string             `json:"date_of_birth,omitempty" form:"date_of_birth,omitempty"`
 	Gender      string             `json:"gender,omitempty" form:"gender,omitempty"`
 	Relation    string             `json:"relation,omitempty" form:"relation,omitempty"`
-	ParentId    primitive.ObjectID `json:"-,omitempty" form:"-,omitempty"`
+	UserId      primitive.ObjectID `json:"-,omitempty" form:"-,omitempty"`
 }

@@ -46,7 +46,7 @@ func (a *UserAPI) AddRelative() gin.HandlerFunc {
 			return
 		}
 
-		payload.ParentId = *userId
+		payload.UserId = *userId
 
 		res, err := a.relativeRepo.CreateOne(&payload)
 

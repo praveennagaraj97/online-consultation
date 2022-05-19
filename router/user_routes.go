@@ -9,7 +9,9 @@ func (r *Router) userRoutes() {
 	userAPI.Initialize(r.app,
 		r.repos.GetUserRepository(),
 		r.repos.GetOneTimePasswordRepository(),
-		r.repos.GetUserRelativeRepository())
+		r.repos.GetUserRelativeRepository(),
+		r.repos.GetUserDeliveryAddressRepository(),
+	)
 
 	authRoutes := r.engine.Group("/api/v1/auth")
 	userRoutes := r.engine.Group("/api/v1/user")
@@ -32,9 +34,18 @@ func (r *Router) userRoutes() {
 	// user Routes
 	userRoutes.GET("", userAPI.GetUserDetails())
 	userRoutes.PATCH("", userAPI.UpdateUserDetails())
+	// Relative
 	userRoutes.POST("/relative", userAPI.AddRelative())
 	userRoutes.GET("/relative", userAPI.GetListOfRelatives())
 	userRoutes.GET("/relative/:id", userAPI.GetRelativeProfileById())
 	userRoutes.PATCH("/relative/:id", userAPI.UpdateRelativeProfileById())
 	userRoutes.DELETE("/relative/:id", userAPI.DeleteRelativeProfileById())
+	// Delivery Address
+	userRoutes.POST("/delivery_address", userAPI.AddNewAddress())
+	userRoutes.GET("/delivery_address", userAPI.GetAllAddress())
+	userRoutes.GET("/delivery_address/:id", userAPI.GetAddressById())
+	userRoutes.PATCH("/delivery_address/:id", userAPI.UpdateAddressById())
+	userRoutes.DELETE("/delivery_address/:id", userAPI.DeleteAddressById())
+	userRoutes.PATCH("/delivery_address/mark_as_default/:id", userAPI.MarkAddressAsDefault())
+
 }

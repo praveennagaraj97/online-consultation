@@ -10,13 +10,19 @@ import (
 )
 
 type Repository struct {
-	userRepo         *userrepository.UserRepository
-	userRelativeRepo *userrepository.UserRelativesRepository
-	otpRepo          *onetimepasswordrepository.OneTimePasswordRepository
-	specialityRepo   *specialityrepo.SpecialityRepository
+	userRepo                *userrepository.UserRepository
+	userRelativeRepo        *userrepository.UserRelativesRepository
+	userDeliveryAddressRepo *userrepository.UserDeliveryAddressRepository
+	otpRepo                 *onetimepasswordrepository.OneTimePasswordRepository
+	specialityRepo          *specialityrepo.SpecialityRepository
 }
 
 func (r *Repository) Initialize(mgoClient *mongo.Client, dbName string) {
+
+	// One Time Password Repo
+	r.otpRepo = &onetimepasswordrepository.OneTimePasswordRepository{}
+	r.otpRepo.InitializeRepository(db.OpenCollection(mgoClient, dbName, "otp"))
+
 	// User Repo
 	r.userRepo = &userrepository.UserRepository{}
 	r.userRepo.InitializeRepository(db.OpenCollection(mgoClient, dbName, "user"))
@@ -25,9 +31,9 @@ func (r *Repository) Initialize(mgoClient *mongo.Client, dbName string) {
 	r.userRelativeRepo = &userrepository.UserRelativesRepository{}
 	r.userRelativeRepo.InitializeRepository(db.OpenCollection(mgoClient, dbName, "user_relative"))
 
-	// One Time Password Repo
-	r.otpRepo = &onetimepasswordrepository.OneTimePasswordRepository{}
-	r.otpRepo.InitializeRepository(db.OpenCollection(mgoClient, dbName, "otp"))
+	// UserDelivery Address Repo
+	r.userDeliveryAddressRepo = &userrepository.UserDeliveryAddressRepository{}
+	r.userDeliveryAddressRepo.Initialize(db.OpenCollection(mgoClient, dbName, "user_delivery_address"))
 
 	// Specialities Repo
 	r.specialityRepo = &specialityrepo.SpecialityRepository{}
@@ -42,6 +48,10 @@ func (r *Repository) GetUserRepository() *userrepository.UserRepository {
 
 func (r *Repository) GetUserRelativeRepository() *userrepository.UserRelativesRepository {
 	return r.userRelativeRepo
+}
+
+func (r *Repository) GetUserDeliveryAddressRepository() *userrepository.UserDeliveryAddressRepository {
+	return r.userDeliveryAddressRepo
 }
 
 func (r *Repository) GetOneTimePasswordRepository() *onetimepasswordrepository.OneTimePasswordRepository {

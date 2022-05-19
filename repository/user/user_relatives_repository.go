@@ -3,7 +3,6 @@ package userrepository
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/praveennagaraj97/online-consultation/api"
@@ -26,29 +25,29 @@ func (r *UserRelativesRepository) InitializeRepository(colln *mongo.Collection) 
 	r.colln = colln
 
 	utils.CreateIndex(colln, bson.D{
-		{Key: "parent_id", Value: 1},
+		{Key: "user_id", Value: 1},
 		{Key: "phone.number", Value: 1},
 		{Key: "phone.code", Value: 1}},
 		"Phone", true)
 
 	utils.CreateIndex(colln, bson.D{
-		{Key: "parent_id", Value: 1},
+		{Key: "user_id", Value: 1},
 		{Key: "email", Value: 1}},
 		"Email", true)
 
 	utils.CreateIndex(colln, bson.D{
-		{Key: "parent_id", Value: 1}},
+		{Key: "user_id", Value: 1}},
 		"Parent ID", false)
 
 	utils.CreateIndex(colln, bson.D{
-		{Key: "parent_id", Value: 1}, {Key: "_id", Value: 1}},
-		"ParentId and Doc Id", false)
+		{Key: "user_id", Value: 1}, {Key: "_id", Value: 1}},
+		"UserId and Doc Id", false)
 }
 
 func (r *UserRelativesRepository) CreateOne(payload *userdto.AddOrEditRelativeDTO) (*usermodel.RelativeEntity, error) {
 
 	if exists := r.checkIfRelativeExist(payload.Email,
-		interfaces.PhoneType{Code: payload.PhoneCode, Number: payload.PhoneNumber}, &payload.ParentId); exists {
+		interfaces.PhoneType{Code: payload.PhoneCode, Number: payload.PhoneNumber}, &payload.UserId); exists {
 		return nil, errors.New("Relative account with given credentials already exist")
 	}
 
@@ -66,7 +65,7 @@ func (r *UserRelativesRepository) CreateOne(payload *userdto.AddOrEditRelativeDT
 		DateOfBirth: payload.DateOfBirth,
 		Gender:      payload.Gender,
 		Relation:    payload.Relation,
-		ParentId:    payload.ParentId,
+		UserId:      payload.UserId,
 	}
 
 	if _, err := r.colln.InsertOne(ctx, doc); err != nil {
@@ -77,22 +76,18 @@ func (r *UserRelativesRepository) CreateOne(payload *userdto.AddOrEditRelativeDT
 
 }
 
-func (r *UserRelativesRepository) checkIfRelativeExist(email string, phone interfaces.PhoneType, parentId *primitive.ObjectID) bool {
+func (r *UserRelativesRepository) checkIfRelativeExist(email string, phone interfaces.PhoneType, UserId *primitive.ObjectID) bool {
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
-	emailExists := bson.D{{Key: "$and", Value: bson.A{bson.M{"parent_id": parentId}, bson.M{"email": email}}}}
-	phoneExists := bson.D{{Key: "$and", Value: bson.A{bson.M{"parent_id": parentId},
+	emailExists := bson.D{{Key: "$and", Value: bson.A{bson.M{"user_id": UserId}, bson.M{"email": email}}}}
+	phoneExists := bson.D{{Key: "$and", Value: bson.A{bson.M{"user_id": UserId},
 		bson.M{"phone.code": phone.Code}, bson.M{"phone.number": phone.Number}}}}
 
 	filter := bson.M{"$or": bson.A{emailExists, phoneExists}}
 
-	fmt.Println(filter)
-
 	count, err := r.colln.CountDocuments(ctx, filter)
-
-	fmt.Println("Count", count)
 
 	if err != nil {
 		return false
@@ -105,7 +100,7 @@ func (r *UserRelativesRepository) FindAll(
 	pgnOpt *api.PaginationOptions,
 	sortOpts *map[string]int8,
 	filterOpts *map[string]primitive.M,
-	keySetSortby string, parentId *primitive.ObjectID) ([]usermodel.RelativeEntity, error) {
+	keySetSortby string, UserId *primitive.ObjectID) ([]usermodel.RelativeEntity, error) {
 
 	opt := &options.FindOptions{}
 
@@ -113,7 +108,7 @@ func (r *UserRelativesRepository) FindAll(
 	defer cancel()
 
 	filters := map[string]bson.M{
-		"parent_id": {"$eq": parentId},
+		"user_id": {"$eq": UserId},
 	}
 
 	if pgnOpt != nil {
@@ -156,10 +151,10 @@ func (r *UserRelativesRepository) FindAll(
 
 }
 
-func (r *UserRelativesRepository) GetDocumentsCount(parentId *primitive.ObjectID, filterOpts *map[string]primitive.M) (int64, error) {
+func (r *UserRelativesRepository) GetDocumentsCount(UserId *primitive.ObjectID, filterOpts *map[string]primitive.M) (int64, error) {
 
 	filters := map[string]bson.M{
-		"parent_id": {"$eq": parentId},
+		"user_id": {"$eq": UserId},
 	}
 
 	if filterOpts != nil {
@@ -174,11 +169,11 @@ func (r *UserRelativesRepository) GetDocumentsCount(parentId *primitive.ObjectID
 	return r.colln.CountDocuments(ctx, filters)
 }
 
-func (r *UserRelativesRepository) FindById(parentId *primitive.ObjectID, id *primitive.ObjectID) (*usermodel.RelativeEntity, error) {
+func (r *UserRelativesRepository) FindById(UserId *primitive.ObjectID, id *primitive.ObjectID) (*usermodel.RelativeEntity, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
-	cur := r.colln.FindOne(ctx, bson.D{{Key: "$and", Value: bson.A{bson.M{"parent_id": parentId}, bson.M{"_id": id}}}})
+	cur := r.colln.FindOne(ctx, bson.D{{Key: "$and", Value: bson.A{bson.M{"user_id": UserId}, bson.M{"_id": id}}}})
 
 	if cur.Err() != nil {
 		return nil, errors.New("Couldn't find any matching result for given id")
@@ -193,12 +188,12 @@ func (r *UserRelativesRepository) FindById(parentId *primitive.ObjectID, id *pri
 	return &data, nil
 }
 
-func (r *UserRelativesRepository) UpdateByID(parentId, id *primitive.ObjectID, payload *userdto.AddOrEditRelativeDTO) error {
+func (r *UserRelativesRepository) UpdateByID(UserId, id *primitive.ObjectID, payload *userdto.AddOrEditRelativeDTO) error {
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
-	filter := bson.M{"$and": bson.A{bson.M{"_id": id, "parent_id": parentId}}}
+	filter := bson.M{"$and": bson.A{bson.M{"_id": id, "user_id": UserId}}}
 
 	if _, err := r.colln.UpdateOne(ctx, filter, bson.M{"$set": payload}); err != nil {
 		return err
@@ -207,12 +202,12 @@ func (r *UserRelativesRepository) UpdateByID(parentId, id *primitive.ObjectID, p
 	return nil
 }
 
-func (r *UserRelativesRepository) DeleteByID(parentId, id *primitive.ObjectID) error {
+func (r *UserRelativesRepository) DeleteByID(UserId, id *primitive.ObjectID) error {
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
-	filter := bson.M{"$and": bson.A{bson.M{"_id": id, "parent_id": parentId}}}
+	filter := bson.M{"$and": bson.A{bson.M{"_id": id, "user_id": UserId}}}
 
 	if _, err := r.colln.DeleteOne(ctx, filter); err != nil {
 		return err

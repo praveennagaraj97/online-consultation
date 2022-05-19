@@ -15,20 +15,24 @@ import (
 )
 
 type UserAPI struct {
-	appConf      *app.ApplicationConfig
-	userRepo     *userrepository.UserRepository
-	otpRepo      *onetimepasswordrepository.OneTimePasswordRepository
-	relativeRepo *userrepository.UserRelativesRepository
+	appConf       *app.ApplicationConfig
+	userRepo      *userrepository.UserRepository
+	otpRepo       *onetimepasswordrepository.OneTimePasswordRepository
+	relativeRepo  *userrepository.UserRelativesRepository
+	delvrAddrRepo *userrepository.UserDeliveryAddressRepository
 }
 
 func (a *UserAPI) Initialize(appConf *app.ApplicationConfig,
 	repo *userrepository.UserRepository,
 	otpRepo *onetimepasswordrepository.OneTimePasswordRepository,
-	relativeRepo *userrepository.UserRelativesRepository) {
+	relativeRepo *userrepository.UserRelativesRepository,
+	dlvrAddrRepo *userrepository.UserDeliveryAddressRepository,
+) {
 	a.appConf = appConf
 	a.userRepo = repo
 	a.otpRepo = otpRepo
 	a.relativeRepo = relativeRepo
+	a.delvrAddrRepo = dlvrAddrRepo
 }
 
 // Get Users Details
