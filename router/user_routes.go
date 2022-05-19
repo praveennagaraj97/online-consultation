@@ -34,5 +34,7 @@ func (r *Router) userRoutes() {
 	userRoutes.PATCH("", userAPI.UpdateUserDetails())
 	userRoutes.POST("/relative", userAPI.AddRelative())
 	userRoutes.GET("/relative", userAPI.GetListOfRelatives())
-
+	userRoutes.GET("/relative/:id", userAPI.GetRelativeProfileById())
+	userRoutes.PATCH("/relative/:id", userAPI.UpdateRelativeProfileById())
+	userRoutes.DELETE("/relative/:id", userAPI.DeleteRelativeProfileById())
 }

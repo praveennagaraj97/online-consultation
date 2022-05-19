@@ -44,12 +44,12 @@ type RequestEmailVerifyDTO struct {
 }
 
 type AddOrEditRelativeDTO struct {
-	Name        string             `json:"name" form:"name"`
-	Email       string             `json:"email" form:"email"`
-	PhoneCode   string             `json:"phone_code" form:"phone_code"`
-	PhoneNumber string             `json:"phone_number" form:"phone_number"`
-	DateOfBirth string             `json:"date_of_birth" form:"date_of_birth"`
-	Gender      string             `json:"gender" form:"gender"`
-	Relation    string             `json:"relation" form:"relation"`
-	ParentId    primitive.ObjectID `json:"-" form:"-"`
+	Name        string             `json:"name,omitempty" form:"name,omitempty"`
+	Email       string             `json:"email,omitempty" form:"email,omitempty"`
+	PhoneCode   string             `json:"phone_code,omitempty" form:"phone_code,omitempty"`
+	PhoneNumber string             `json:"phone_number,omitempty" form:"phone_number,omitempty"`
+	DateOfBirth string             `json:"date_of_birth,omitempty" form:"date_of_birth,omitempty"`
+	Gender      string             `json:"gender,omitempty" form:"gender,omitempty"`
+	Relation    string             `json:"relation,omitempty" form:"relation,omitempty"`
+	ParentId    primitive.ObjectID `json:"-,omitempty" form:"-,omitempty"`
 }

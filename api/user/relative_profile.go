@@ -135,3 +135,93 @@ func (a *UserAPI) GetListOfRelatives() gin.HandlerFunc {
 		})
 	}
 }
+
+func (a *UserAPI) GetRelativeProfileById() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		userId, err := api.GetUserIdFromContext(ctx)
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusInternalServerError, nil)
+			return
+		}
+
+		docParamId := ctx.Param("id")
+
+		docId, err := primitive.ObjectIDFromHex(docParamId)
+		if err != nil {
+			api.SendErrorResponse(ctx, "Given ID is not valid", http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		res, err := a.relativeRepo.FindById(userId, &docId)
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusBadRequest, nil)
+			return
+		}
+
+		ctx.JSON(http.StatusOK, serialize.DataResponse[*usermodel.RelativeEntity]{
+			Data: res,
+			Response: serialize.Response{
+				StatusCode: http.StatusOK,
+				Message:    "Retrieved relative profile successfully",
+			},
+		})
+	}
+}
+
+func (a *UserAPI) UpdateRelativeProfileById() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		userId, err := api.GetUserIdFromContext(ctx)
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusInternalServerError, nil)
+			return
+		}
+
+		docParamId := ctx.Param("id")
+
+		docId, err := primitive.ObjectIDFromHex(docParamId)
+		if err != nil {
+			api.SendErrorResponse(ctx, "Given ID is not valid", http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		var payload userdto.AddOrEditRelativeDTO
+
+		if err = ctx.ShouldBind(&payload); err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+			return
+		}
+		defer ctx.Request.Body.Close()
+
+		if err := a.relativeRepo.UpdateByID(userId, &docId, &payload); err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusBadRequest, nil)
+			return
+		}
+
+		ctx.JSON(http.StatusNoContent, nil)
+	}
+}
+
+func (a *UserAPI) DeleteRelativeProfileById() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		userId, err := api.GetUserIdFromContext(ctx)
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusInternalServerError, nil)
+			return
+		}
+
+		docParamId := ctx.Param("id")
+
+		docId, err := primitive.ObjectIDFromHex(docParamId)
+		if err != nil {
+			api.SendErrorResponse(ctx, "Given ID is not valid", http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		if err := a.relativeRepo.DeleteByID(userId, &docId); err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusBadRequest, nil)
+			return
+		}
+
+		ctx.JSON(http.StatusNoContent, nil)
+	}
+}
