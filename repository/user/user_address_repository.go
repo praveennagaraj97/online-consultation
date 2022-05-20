@@ -3,6 +3,7 @@ package userrepository
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/praveennagaraj97/online-consultation/api"
@@ -25,10 +26,9 @@ func (r *UserDeliveryAddressRepository) Initialize(colln *mongo.Collection) {
 
 	utils.CreateIndex(colln,
 		bson.D{{Key: "_id", Value: 1}, {Key: "user_id", Value: 1}}, "User ID and Doc ID", false)
+	utils.CreateIndex(colln, bson.D{{Key: "user_id", Value: 1}}, "User ID", false)
+	utils.CreateIndex(colln, bson.D{{Key: "user_id", Value: 1}, {Key: "is_default", Value: 1}}, "Parent ID and Default Address", false)
 
-	utils.CreateIndex(colln, bson.D{
-		{Key: "user_id", Value: 1}},
-		"User ID", false)
 }
 
 func (r *UserDeliveryAddressRepository) CreateOne(payload *userdto.AddOrEditDeliveryAddressDTO) (*usermodel.UserDeliveryAddressEntity, error) {
@@ -173,6 +173,29 @@ func (r *UserDeliveryAddressRepository) DeleteById(userId, id *primitive.ObjectI
 	if _, err := r.colln.DeleteOne(ctx, filter); err != nil {
 		return err
 	}
+
+	return nil
+}
+
+func (r *UserDeliveryAddressRepository) ToggleDefault(parentId, id *primitive.ObjectID) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	filter := bson.D{{Key: "$and", Value: bson.A{bson.M{"parent_id": parentId}, bson.M{"is_default": true}}}}
+
+	count, err := r.colln.CountDocuments(ctx, filter)
+	if err != nil {
+		return err
+	}
+
+	// mark as false
+	if count > 0 {
+		//
+	}
+
+	// r.colln.UpdateOne(ctx,bson.D{{Key: "$and",Value: }})
+
+	fmt.Println(count)
 
 	return nil
 }

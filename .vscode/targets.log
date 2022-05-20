@@ -6,11 +6,8 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # PARTICULAR PURPOSE.
 
 # This program built for i386-apple-darwin11.3.0
- 
-make: *** No rule to make target `all'.  Stop.
 
-
-# Make data base, printed on Thu May 19 00:38:57 2022
+# Make data base, printed on Fri May 20 17:30:23 2022
 
 # Variables
 
@@ -43,7 +40,7 @@ VSCODE_VERBOSE_LOGGING = true
 # environment
 __CFBundleIdentifier = com.microsoft.VSCode
 # environment
-VSCODE_IPC_HOOK_EXTHOST = /var/folders/m5/t1f8t1gj4vz1j776h90v1r2h0000gn/T/vscode-ipc-7f334fb0-a344-4b6b-84b0-4b4a0d1b5ec6.sock
+VSCODE_IPC_HOOK_EXTHOST = /var/folders/m5/t1f8t1gj4vz1j776h90v1r2h0000gn/T/vscode-ipc-b027786d-b2ec-4985-801e-eeec9b451218.sock
 # environment
 VSCODE_CWD = /
 # environment
@@ -59,7 +56,7 @@ ELECTRON_RUN_AS_NODE = 1
 # default
 .FEATURES := target-specific order-only second-expansion else-if archives jobserver check-symlink
 # environment
-SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.vxh8S9LS20/Listeners
+SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.HenLqiLQe8/Listeners
 # automatic
 %F = $(notdir $%)
 # environment
@@ -75,7 +72,7 @@ HOME = /Users/praveennagaraj
 # default
 MAKEFILEPATH = $(shell /usr/bin/xcode-select -print-path 2>/dev/null || echo /Developer)/Makefiles
 # environment
-VSCODE_CODE_CACHE_PATH = /Users/praveennagaraj/Library/Application Support/Code/CachedData/da15b6fd3ef856477bf6f4fb29ba1b7af717770d
+VSCODE_CODE_CACHE_PATH = /Users/praveennagaraj/Library/Application Support/Code/CachedData/c3511e6c69bb39013c4a4b7b9566ec1ca73fc4d5
 # environment
 LOGNAME = praveennagaraj
 # environment
@@ -111,7 +108,7 @@ TMPDIR = /var/folders/m5/t1f8t1gj4vz1j776h90v1r2h0000gn/T/
 # automatic
 *F = $(notdir $*)
 # environment
-VSCODE_IPC_HOOK = /Users/praveennagaraj/Library/Application Support/Code/1.67.1-main.sock
+VSCODE_IPC_HOOK = /Users/praveennagaraj/Library/Application Support/Code/1.67.2-main.sock
 # makefile
 MAKEFLAGS = Rrqp
 # environment
@@ -145,7 +142,7 @@ MAKELEVEL := 0
 # environment
 LANG = C
 # environment
-VSCODE_PID = 1092
+VSCODE_PID = 1200
 # variable set hash-table stats:
 # Load=66/1024=6%, Rehash=0, Collisions=2/90=2%
 
@@ -157,7 +154,6 @@ VSCODE_PID = 1092
 
 # . (device 16777250, inode 15038850): 28 files, no impossibilities.
 
- 
 # 28 files, no impossibilities in 1 directories.
 
 # Implicit Rules
@@ -229,6 +225,8 @@ stop_dev:
 # strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
-# Finished Make data base on Thu May 19 00:38:57 2022
+# Finished Make data base on Fri May 20 17:30:23 2022
 
  
+make: *** No rule to make target `all'.  Stop.
+

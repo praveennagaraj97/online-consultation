@@ -65,7 +65,7 @@ func ParseFilterByOptions(c *gin.Context) *map[string]bson.M {
 			continue
 		}
 		filterBy := filterParamsBinder(key)
-		if contains(filterBy[1]) {
+		if len(filterBy) > 0 && contains(filterBy[1]) {
 			var filterValue interface{} = filterKeys.Get(key)
 
 			// boolean parser
@@ -77,6 +77,7 @@ func ParseFilterByOptions(c *gin.Context) *map[string]bson.M {
 			opts[filterBy[0]] = bson.M{fmt.Sprintf("$%s", filterBy[1]): filterValue}
 		}
 	}
+
 	return &opts
 }
 

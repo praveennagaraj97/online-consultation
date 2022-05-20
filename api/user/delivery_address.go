@@ -221,6 +221,23 @@ func (a *UserAPI) DeleteAddressById() gin.HandlerFunc {
 	}
 }
 
-func (a *UserAPI) MarkAddressAsDefault() gin.HandlerFunc {
-	return func(ctx *gin.Context) {}
+func (a *UserAPI) ToggleDefaultAddress() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		userId, err := api.GetUserIdFromContext(ctx)
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusInternalServerError, nil)
+			return
+		}
+
+		docParamId := ctx.Param("id")
+
+		docId, err := primitive.ObjectIDFromHex(docParamId)
+		if err != nil {
+			api.SendErrorResponse(ctx, "Given ID is not valid", http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		err = a.delvrAddrRepo.ToggleDefault(userId, &docId)
+
+	}
 }
