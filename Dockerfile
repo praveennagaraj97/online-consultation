@@ -19,6 +19,8 @@ RUN chown praveen /src/app
 USER praveen
 
 
+
+
 EXPOSE 4200
 
 EXPOSE 25 465 587 2525

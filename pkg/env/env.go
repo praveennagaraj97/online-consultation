@@ -9,7 +9,7 @@ import (
 
 func init() {
 
-	err := godotenv.Load(".env")
+	err := godotenv.Load("/etc/secrets/.env")
 	if err != nil {
 		logger.ErrorLogFatal("Failed to load env variables")
 	}
