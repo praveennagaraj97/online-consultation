@@ -1,6 +1,7 @@
 package app
 
 import (
+	awspkg "github.com/praveennagaraj97/online-consultation/pkg/aws"
 	mailer "github.com/praveennagaraj97/online-consultation/pkg/email"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -15,4 +16,5 @@ type ApplicationConfig struct {
 	}
 	MongoClient *mongo.Client
 	EmailClient *mailer.Mailer
+	AwsUtils    *awspkg.AWSConfiguration
 }

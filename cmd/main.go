@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/praveennagaraj97/online-consultation/app"
 	"github.com/praveennagaraj97/online-consultation/db"
+	awspkg "github.com/praveennagaraj97/online-consultation/pkg/aws"
 	mailer "github.com/praveennagaraj97/online-consultation/pkg/email"
 	"github.com/praveennagaraj97/online-consultation/pkg/env"
 	twiliopkg "github.com/praveennagaraj97/online-consultation/pkg/sms/twilio"
@@ -31,6 +32,10 @@ func main() {
 	app.EmailClient = &emailClient
 	// Initialize Database
 	app.MongoClient = db.InitializeMongoDatabase(&app.DB.MONGO_URI)
+
+	awsPkg := awspkg.AWSConfiguration{}
+	awsPkg.Initialize()
+	app.AwsUtils = &awsPkg
 
 	// Initialize Twilio SMS Package
 	twiliopkg.Initialize()

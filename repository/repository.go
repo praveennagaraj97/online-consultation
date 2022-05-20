@@ -3,8 +3,8 @@ package repository
 import (
 	"github.com/praveennagaraj97/online-consultation/db"
 	logger "github.com/praveennagaraj97/online-consultation/pkg/log"
+	consultationrepository "github.com/praveennagaraj97/online-consultation/repository/consultation"
 	onetimepasswordrepository "github.com/praveennagaraj97/online-consultation/repository/onetimepassword"
-	specialityrepo "github.com/praveennagaraj97/online-consultation/repository/speciality"
 	userrepository "github.com/praveennagaraj97/online-consultation/repository/user"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -14,7 +14,7 @@ type Repository struct {
 	userRelativeRepo        *userrepository.UserRelativesRepository
 	userDeliveryAddressRepo *userrepository.UserDeliveryAddressRepository
 	otpRepo                 *onetimepasswordrepository.OneTimePasswordRepository
-	specialityRepo          *specialityrepo.SpecialityRepository
+	consultationRepo        *consultationrepository.ConsultationRepository
 }
 
 func (r *Repository) Initialize(mgoClient *mongo.Client, dbName string) {
@@ -35,9 +35,9 @@ func (r *Repository) Initialize(mgoClient *mongo.Client, dbName string) {
 	r.userDeliveryAddressRepo = &userrepository.UserDeliveryAddressRepository{}
 	r.userDeliveryAddressRepo.Initialize(db.OpenCollection(mgoClient, dbName, "user_delivery_address"))
 
-	// Specialities Repo
-	r.specialityRepo = &specialityrepo.SpecialityRepository{}
-	r.specialityRepo.Init(db.OpenCollection(mgoClient, dbName, "speciality"))
+	// Consultation Repo
+	r.consultationRepo = &consultationrepository.ConsultationRepository{}
+	r.consultationRepo.Initialize(db.OpenCollection(mgoClient, dbName, "consultation"))
 
 	logger.PrintLog("Repositories initialized 📜")
 }
@@ -58,6 +58,6 @@ func (r *Repository) GetOneTimePasswordRepository() *onetimepasswordrepository.O
 	return r.otpRepo
 }
 
-func (r *Repository) GetSpecialityRepository() *specialityrepo.SpecialityRepository {
-	return r.specialityRepo
+func (r *Repository) GetConsultationRepository() *consultationrepository.ConsultationRepository {
+	return r.consultationRepo
 }

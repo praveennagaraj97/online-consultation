@@ -11,8 +11,8 @@ type SMSType struct {
 }
 
 type ImageType struct {
-	OriginalSrc string `json:"src" bson:"src" form:"src"`
-	BlurDataURL string `json:"blur_data_url" bson:"blur_data_url" form:"blur_data_url"`
+	OriginalSrc string `json:"src" bson:"src"`
+	BlurDataURL string `json:"blur_data_url" bson:"blur_data_url"`
 	Width       string `json:"width" form:"width" bson:"width"`
 	Height      string `json:"height" form:"height" bson:"height"`
 	KeyID       string `json:"-" bson:"key_id"`
