@@ -221,7 +221,7 @@ func (a *UserAPI) DeleteAddressById() gin.HandlerFunc {
 	}
 }
 
-func (a *UserAPI) ToggleDefaultAddress() gin.HandlerFunc {
+func (a *UserAPI) ToggleDefaultAddress(status bool) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		userId, err := api.GetUserIdFromContext(ctx)
 		if err != nil {
@@ -237,7 +237,12 @@ func (a *UserAPI) ToggleDefaultAddress() gin.HandlerFunc {
 			return
 		}
 
-		err = a.delvrAddrRepo.ToggleDefault(userId, &docId)
+		if err = a.delvrAddrRepo.UpdateDefaultStatus(userId, &docId, status); err != nil {
+			api.SendErrorResponse(ctx, "Failed to update status", http.StatusInternalServerError, nil)
+			return
+		}
+
+		ctx.JSON(http.StatusNoContent, nil)
 
 	}
 }

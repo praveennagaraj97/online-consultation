@@ -177,25 +177,25 @@ func (r *UserDeliveryAddressRepository) DeleteById(userId, id *primitive.ObjectI
 	return nil
 }
 
-func (r *UserDeliveryAddressRepository) ToggleDefault(parentId, id *primitive.ObjectID) error {
+func (r *UserDeliveryAddressRepository) UpdateDefaultStatus(userId, id *primitive.ObjectID, status bool) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
-	filter := bson.D{{Key: "$and", Value: bson.A{bson.M{"parent_id": parentId}, bson.M{"is_default": true}}}}
+	if status {
+		filter := bson.D{{Key: "$and", Value: bson.A{bson.M{"user_id": userId}, bson.M{"is_default": true}}}}
 
-	count, err := r.colln.CountDocuments(ctx, filter)
-	if err != nil {
+		if _, err := r.colln.UpdateMany(ctx, filter, bson.M{"$set": bson.M{"is_default": false}}); err != nil {
+			return err
+		}
+	}
+
+	updateFilter := bson.D{{Key: "$and", Value: bson.A{bson.M{"user_id": userId}, bson.M{"_id": id}}}}
+
+	fmt.Println(updateFilter)
+
+	if _, err := r.colln.UpdateOne(ctx, updateFilter, bson.M{"$set": bson.M{"is_default": status}}); err != nil {
 		return err
 	}
-
-	// mark as false
-	if count > 0 {
-		//
-	}
-
-	// r.colln.UpdateOne(ctx,bson.D{{Key: "$and",Value: }})
-
-	fmt.Println(count)
 
 	return nil
 }

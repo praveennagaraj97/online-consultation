@@ -62,6 +62,6 @@ type AddOrEditDeliveryAddressDTO struct {
 	PinCode     string             `json:"pincode,omitempty" form:"pincode,omitempty"`
 	PhoneCode   string             `json:"phone_code,omitempty" form:"phone_code,omitempty"`
 	PhoneNumber string             `json:"phone_number,omitempty" form:"phone_number,omitempty"`
-	IsDefault   bool               `json:"is_default,omitempty" form:"is_default,omitempty"`
 	UserId      primitive.ObjectID `json:"-,omitempty" form:"-,omitempty"`
+	IsDefault   bool
 }

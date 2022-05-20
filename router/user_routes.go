@@ -46,6 +46,7 @@ func (r *Router) userRoutes() {
 	userRoutes.GET("/delivery_address/:id", userAPI.GetAddressById())
 	userRoutes.PATCH("/delivery_address/:id", userAPI.UpdateAddressById())
 	userRoutes.DELETE("/delivery_address/:id", userAPI.DeleteAddressById())
-	userRoutes.PATCH("/delivery_address/:id/toggle_as_default", userAPI.ToggleDefaultAddress())
+	userRoutes.PATCH("/delivery_address/:id/mark_default", userAPI.ToggleDefaultAddress(true))
+	userRoutes.PATCH("/delivery_address/:id/unmark_default", userAPI.ToggleDefaultAddress(false))
 
 }
