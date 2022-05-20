@@ -1,6 +1,7 @@
 package userapi
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -75,7 +76,7 @@ func (a *UserAPI) GetListOfRelatives() gin.HandlerFunc {
 		}
 
 		// get pagination/sort/filter options.
-		pgOpts := api.ParsePaginationOptions(ctx)
+		pgOpts := api.ParsePaginationOptions(ctx, "user_relative_account")
 		srtOpts := api.ParseSortByOptions(ctx)
 		filterOpts := api.ParseFilterByOptions(ctx)
 		keySetSortby := "$gt"
@@ -107,6 +108,8 @@ func (a *UserAPI) GetListOfRelatives() gin.HandlerFunc {
 		var lastResId *primitive.ObjectID
 
 		if pgOpts.PaginateId == nil {
+
+			fmt.Println("count ran")
 			docCount, err = a.relativeRepo.GetDocumentsCount(userId, filterOpts)
 			if err != nil {
 				api.SendErrorResponse(ctx, err.Error(), http.StatusInternalServerError, nil)
@@ -118,7 +121,7 @@ func (a *UserAPI) GetListOfRelatives() gin.HandlerFunc {
 			lastResId = &res[resLen-1].ID
 		}
 
-		count, next, prev, paginateKeySetID := api.GetPaginateOptions(docCount, pgOpts, int64(resLen), lastResId)
+		count, next, prev, paginateKeySetID := api.GetPaginateOptions(docCount, pgOpts, int64(resLen), lastResId, "user_relative_account")
 
 		ctx.JSON(http.StatusOK, serialize.PaginatedDataResponse[[]usermodel.RelativeEntity]{
 			Count:            count,

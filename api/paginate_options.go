@@ -23,9 +23,12 @@ type PaginationOptions struct {
 	PageNum int
 	// Key set page id
 	PaginateId *primitive.ObjectID
+
+	// Cursor ID
+	Cursor string
 }
 
-func GetPaginateOptions(docCount int64, pgOpts *PaginationOptions, docLen int64, lastResID *primitive.ObjectID) (*uint64, *bool, *bool, *string) {
+func GetPaginateOptions(docCount int64, pgOpts *PaginationOptions, docLen int64, lastResID *primitive.ObjectID, cursor string) (*uint64, *bool, *bool, *string) {
 	// Paginate Options
 	var count uint64
 	var next bool
@@ -41,14 +44,14 @@ func GetPaginateOptions(docCount int64, pgOpts *PaginationOptions, docLen int64,
 
 		// First Next paginate ID
 		paginateObjectId := lastResID
-		paginateId = encodeKeySetPaginationID(count, paginateObjectId, 1)
+		paginateId = encodeKeySetPaginationID(count, paginateObjectId, 1, cursor)
 	} else {
 		count = pgOpts.CachedCount
 		pageNum = pgOpts.CachedPageNum + 1
 		if pageNum < pgOpts.CachedCount/uint64(pgOpts.PerPage) || count > uint64(int(pageNum)*pgOpts.PerPage) {
 			paginateObjectId := lastResID
 			next = true
-			paginateId = encodeKeySetPaginationID(count, paginateObjectId, int64(pageNum))
+			paginateId = encodeKeySetPaginationID(count, paginateObjectId, int64(pageNum), cursor)
 		}
 	}
 
@@ -57,9 +60,9 @@ func GetPaginateOptions(docCount int64, pgOpts *PaginationOptions, docLen int64,
 }
 
 // parse pagination options from request URL. accepts per_page & page_num & paginate_id(for infinite scroll and performance).
-func ParsePaginationOptions(c *gin.Context) *PaginationOptions {
+func ParsePaginationOptions(c *gin.Context, cur string) *PaginationOptions {
 	// Check for startId
-	count, nextID, cachedPageNum, err := decodeKeySetPaginationID(c.Request.URL.Query().Get("paginate_id"))
+	count, nextID, cachedPageNum, cursor, err := decodeKeySetPaginationID(c.Request.URL.Query().Get("paginate_id"))
 	if err != nil {
 		count = 0
 		nextID = nil
@@ -69,6 +72,13 @@ func ParsePaginationOptions(c *gin.Context) *PaginationOptions {
 	pageNum, err := strconv.Atoi(c.Request.URL.Query().Get("page_num"))
 	if err != nil || pageNum < 1 {
 		pageNum = 1
+	}
+
+	// Reset for duplicate cursor
+	if cur != cursor {
+		count = 0
+		nextID = nil
+		cachedPageNum = 1
 	}
 
 	// Results per page
@@ -83,46 +93,49 @@ func ParsePaginationOptions(c *gin.Context) *PaginationOptions {
 		PaginateId:    nextID,
 		CachedCount:   count,
 		CachedPageNum: cachedPageNum,
+		Cursor:        cursor,
 	}
 }
 
-func encodeKeySetPaginationID(count uint64, paginateId *primitive.ObjectID, pageNum int64) *string {
+func encodeKeySetPaginationID(count uint64, paginateId *primitive.ObjectID, pageNum int64, cursorRef string) *string {
 	if paginateId == nil {
 		return nil
 	}
-	paginateString := fmt.Sprintf("nextId=%s&count=%d&pageNum=%d", paginateId.Hex(), count, pageNum)
+	paginateString := fmt.Sprintf("nextId=%s&count=%d&pageNum=%d&cursor=%s", paginateId.Hex(), count, pageNum, cursorRef)
 	encryptedID := base64.StdEncoding.EncodeToString([]byte(paginateString))
 
 	return &encryptedID
 }
 
-func decodeKeySetPaginationID(encryptedID string) (uint64, *primitive.ObjectID, uint64, error) {
+func decodeKeySetPaginationID(encryptedID string) (uint64, *primitive.ObjectID, uint64, string, error) {
 
 	decodedID, err := base64.StdEncoding.DecodeString(encryptedID)
 	if err != nil {
-		return 0, nil, 1, err
+		return 0, nil, 1, "", err
 	}
 
 	info, err := url.ParseQuery(string(decodedID))
 	if err != nil {
-		return 0, nil, 1, err
+		return 0, nil, 1, "", err
 	}
 
 	count, err := strconv.ParseUint(info.Get("count"), 10, 64)
 	if err != nil {
-		return 0, nil, 1, err
+		return 0, nil, 1, "", err
 	}
 
 	nextId, err := primitive.ObjectIDFromHex(info.Get("nextId"))
 	if err != nil {
-		return 0, nil, 1, err
+		return 0, nil, 1, "", err
 	}
+
+	cursor := info.Get("cursor")
 
 	pageNum, err := strconv.ParseUint(info.Get("pageNum"), 10, 64)
 	if err != nil {
-		return 0, nil, 1, err
+		return 0, nil, 1, "", err
 	}
 
-	return count, &nextId, pageNum, nil
+	return count, &nextId, pageNum, cursor, nil
 
 }

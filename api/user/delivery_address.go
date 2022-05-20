@@ -61,7 +61,7 @@ func (a *UserAPI) GetAllAddress() gin.HandlerFunc {
 		}
 
 		// get pagination/sort/filter options.
-		pgOpts := api.ParsePaginationOptions(ctx)
+		pgOpts := api.ParsePaginationOptions(ctx, "user_delivery_address")
 		srtOpts := api.ParseSortByOptions(ctx)
 		filterOpts := api.ParseFilterByOptions(ctx)
 		keySetSortby := "$gt"
@@ -103,7 +103,7 @@ func (a *UserAPI) GetAllAddress() gin.HandlerFunc {
 			lastResId = &res[resLen-1].ID
 		}
 
-		count, next, prev, paginateKeySetID := api.GetPaginateOptions(docCount, pgOpts, int64(resLen), lastResId)
+		count, next, prev, paginateKeySetID := api.GetPaginateOptions(docCount, pgOpts, int64(resLen), lastResId, "user_delivery_address")
 
 		ctx.JSON(http.StatusOK, serialize.PaginatedDataResponse[[]usermodel.UserDeliveryAddressEntity]{
 			Count:            count,
