@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -58,19 +59,21 @@ func (m *Middlewares) IsAuthorized() gin.HandlerFunc {
 }
 
 // Checks user role for given route
-func (m *Middlewares) UserRole(allowedRoles []string) gin.HandlerFunc {
+func (m *Middlewares) UserRole(allowedRoles []constants.UserType) gin.HandlerFunc {
 	return func(c *gin.Context) {
+
 		userRole, exists := c.Get("role")
 		if !exists {
 			userRole = "user"
 		}
 		for _, role := range allowedRoles {
-			if role == userRole {
+			fmt.Println(role, userRole)
+			if string(role) == userRole {
 				c.Next()
 				return
 			}
 		}
-		api.SendErrorResponse(c, "not_allowed", http.StatusMethodNotAllowed, nil)
+		api.SendErrorResponse(c, "Method Not Allowed", http.StatusMethodNotAllowed, nil)
 		c.Abort()
 	}
 }

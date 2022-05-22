@@ -10,6 +10,16 @@ const (
 	CUSTOME_HEADER_LANG_KEY Constants = "LOCALE"
 )
 
+type UserType string
+
+const (
+	SUPER_ADMIN UserType = "super_admin"
+	ADMIN       UserType = "admin"
+	EDITOR      UserType = "editor"
+	USER        UserType = "user"
+	DOCTOR      UserType = "doctor"
+)
+
 // Cookie - 30 min
 const CookieAccessExpiryTime int = 60 * 30
 

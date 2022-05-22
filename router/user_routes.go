@@ -1,6 +1,9 @@
 package router
 
-import userapi "github.com/praveennagaraj97/online-consultation/api/user"
+import (
+	userapi "github.com/praveennagaraj97/online-consultation/api/user"
+	"github.com/praveennagaraj97/online-consultation/constants"
+)
 
 func (r *Router) userRoutes() {
 
@@ -28,9 +31,9 @@ func (r *Router) userRoutes() {
 	authRoutes.POST("/check_email_taken", userAPI.CheckUserExistsByEmail())
 	authRoutes.POST("/check_phone_taken", userAPI.CheckUserExistsByPhoneNumber())
 
-	authRoutes.GET("/refresh_token", r.middlewares.IsAuthorized(), r.middlewares.UserRole([]string{"user"}), userAPI.RefreshToken())
+	authRoutes.GET("/refresh_token", r.middlewares.IsAuthorized(), r.middlewares.UserRole([]constants.UserType{constants.USER}), userAPI.RefreshToken())
 
-	userRoutes.Use(r.middlewares.IsAuthorized(), r.middlewares.UserRole([]string{"user"}))
+	userRoutes.Use(r.middlewares.IsAuthorized(), r.middlewares.UserRole([]constants.UserType{constants.USER}))
 	// user Routes
 	userRoutes.GET("", userAPI.GetUserDetails())
 	userRoutes.PATCH("", userAPI.UpdateUserDetails())
