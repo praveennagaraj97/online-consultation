@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	userdto "github.com/praveennagaraj97/online-consultation/dto"
+	userdto "github.com/praveennagaraj97/online-consultation/dto/user"
 	usermodel "github.com/praveennagaraj97/online-consultation/models/user"
 	"github.com/praveennagaraj97/online-consultation/pkg/validator"
 	"github.com/praveennagaraj97/online-consultation/serialize"

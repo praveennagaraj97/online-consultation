@@ -3,6 +3,7 @@ package repository
 import (
 	"github.com/praveennagaraj97/online-consultation/db"
 	logger "github.com/praveennagaraj97/online-consultation/pkg/log"
+	adminrepository "github.com/praveennagaraj97/online-consultation/repository/admin"
 	consultationrepository "github.com/praveennagaraj97/online-consultation/repository/consultation"
 	onetimepasswordrepository "github.com/praveennagaraj97/online-consultation/repository/onetimepassword"
 	userrepository "github.com/praveennagaraj97/online-consultation/repository/user"
@@ -15,6 +16,7 @@ type Repository struct {
 	userDeliveryAddressRepo *userrepository.UserDeliveryAddressRepository
 	otpRepo                 *onetimepasswordrepository.OneTimePasswordRepository
 	consultationRepo        *consultationrepository.ConsultationRepository
+	adminRepo               *adminrepository.AdminRepository
 }
 
 func (r *Repository) Initialize(mgoClient *mongo.Client, dbName string) {
@@ -39,6 +41,10 @@ func (r *Repository) Initialize(mgoClient *mongo.Client, dbName string) {
 	r.consultationRepo = &consultationrepository.ConsultationRepository{}
 	r.consultationRepo.Initialize(db.OpenCollection(mgoClient, dbName, "consultation"))
 
+	// Admin Repo
+	r.adminRepo = &adminrepository.AdminRepository{}
+	r.adminRepo.Initialize(db.OpenCollection(mgoClient, dbName, "admin"))
+
 	logger.PrintLog("Repositories initialized 📜")
 }
 
@@ -60,4 +66,8 @@ func (r *Repository) GetOneTimePasswordRepository() *onetimepasswordrepository.O
 
 func (r *Repository) GetConsultationRepository() *consultationrepository.ConsultationRepository {
 	return r.consultationRepo
+}
+
+func (r *Repository) GetAdminRepository() *adminrepository.AdminRepository {
+	return r.adminRepo
 }

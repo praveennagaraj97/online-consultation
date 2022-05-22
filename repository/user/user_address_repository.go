@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/praveennagaraj97/online-consultation/api"
-	userdto "github.com/praveennagaraj97/online-consultation/dto"
+	userdto "github.com/praveennagaraj97/online-consultation/dto/user"
 	"github.com/praveennagaraj97/online-consultation/interfaces"
 	usermodel "github.com/praveennagaraj97/online-consultation/models/user"
 	"github.com/praveennagaraj97/online-consultation/utils"

@@ -38,6 +38,7 @@ func (router *Router) ListenAndServe(conf *app.ApplicationConfig) {
 	// User and Auth Routes
 	router.userRoutes()
 	router.consultationRoutes()
+	router.adminRoutes()
 
 	// 404
 	r.Use(func(ctx *gin.Context) {

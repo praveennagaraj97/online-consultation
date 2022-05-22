@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/praveennagaraj97/online-consultation/api"
 	"github.com/praveennagaraj97/online-consultation/constants"
-	userdto "github.com/praveennagaraj97/online-consultation/dto"
+	userdto "github.com/praveennagaraj97/online-consultation/dto/user"
 	"github.com/praveennagaraj97/online-consultation/interfaces"
 	otpmodel "github.com/praveennagaraj97/online-consultation/models/otp"
 	"github.com/praveennagaraj97/online-consultation/serialize"

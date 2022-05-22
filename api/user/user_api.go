@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/praveennagaraj97/online-consultation/api"
 	"github.com/praveennagaraj97/online-consultation/app"
-	userdto "github.com/praveennagaraj97/online-consultation/dto"
+	userdto "github.com/praveennagaraj97/online-consultation/dto/user"
 	usermodel "github.com/praveennagaraj97/online-consultation/models/user"
 	"github.com/praveennagaraj97/online-consultation/serialize"
 

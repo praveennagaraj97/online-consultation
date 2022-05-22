@@ -10,7 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/praveennagaraj97/online-consultation/api"
 	"github.com/praveennagaraj97/online-consultation/constants"
-	userdto "github.com/praveennagaraj97/online-consultation/dto"
+	userdto "github.com/praveennagaraj97/online-consultation/dto/user"
 	"github.com/praveennagaraj97/online-consultation/interfaces"
 	usermodel "github.com/praveennagaraj97/online-consultation/models/user"
 	mailer "github.com/praveennagaraj97/online-consultation/pkg/email"
