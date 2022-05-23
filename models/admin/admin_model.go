@@ -12,11 +12,12 @@ import (
 type AdminEntity struct {
 	ID           primitive.ObjectID `json:"id" bson:"_id"`
 	Name         string             `json:"name" bson:"name"`
-	Role         []string           `json:"role" bson:"role"`
+	UserName     string             `json:"user_name" bson:"user_name"`
+	Role         constants.UserType `json:"-" bson:"role"`
 	Email        string             `json:"email" bson:"email"`
-	Password     string             `json:"password" bson:"password"`
-	CreatedAt    primitive.DateTime `json:"created_at" bson:"created_at"`
-	RefreshToken string             `json:"refresh_token" bson:"refresh_token"`
+	Password     string             `json:"-" bson:"password"`
+	CreatedAt    primitive.DateTime `json:"joined_on" bson:"created_at"`
+	RefreshToken string             `json:"-" bson:"refresh_token"`
 }
 
 func (a *AdminEntity) EncodePassword() error {

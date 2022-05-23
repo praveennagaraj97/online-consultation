@@ -72,7 +72,7 @@ func (a *UserAPI) Register() gin.HandlerFunc {
 
 		// Set Refresh Token
 		ctx.SetCookie(string(constants.REFRESH_TOKEN),
-			access,
+			refresh,
 			constants.CookieRefreshExpiryTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
 
 		if err != nil {
@@ -162,7 +162,7 @@ func (a *UserAPI) SignInWithPhoneNumber() gin.HandlerFunc {
 
 		// Set Refresh Token
 		ctx.SetCookie(string(constants.REFRESH_TOKEN),
-			access,
+			refresh,
 			constants.CookieRefreshExpiryTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
 
 		if err != nil {
@@ -308,7 +308,7 @@ func (a UserAPI) SendLoginCredentialsForEmailLink() gin.HandlerFunc {
 
 		// Set Refresh Token
 		ctx.SetCookie(string(constants.REFRESH_TOKEN),
-			access,
+			refresh,
 			constants.CookieRefreshExpiryTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
 
 		if err != nil {

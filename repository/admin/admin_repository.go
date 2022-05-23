@@ -2,10 +2,14 @@ package adminrepository
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"time"
 
+	admindto "github.com/praveennagaraj97/online-consultation/dto/admin"
 	adminmodel "github.com/praveennagaraj97/online-consultation/models/admin"
+	"github.com/praveennagaraj97/online-consultation/utils"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -15,13 +19,94 @@ type AdminRepository struct {
 
 func (r *AdminRepository) Initialize(colln *mongo.Collection) {
 	r.colln = colln
+
+	utils.CreateIndex(colln, bson.D{{Key: "email", Value: 1}}, "Email", true)
+	utils.CreateIndex(colln, bson.D{{Key: "user_name", Value: 1}}, "User Name", true)
+
 }
 
-func (r *AdminRepository) CreateOne() (*adminmodel.AdminEntity, error) {
+func (r *AdminRepository) CreateOne(payload *admindto.AddNewAdminDTO) (*adminmodel.AdminEntity, error) {
+
+	if exists := r.checkIfUserExistsByEmailOrUserName(payload.Email, payload.UserName); exists {
+		return nil, errors.New("User with given credentials already exist")
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
-	fmt.Println(ctx)
+	doc := adminmodel.AdminEntity{
+		ID:           primitive.NewObjectID(),
+		Name:         payload.Name,
+		Role:         payload.Role,
+		Email:        payload.Email,
+		UserName:     payload.UserName,
+		Password:     payload.Password,
+		CreatedAt:    primitive.NewDateTimeFromTime(time.Now()),
+		RefreshToken: "",
+	}
 
-	return nil, nil
+	doc.EncodePassword()
+
+	if _, err := r.colln.InsertOne(ctx, doc); err != nil {
+		return nil, err
+	}
+
+	return &doc, nil
+}
+
+func (r *AdminRepository) checkIfUserExistsByEmailOrUserName(email, userName string) bool {
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	filter := bson.D{{Key: "$or", Value: bson.A{bson.M{"email": email}, bson.M{"user_name": userName}}}}
+
+	count, err := r.colln.CountDocuments(ctx, filter)
+	if err != nil {
+		return false
+	}
+
+	return count > 0
+}
+
+func (r *AdminRepository) FindByUserName(name string) (*adminmodel.AdminEntity, error) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	cur := r.colln.FindOne(ctx, bson.M{"user_name": name})
+
+	if cur.Err() != nil {
+		return nil, errors.New("Couldn't find any user")
+	}
+
+	var result adminmodel.AdminEntity
+
+	if err := cur.Decode(&result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+
+}
+
+func (r *AdminRepository) FindByEmail(email string) (*adminmodel.AdminEntity, error) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	cur := r.colln.FindOne(ctx, bson.M{"email": email})
+
+	if cur.Err() != nil {
+		return nil, errors.New("Couldn't find any user")
+	}
+
+	var result adminmodel.AdminEntity
+
+	if err := cur.Decode(&result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+
 }
