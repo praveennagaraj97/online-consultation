@@ -3,7 +3,6 @@ package userrepository
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/praveennagaraj97/online-consultation/api"
@@ -190,8 +189,6 @@ func (r *UserDeliveryAddressRepository) UpdateDefaultStatus(userId, id *primitiv
 	}
 
 	updateFilter := bson.D{{Key: "$and", Value: bson.A{bson.M{"user_id": userId}, bson.M{"_id": id}}}}
-
-	fmt.Println(updateFilter)
 
 	if _, err := r.colln.UpdateOne(ctx, updateFilter, bson.M{"$set": bson.M{"is_default": status}}); err != nil {
 		return err

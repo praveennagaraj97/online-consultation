@@ -1,7 +1,6 @@
 package userapi
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -108,8 +107,6 @@ func (a *UserAPI) GetListOfRelatives() gin.HandlerFunc {
 		var lastResId *primitive.ObjectID
 
 		if pgOpts.PaginateId == nil {
-
-			fmt.Println("count ran")
 			docCount, err = a.relativeRepo.GetDocumentsCount(userId, filterOpts)
 			if err != nil {
 				api.SendErrorResponse(ctx, err.Error(), http.StatusInternalServerError, nil)

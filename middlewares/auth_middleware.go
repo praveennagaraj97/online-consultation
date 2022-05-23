@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -67,7 +66,6 @@ func (m *Middlewares) UserRole(allowedRoles []constants.UserType) gin.HandlerFun
 			userRole = "user"
 		}
 		for _, role := range allowedRoles {
-			fmt.Println(role, userRole)
 			if string(role) == userRole {
 				c.Next()
 				return
