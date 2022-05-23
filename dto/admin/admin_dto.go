@@ -15,3 +15,8 @@ type LoginDTO struct {
 	Email    string `json:"email" form:"email"`
 	Password string `json:"password" form:"password"`
 }
+
+type UpdateAdminDTO struct {
+	Name         string `json:"name,omitempty" form:"name,omitempty" bson:"name,omitempty"`
+	RefreshToken string `json:"-" form:"-" bson:"refresh_token,omitempty"`
+}

@@ -110,3 +110,14 @@ func (r *AdminRepository) FindByEmail(email string) (*adminmodel.AdminEntity, er
 	return &result, nil
 
 }
+
+func (r *AdminRepository) UpdateById(id *primitive.ObjectID, payload *admindto.UpdateAdminDTO) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	if _, err := r.colln.UpdateByID(ctx, id, bson.M{"$set": payload}); err != nil {
+		return err
+	}
+
+	return nil
+}

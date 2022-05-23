@@ -103,9 +103,9 @@ func (a *AdminAPI) Login() gin.HandlerFunc {
 
 		access, refresh, accessTime, err := user.GetAccessAndRefreshToken(!shouldExp, string(user.Role))
 
-		// a.userRepo.UpdateById(&res.ID, &userdto.UpdateUserDTO{
-		// 	RefreshToken: refresh,
-		// })
+		a.adminRepo.UpdateById(&user.ID, &admindto.UpdateAdminDTO{
+			RefreshToken: refresh,
+		})
 
 		// Set Access Token
 		ctx.SetCookie(string(constants.AUTH_TOKEN),
@@ -146,10 +146,6 @@ func (a *AdminAPI) ResetPassword() gin.HandlerFunc {
 }
 
 func (a *AdminAPI) RefreshToken() gin.HandlerFunc {
-	return func(ctx *gin.Context) {}
-}
-
-func (a *AdminAPI) UpdateUser() gin.HandlerFunc {
 	return func(ctx *gin.Context) {}
 }
 
