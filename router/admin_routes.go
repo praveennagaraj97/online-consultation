@@ -19,7 +19,7 @@ func (r *Router) adminRoutes() {
 
 	routes.POST("/login", api.Login())
 	routes.POST("/forgot_password", api.ForgotPassword())
-	routes.POST("/reset_password", api.ResetPassword())
+	routes.POST("/reset_password/:token", api.ResetPassword())
 
 	routes.Use(r.middlewares.IsAuthorized())
 
