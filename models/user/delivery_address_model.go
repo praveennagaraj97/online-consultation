@@ -14,5 +14,5 @@ type UserDeliveryAddressEntity struct {
 	PinCode     string               `json:"pincode" bson:"pincode"`
 	PhoneNumber interfaces.PhoneType `json:"phone" bson:"phone"`
 	IsDefault   bool                 `json:"is_default" bson:"is_default"`
-	UserId      primitive.ObjectID   `json:"user_id" bson:"user_id"`
+	UserId      primitive.ObjectID   `json:"-" bson:"user_id"`
 }

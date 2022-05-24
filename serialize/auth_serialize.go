@@ -17,7 +17,7 @@ type AuthResponse struct {
 }
 
 type RefreshResponse struct {
-	Token        string `json:"token"`
+	Token        string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
 	Response
 }

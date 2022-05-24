@@ -18,6 +18,8 @@ func (r *Router) adminRoutes() {
 	}
 
 	routes.POST("/login", api.Login())
+	routes.POST("/forgot_password", api.ForgotPassword())
+	routes.POST("/reset_password", api.ResetPassword())
 
 	routes.Use(r.middlewares.IsAuthorized())
 
@@ -25,5 +27,10 @@ func (r *Router) adminRoutes() {
 		api.AddNewAdmin(constants.ADMIN))
 	routes.POST("/add_editor", r.middlewares.UserRole([]constants.UserType{constants.ADMIN, constants.SUPER_ADMIN}),
 		api.AddNewAdmin(constants.EDITOR))
+	routes.DELETE("/delete_admin", r.middlewares.UserRole([]constants.UserType{constants.SUPER_ADMIN}), api.DeleteUser())
+	routes.DELETE("/change_role", r.middlewares.UserRole([]constants.UserType{constants.SUPER_ADMIN}), api.ChangeRole())
+	routes.DELETE("/delete_editor", r.middlewares.UserRole([]constants.UserType{constants.ADMIN}), api.DeleteUser())
 
+	routes.GET("/refresh_token", api.RefreshToken())
+	routes.PATCH("/update_password", api.UpdatePassword())
 }

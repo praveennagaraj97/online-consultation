@@ -480,7 +480,7 @@ func (a *UserAPI) Logout() gin.HandlerFunc {
 // Can be force refreshed by passing force param set to true.
 func (a *UserAPI) RefreshToken() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		token, refreshToken, err := a.getAccessAndRefreshTokenFromRequest(c)
+		token, refreshToken, err := tokens.GetAccessAndRefreshTokenFromRequest(c)
 		if err != nil {
 			api.SendErrorResponse(c, err.Error(), http.StatusUnauthorized, nil)
 			return
@@ -534,7 +534,7 @@ func (a *UserAPI) RefreshToken() gin.HandlerFunc {
 
 		// Set Refresh Token
 		c.SetCookie(string(constants.REFRESH_TOKEN),
-			access,
+			refresh,
 			constants.CookieRefreshExpiryTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
 
 		if err != nil {
@@ -548,7 +548,7 @@ func (a *UserAPI) RefreshToken() gin.HandlerFunc {
 				Message:    "Token refreshed successfully",
 			},
 			Token:        token,
-			RefreshToken: refreshToken,
+			RefreshToken: refresh,
 		})
 	}
 }

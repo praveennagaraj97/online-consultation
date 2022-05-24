@@ -121,3 +121,24 @@ func (r *AdminRepository) UpdateById(id *primitive.ObjectID, payload *admindto.U
 
 	return nil
 }
+
+func (r *AdminRepository) FindById(id *primitive.ObjectID) (*adminmodel.AdminEntity, error) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	cur := r.colln.FindOne(ctx, bson.M{"_id": id})
+
+	if cur.Err() != nil {
+		return nil, errors.New("Couldn't find any user")
+	}
+
+	var result adminmodel.AdminEntity
+
+	if err := cur.Decode(&result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+
+}

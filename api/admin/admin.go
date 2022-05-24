@@ -11,9 +11,11 @@ import (
 	"github.com/praveennagaraj97/online-consultation/constants"
 	admindto "github.com/praveennagaraj97/online-consultation/dto/admin"
 	adminmodel "github.com/praveennagaraj97/online-consultation/models/admin"
-	authvalidator "github.com/praveennagaraj97/online-consultation/pkg/validator/auth"
+	"github.com/praveennagaraj97/online-consultation/pkg/tokens"
+	adminvalidator "github.com/praveennagaraj97/online-consultation/pkg/validator/admin"
 	adminrepository "github.com/praveennagaraj97/online-consultation/repository/admin"
 	"github.com/praveennagaraj97/online-consultation/serialize"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type AdminAPI struct {
@@ -39,7 +41,7 @@ func (a *AdminAPI) AddNewAdmin(role constants.UserType) gin.HandlerFunc {
 
 		defer ctx.Request.Body.Close()
 
-		if errors := authvalidator.ValidateNewAdminDTO(&payload); errors != nil {
+		if errors := adminvalidator.ValidateNewAdminDTO(&payload); errors != nil {
 			api.SendErrorResponse(ctx, errors.Message, http.StatusUnprocessableEntity, errors.Errors)
 			return
 		}
@@ -72,7 +74,7 @@ func (a *AdminAPI) Login() gin.HandlerFunc {
 		}
 		defer ctx.Request.Body.Close()
 
-		if errors := authvalidator.ValidateAdminLoginDTO(&payload); errors != nil {
+		if errors := adminvalidator.ValidateAdminLoginDTO(&payload); errors != nil {
 			api.SendErrorResponse(ctx, errors.Message, errors.StatusCode, errors.Errors)
 			return
 		}
@@ -138,6 +140,51 @@ func (a *AdminAPI) Login() gin.HandlerFunc {
 }
 
 func (a *AdminAPI) UpdatePassword() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		var payload admindto.UpdatePasswordDTO
+
+		if err := ctx.ShouldBind(&payload); err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		if errors := adminvalidator.ValidateUpdatePasswordDTO(&payload); errors != nil {
+			api.SendErrorResponse(ctx, errors.Message, errors.StatusCode, errors.Errors)
+			return
+		}
+
+		userId, err := api.GetUserIdFromContext(ctx)
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		user, err := a.adminRepo.FindById(userId)
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		if err := user.DecodePassword(payload.Password); err != nil {
+			api.SendErrorResponse(ctx, "Current password is not valid", http.StatusUnauthorized, nil)
+			return
+		}
+
+		user.Password = payload.NewPassword
+		user.EncodePassword()
+
+		if err = a.adminRepo.UpdateById(&user.ID, &admindto.UpdateAdminDTO{
+			Password: user.Password,
+		}); err != nil {
+			api.SendErrorResponse(ctx, "Something went wrong", http.StatusBadRequest, nil)
+			return
+		}
+
+		ctx.JSON(http.StatusNoContent, nil)
+	}
+}
+
+func (a *AdminAPI) ForgotPassword() gin.HandlerFunc {
 	return func(ctx *gin.Context) {}
 }
 
@@ -146,7 +193,81 @@ func (a *AdminAPI) ResetPassword() gin.HandlerFunc {
 }
 
 func (a *AdminAPI) RefreshToken() gin.HandlerFunc {
-	return func(ctx *gin.Context) {}
+	return func(c *gin.Context) {
+		token, refreshToken, err := tokens.GetAccessAndRefreshTokenFromRequest(c)
+		if err != nil {
+			api.SendErrorResponse(c, err.Error(), http.StatusUnauthorized, nil)
+			return
+		}
+
+		// check if force refresh is requested
+		isForce, _ := strconv.ParseBool(c.Request.URL.Query().Get("force"))
+
+		// parse auth Token
+		_, err = tokens.DecodeJSONWebToken(token)
+		if err == nil && !isForce {
+			api.SendErrorResponse(c, "Token is not expired", http.StatusNotAcceptable, nil)
+			return
+		}
+
+		// parse refresh token
+		claimedRefreshToken, err := tokens.DecodeJSONWebToken(refreshToken)
+		if err != nil {
+			api.SendErrorResponse(c, "Revalidate token malformed", http.StatusNotAcceptable, nil)
+			return
+		}
+
+		userId, err := primitive.ObjectIDFromHex(claimedRefreshToken.ID)
+		if err != nil {
+			api.SendErrorResponse(c, "Something went wrong", http.StatusNotAcceptable, nil)
+			return
+		}
+
+		// cross check refresh token with db.
+		user, err := a.adminRepo.FindById(&userId)
+		if err != nil {
+			api.SendErrorResponse(c, "Couldn't find any user for this refresh token", http.StatusNotFound, nil)
+			return
+		}
+
+		if user.RefreshToken != refreshToken {
+			api.SendErrorResponse(c, "Revalidate token Malformed", http.StatusUnauthorized, nil)
+			return
+		}
+
+		access, refresh, accessTime, err := user.GetAccessAndRefreshToken(true, string(user.Role))
+
+		if err = a.adminRepo.UpdateById(&user.ID, &admindto.UpdateAdminDTO{
+			RefreshToken: refresh,
+		}); err != nil {
+			api.SendErrorResponse(c, err.Error(), http.StatusBadGateway, nil)
+			return
+		}
+
+		// Set Access Token
+		c.SetCookie(string(constants.AUTH_TOKEN),
+			access,
+			accessTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
+
+		// Set Refresh Token
+		c.SetCookie(string(constants.REFRESH_TOKEN),
+			refresh,
+			constants.CookieRefreshExpiryTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
+
+		if err != nil {
+			api.SendErrorResponse(c, "Something went wrong", http.StatusInternalServerError, nil)
+			return
+		}
+
+		c.JSON(http.StatusOK, &serialize.RefreshResponse{
+			Response: serialize.Response{
+				StatusCode: http.StatusOK,
+				Message:    "Token refreshed successfully",
+			},
+			Token:        token,
+			RefreshToken: refresh,
+		})
+	}
 }
 
 func (a *AdminAPI) DeleteUser() gin.HandlerFunc {
