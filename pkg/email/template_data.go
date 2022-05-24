@@ -60,7 +60,7 @@ func GetSignWithEmailLinkTemplateData(name, link string) *ConfirmEmailTemplateDa
 		MetaInfo: &EmailMetaInfoTemplateData{
 			MetaTitle: "Online Consultation | Sign With Email Link",
 		},
-		NotificationPreviewMsg: "Click Below to sign in to online consultation",
+		NotificationPreviewMsg: "Sign in to online consultation",
 		Title:                  fmt.Sprintf("Hi %s,\n", name),
 		Message: `Tap the below button to sign in to your account. If you
                   didn't request to sign in for
@@ -70,5 +70,23 @@ func GetSignWithEmailLinkTemplateData(name, link string) *ConfirmEmailTemplateDa
 		FooterMessage: `You received this email because we received a request for
                   sign in from your account.`,
 		ButtonName: "Sign In",
+	}
+}
+
+func GetForgotEmailLinkTemplateData(name, link string) *ConfirmEmailTemplateData {
+	return &ConfirmEmailTemplateData{
+		MetaInfo: &EmailMetaInfoTemplateData{
+			MetaTitle: "Online Consultation | Forgot Password",
+		},
+		NotificationPreviewMsg: "Reset your password for online consultation",
+		Title:                  fmt.Sprintf("Hi %s,\n", name),
+		Message: `Tap the below button to reset your password. If you
+                  didn't request to reset your password for
+                  Online Consultation, you can safely delete
+                  this email.`,
+		Href: link,
+		FooterMessage: `You received this email because we received a request for
+                  resetting your password.`,
+		ButtonName: "Reset now",
 	}
 }

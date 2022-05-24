@@ -27,3 +27,12 @@ type UpdatePasswordDTO struct {
 	NewPassword     string `json:"new_password" form:"new_password"`
 	ConfirmPassword string `json:"confirm_password" form:"confirm_password"`
 }
+
+type ForgorPasswordDTO struct {
+	Email string `json:"email" form:"email"`
+}
+
+type ResetPasswordDTO struct {
+	NewPassword     string `json:"password" form:"password"`
+	ConfirmPassword string `json:"confirm_password" form:"confirm_password"`
+}

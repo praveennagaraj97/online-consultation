@@ -2,8 +2,10 @@ package adminapi
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/praveennagaraj97/online-consultation/api"
@@ -11,7 +13,10 @@ import (
 	"github.com/praveennagaraj97/online-consultation/constants"
 	admindto "github.com/praveennagaraj97/online-consultation/dto/admin"
 	adminmodel "github.com/praveennagaraj97/online-consultation/models/admin"
+	mailer "github.com/praveennagaraj97/online-consultation/pkg/email"
+	"github.com/praveennagaraj97/online-consultation/pkg/env"
 	"github.com/praveennagaraj97/online-consultation/pkg/tokens"
+	"github.com/praveennagaraj97/online-consultation/pkg/validator"
 	adminvalidator "github.com/praveennagaraj97/online-consultation/pkg/validator/admin"
 	adminrepository "github.com/praveennagaraj97/online-consultation/repository/admin"
 	"github.com/praveennagaraj97/online-consultation/serialize"
@@ -185,11 +190,107 @@ func (a *AdminAPI) UpdatePassword() gin.HandlerFunc {
 }
 
 func (a *AdminAPI) ForgotPassword() gin.HandlerFunc {
-	return func(ctx *gin.Context) {}
+	return func(ctx *gin.Context) {
+		var payload admindto.ForgorPasswordDTO
+
+		if err := ctx.ShouldBind(&payload); err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		if err := validator.ValidateEmail(payload.Email); err != nil {
+			api.SendErrorResponse(ctx, "Entered email is not valid", http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		user, err := a.adminRepo.FindByEmail(payload.Email)
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		token, err := tokens.GenerateTokenWithExpiryTimeAndType(user.ID.Hex(),
+			time.Now().Local().Add(time.Hour*48).Unix(),
+			"reset-email", "user")
+
+		emailLink := fmt.Sprintf("%s?verifyCode=%s",
+			env.GetEnvVariable("CLIENT_VERIFY_FORGOT_PASSWORD_LINK"), token)
+
+		td := mailer.GetForgotEmailLinkTemplateData(user.Name, emailLink)
+		if err = a.appConf.EmailClient.SendNoReplyMail([]string{user.Email},
+			"Reset your password", "verify-email",
+			"base", td); err != nil {
+			log.Println("Reset email failed to send")
+		}
+
+		ctx.JSON(http.StatusOK, serialize.Response{
+			StatusCode: http.StatusOK,
+			Message:    "An email with reset link has been sent to your email.",
+		})
+
+	}
 }
 
 func (a *AdminAPI) ResetPassword() gin.HandlerFunc {
-	return func(ctx *gin.Context) {}
+	return func(ctx *gin.Context) {
+		token, exists := ctx.Params.Get("token")
+		if !exists {
+			api.SendErrorResponse(ctx, "Couldn't find any token", http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		claimedInfo, err := tokens.DecodeJSONWebToken(token)
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		if claimedInfo.Type != "reset-email" {
+			api.SendErrorResponse(ctx, "Provided token is invalid", http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		objectId, err := primitive.ObjectIDFromHex(claimedInfo.ID)
+
+		if err != nil {
+			api.SendErrorResponse(ctx, "Token is malformed", http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		var payload admindto.ResetPasswordDTO
+
+		if err := ctx.ShouldBind(&payload); err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		if err := adminvalidator.ValidateResetPasswordDTO(&payload); err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		user, err := a.adminRepo.FindById(&objectId)
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		user.Password = payload.NewPassword
+		user.EncodePassword()
+
+		if err = a.adminRepo.UpdateById(&user.ID, &admindto.UpdateAdminDTO{
+			Password: user.Password,
+		}); err != nil {
+			api.SendErrorResponse(ctx, "Something went wrong", http.StatusBadRequest, nil)
+			return
+		}
+
+		ctx.JSON(http.StatusOK, serialize.Response{
+			StatusCode: http.StatusOK,
+			Message:    "Password changed successfully",
+		})
+
+	}
 }
 
 func (a *AdminAPI) RefreshToken() gin.HandlerFunc {

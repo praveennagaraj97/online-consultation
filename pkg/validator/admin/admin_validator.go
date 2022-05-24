@@ -1,6 +1,7 @@
 package adminvalidator
 
 import (
+	"errors"
 	"net/http"
 	"strings"
 
@@ -126,6 +127,30 @@ func ValidateUpdatePasswordDTO(payload *admindto.UpdatePasswordDTO) *serialize.E
 				Message:    "Given data is invalid",
 			},
 		}
+	}
+
+	return nil
+}
+
+func ValidateResetPasswordDTO(payload *admindto.ResetPasswordDTO) error {
+
+	if payload.NewPassword == "" {
+		return errors.New("Password cannot be empty")
+
+	}
+
+	if payload.ConfirmPassword == "" {
+		return errors.New("Confirm Password cannot be empty")
+
+	}
+
+	if payload.ConfirmPassword != payload.NewPassword {
+		return errors.New("Password didn't match")
+
+	}
+
+	if len(payload.NewPassword) < 6 {
+		return errors.New("Password is too week, password should contain atleast 6 characters")
 	}
 
 	return nil
