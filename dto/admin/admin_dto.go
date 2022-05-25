@@ -32,6 +32,10 @@ type ForgorPasswordDTO struct {
 	Email string `json:"email" form:"email"`
 }
 
+type AdminIdDTO struct {
+	ID string `json:"id" form:"id"`
+}
+
 type ResetPasswordDTO struct {
 	NewPassword     string `json:"password" form:"password"`
 	ConfirmPassword string `json:"confirm_password" form:"confirm_password"`

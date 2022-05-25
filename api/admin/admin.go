@@ -153,6 +153,8 @@ func (a *AdminAPI) UpdatePassword() gin.HandlerFunc {
 			return
 		}
 
+		defer ctx.Request.Body.Close()
+
 		if errors := adminvalidator.ValidateUpdatePasswordDTO(&payload); errors != nil {
 			api.SendErrorResponse(ctx, errors.Message, errors.StatusCode, errors.Errors)
 			return
@@ -197,6 +199,8 @@ func (a *AdminAPI) ForgotPassword() gin.HandlerFunc {
 			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
 			return
 		}
+
+		defer ctx.Request.Body.Close()
 
 		if err := validator.ValidateEmail(payload.Email); err != nil {
 			api.SendErrorResponse(ctx, "Entered email is not valid", http.StatusUnprocessableEntity, nil)
@@ -372,13 +376,63 @@ func (a *AdminAPI) RefreshToken() gin.HandlerFunc {
 }
 
 func (a *AdminAPI) DeleteUser() gin.HandlerFunc {
-	return func(ctx *gin.Context) {}
+	return func(ctx *gin.Context) {
+		var payload admindto.AdminIdDTO
+
+		if err := ctx.ShouldBind(&payload); err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+			return
+		}
+		defer ctx.Request.Body.Close()
+
+		adminId, err := primitive.ObjectIDFromHex(payload.ID)
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		if err := a.adminRepo.DeleteById(&adminId); err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusBadRequest, nil)
+			return
+		}
+
+		ctx.JSON(204, nil)
+
+	}
 }
 
 func (a *AdminAPI) ChangeRole() gin.HandlerFunc {
-	return func(ctx *gin.Context) {}
+	return func(ctx *gin.Context) {
+		ctx.JSON(http.StatusBadRequest, map[string]string{
+			"info": "Method not implemented",
+		})
+	}
 }
 
 func (a *AdminAPI) Logout() gin.HandlerFunc {
-	return func(ctx *gin.Context) {}
+	return func(ctx *gin.Context) {
+
+		id, err := api.GetUserIdFromContext(ctx)
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusUnauthorized, nil)
+			return
+		}
+
+		err = a.adminRepo.UpdateById(id, &admindto.UpdateAdminDTO{
+			RefreshToken: "",
+		})
+
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusUnauthorized, nil)
+			return
+		}
+
+		ctx.SetCookie(string(constants.AUTH_TOKEN), "", 0, "/", a.appConf.Domain, false, true)
+		ctx.SetCookie(string(constants.REFRESH_TOKEN), "", 0, "/", a.appConf.Domain, false, true)
+
+		ctx.JSON(http.StatusOK, serialize.Response{
+			StatusCode: http.StatusOK,
+			Message:    "Logged out successfully",
+		})
+	}
 }

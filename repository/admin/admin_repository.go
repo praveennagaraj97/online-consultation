@@ -142,3 +142,18 @@ func (r *AdminRepository) FindById(id *primitive.ObjectID) (*adminmodel.AdminEnt
 	return &result, nil
 
 }
+
+func (r *AdminRepository) DeleteById(id *primitive.ObjectID) error {
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	_, err := r.colln.DeleteOne(ctx, bson.M{"_id": id})
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+
+}
