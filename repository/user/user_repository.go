@@ -75,6 +75,15 @@ func (r *UserRepository) UpdateById(id *primitive.ObjectID, payload *userdto.Upd
 
 }
 
+func (r *UserRepository) UpdateRefreshToken(id *primitive.ObjectID, token string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	_, err := r.collection.UpdateByID(ctx, id, bson.D{{Key: "$set", Value: bson.M{"refresh_token": token}}})
+	return err
+
+}
+
 func (r *UserRepository) checkIfUserExistsWithEmailOrPhone(email, number, code string) bool {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()

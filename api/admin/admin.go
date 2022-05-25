@@ -110,9 +110,7 @@ func (a *AdminAPI) Login() gin.HandlerFunc {
 
 		access, refresh, accessTime, err := user.GetAccessAndRefreshToken(!shouldExp, string(user.Role))
 
-		a.adminRepo.UpdateById(&user.ID, &admindto.UpdateAdminDTO{
-			RefreshToken: refresh,
-		})
+		a.adminRepo.UpdateRefreshToken(&user.ID, refresh)
 
 		// Set Access Token
 		ctx.SetCookie(string(constants.AUTH_TOKEN),
@@ -342,9 +340,7 @@ func (a *AdminAPI) RefreshToken() gin.HandlerFunc {
 
 		access, refresh, accessTime, err := user.GetAccessAndRefreshToken(true, string(user.Role))
 
-		if err = a.adminRepo.UpdateById(&user.ID, &admindto.UpdateAdminDTO{
-			RefreshToken: refresh,
-		}); err != nil {
+		if err = a.adminRepo.UpdateRefreshToken(&user.ID, refresh); err != nil {
 			api.SendErrorResponse(c, err.Error(), http.StatusBadGateway, nil)
 			return
 		}
@@ -418,9 +414,7 @@ func (a *AdminAPI) Logout() gin.HandlerFunc {
 			return
 		}
 
-		err = a.adminRepo.UpdateById(id, &admindto.UpdateAdminDTO{
-			RefreshToken: "",
-		})
+		err = a.adminRepo.UpdateRefreshToken(id, "")
 
 		if err != nil {
 			api.SendErrorResponse(ctx, err.Error(), http.StatusUnauthorized, nil)

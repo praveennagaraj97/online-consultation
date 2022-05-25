@@ -122,6 +122,17 @@ func (r *AdminRepository) UpdateById(id *primitive.ObjectID, payload *admindto.U
 	return nil
 }
 
+func (r *AdminRepository) UpdateRefreshToken(id *primitive.ObjectID, token string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	if _, err := r.colln.UpdateByID(ctx, id, bson.D{{Key: "$set", Value: bson.M{"refresh_token": token}}}); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (r *AdminRepository) FindById(id *primitive.ObjectID) (*adminmodel.AdminEntity, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)

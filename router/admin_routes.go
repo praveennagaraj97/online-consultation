@@ -33,4 +33,5 @@ func (r *Router) adminRoutes() {
 
 	routes.GET("/refresh_token", api.RefreshToken())
 	routes.PATCH("/update_password", api.UpdatePassword())
+	routes.GET("/logout", api.Logout())
 }

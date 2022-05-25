@@ -21,7 +21,7 @@ func (m *Middlewares) IsAuthorized() gin.HandlerFunc {
 			authHeader := c.Request.Header.Get("Authorization")
 			containsBearerToken := strings.HasPrefix(authHeader, "Bearer")
 			if !containsBearerToken {
-				api.SendErrorResponse(c, "token_not_found", http.StatusUnauthorized, nil)
+				api.SendErrorResponse(c, "Token is missing", http.StatusUnauthorized, nil)
 				c.Abort()
 				return
 			} else {
@@ -31,7 +31,7 @@ func (m *Middlewares) IsAuthorized() gin.HandlerFunc {
 			token = cookie.Value
 		}
 		if token == "" {
-			api.SendErrorResponse(c, "un_authorized", http.StatusUnauthorized, nil)
+			api.SendErrorResponse(c, "Not Authorized", http.StatusUnauthorized, nil)
 			c.Abort()
 			return
 		}
@@ -46,7 +46,7 @@ func (m *Middlewares) IsAuthorized() gin.HandlerFunc {
 		}
 
 		if claims.Type != "access" {
-			api.SendErrorResponse(c, "refresh_token_not_acceptable", http.StatusUnauthorized, nil)
+			api.SendErrorResponse(c, "Refresh token is not acceptable", http.StatusNotAcceptable, nil)
 			c.Abort()
 			return
 		}

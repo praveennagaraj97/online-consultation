@@ -23,7 +23,6 @@ type UpdateUserDTO struct {
 	PhoneNumber   string `json:"-" form:"-" bson:"phone_number,omitempty"`
 	DOB           string `json:"date_of_birth,omitempty" form:"date_of_birth,omitempty" bson:"date_of_birth,omitempty"`
 	Gender        string `json:"gender,omitempty" form:"gender,omitempty" bson:"gender,omitempty"`
-	RefreshToken  string `json:"-" form:"-" bson:"refresh_token,omitempty"`
 	EmailVerified bool   `json:"-" form:"-" bson:"email_verified,omitempty"`
 }
 

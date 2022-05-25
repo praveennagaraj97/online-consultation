@@ -61,9 +61,7 @@ func (a *UserAPI) Register() gin.HandlerFunc {
 
 		access, refresh, accessTime, err := res.GetAccessAndRefreshToken(!shouldExp)
 
-		a.userRepo.UpdateById(&res.ID, &userdto.UpdateUserDTO{
-			RefreshToken: refresh,
-		})
+		a.userRepo.UpdateRefreshToken(&res.ID, refresh)
 
 		// Set Access Token
 		ctx.SetCookie(string(constants.AUTH_TOKEN),
@@ -151,9 +149,7 @@ func (a *UserAPI) SignInWithPhoneNumber() gin.HandlerFunc {
 
 		access, refresh, accessTime, err := res.GetAccessAndRefreshToken(!shouldExp)
 
-		a.userRepo.UpdateById(&res.ID, &userdto.UpdateUserDTO{
-			RefreshToken: refresh,
-		})
+		a.userRepo.UpdateRefreshToken(&res.ID, refresh)
 
 		// Set Access Token
 		ctx.SetCookie(string(constants.AUTH_TOKEN),
@@ -297,9 +293,7 @@ func (a UserAPI) SendLoginCredentialsForEmailLink() gin.HandlerFunc {
 
 		access, refresh, accessTime, err := res.GetAccessAndRefreshToken(!shouldExp)
 
-		a.userRepo.UpdateById(&res.ID, &userdto.UpdateUserDTO{
-			RefreshToken: refresh,
-		})
+		a.userRepo.UpdateRefreshToken(&res.ID, refresh)
 
 		// Set Access Token
 		ctx.SetCookie(string(constants.AUTH_TOKEN),
@@ -456,9 +450,7 @@ func (a *UserAPI) Logout() gin.HandlerFunc {
 			return
 		}
 
-		err = a.userRepo.UpdateById(id, &userdto.UpdateUserDTO{
-			RefreshToken: "",
-		})
+		err = a.userRepo.UpdateRefreshToken(id, "")
 
 		if err != nil {
 			api.SendErrorResponse(c, err.Error(), http.StatusUnauthorized, nil)
@@ -523,9 +515,7 @@ func (a *UserAPI) RefreshToken() gin.HandlerFunc {
 
 		access, refresh, accessTime, err := user.GetAccessAndRefreshToken(true)
 
-		a.userRepo.UpdateById(&user.ID, &userdto.UpdateUserDTO{
-			RefreshToken: refresh,
-		})
+		a.userRepo.UpdateRefreshToken(&user.ID, refresh)
 
 		// Set Access Token
 		c.SetCookie(string(constants.AUTH_TOKEN),
