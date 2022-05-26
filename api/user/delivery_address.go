@@ -7,7 +7,6 @@ import (
 	"github.com/praveennagaraj97/online-consultation/api"
 	userdto "github.com/praveennagaraj97/online-consultation/dto/user"
 	usermodel "github.com/praveennagaraj97/online-consultation/models/user"
-	uservalidator "github.com/praveennagaraj97/online-consultation/pkg/validator/user"
 	"github.com/praveennagaraj97/online-consultation/serialize"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -28,7 +27,7 @@ func (a *UserAPI) AddNewAddress() gin.HandlerFunc {
 			return
 		}
 
-		if errors := uservalidator.ValidateUserDeliveryAddressDTO(&payload); errors != nil {
+		if errors := payload.ValidateUserDeliveryAddressDTO(); errors != nil {
 			api.SendErrorResponse(ctx, errors.Message, errors.StatusCode, errors.Errors)
 			return
 		}

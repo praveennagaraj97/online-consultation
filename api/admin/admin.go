@@ -17,7 +17,6 @@ import (
 	"github.com/praveennagaraj97/online-consultation/pkg/env"
 	"github.com/praveennagaraj97/online-consultation/pkg/tokens"
 	"github.com/praveennagaraj97/online-consultation/pkg/validator"
-	adminvalidator "github.com/praveennagaraj97/online-consultation/pkg/validator/admin"
 	adminrepository "github.com/praveennagaraj97/online-consultation/repository/admin"
 	"github.com/praveennagaraj97/online-consultation/serialize"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -46,7 +45,7 @@ func (a *AdminAPI) AddNewAdmin(role constants.UserType) gin.HandlerFunc {
 
 		defer ctx.Request.Body.Close()
 
-		if errors := adminvalidator.ValidateNewAdminDTO(&payload); errors != nil {
+		if errors := payload.ValidateNewAdminDTO(); errors != nil {
 			api.SendErrorResponse(ctx, errors.Message, http.StatusUnprocessableEntity, errors.Errors)
 			return
 		}
@@ -79,7 +78,7 @@ func (a *AdminAPI) Login() gin.HandlerFunc {
 		}
 		defer ctx.Request.Body.Close()
 
-		if errors := adminvalidator.ValidateAdminLoginDTO(&payload); errors != nil {
+		if errors := payload.ValidateAdminLoginDTO(); errors != nil {
 			api.SendErrorResponse(ctx, errors.Message, errors.StatusCode, errors.Errors)
 			return
 		}
@@ -153,7 +152,7 @@ func (a *AdminAPI) UpdatePassword() gin.HandlerFunc {
 
 		defer ctx.Request.Body.Close()
 
-		if errors := adminvalidator.ValidateUpdatePasswordDTO(&payload); errors != nil {
+		if errors := payload.ValidateUpdatePasswordDTO(); errors != nil {
 			api.SendErrorResponse(ctx, errors.Message, errors.StatusCode, errors.Errors)
 			return
 		}
@@ -266,7 +265,7 @@ func (a *AdminAPI) ResetPassword() gin.HandlerFunc {
 			return
 		}
 
-		if err := adminvalidator.ValidateResetPasswordDTO(&payload); err != nil {
+		if err := payload.ValidateResetPasswordDTO(); err != nil {
 			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
 			return
 		}

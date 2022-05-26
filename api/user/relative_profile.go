@@ -7,7 +7,6 @@ import (
 	"github.com/praveennagaraj97/online-consultation/api"
 	userdto "github.com/praveennagaraj97/online-consultation/dto/user"
 	usermodel "github.com/praveennagaraj97/online-consultation/models/user"
-	uservalidator "github.com/praveennagaraj97/online-consultation/pkg/validator/user"
 	"github.com/praveennagaraj97/online-consultation/serialize"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -23,7 +22,7 @@ func (a *UserAPI) AddRelative() gin.HandlerFunc {
 
 		defer ctx.Request.Body.Close()
 
-		if err := uservalidator.ValidateRelativeDTO(&payload); err != nil {
+		if err := payload.ValidateRelativeDTO(); err != nil {
 			api.SendErrorResponse(ctx, err.Message, err.StatusCode, err.Errors)
 			return
 		}
@@ -41,7 +40,7 @@ func (a *UserAPI) AddRelative() gin.HandlerFunc {
 			return
 		}
 
-		if err := uservalidator.CompareAndValidateRelativeDTOWithUserData(&payload, user); err != nil {
+		if err := payload.CompareAndValidateRelativeDTOWithUserData(user); err != nil {
 			api.SendErrorResponse(ctx, err.Message, err.StatusCode, err.Errors)
 			return
 		}

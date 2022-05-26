@@ -1,6 +1,14 @@
 package userdto
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"net/http"
+	"strings"
+
+	usermodel "github.com/praveennagaraj97/online-consultation/models/user"
+	"github.com/praveennagaraj97/online-consultation/pkg/validator"
+	"github.com/praveennagaraj97/online-consultation/serialize"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 type RegisterDTO struct {
 	Name           string `json:"name" form:"name"`
@@ -63,4 +71,187 @@ type AddOrEditDeliveryAddressDTO struct {
 	PhoneNumber string             `json:"phone_number,omitempty" form:"phone_number,omitempty"`
 	UserId      primitive.ObjectID `json:"-,omitempty" form:"-,omitempty"`
 	IsDefault   bool
+}
+
+func (payload *AddOrEditRelativeDTO) ValidateRelativeDTO() *serialize.ErrorResponse {
+
+	errors := map[string]string{}
+
+	if strings.Trim(payload.Name, "") == "" {
+		errors["name"] = "Name cannot be empty"
+	}
+
+	if err := validator.ValidateEmail(payload.Email); err != nil {
+		errors["email"] = "Provided email is not valid"
+	}
+
+	if payload.PhoneCode == "" {
+		errors["phone_code"] = "Phone code cannot be empty"
+	}
+
+	if payload.PhoneNumber == "" {
+		errors["phone_number"] = "Phone number cannot be empty"
+	}
+
+	if payload.Gender == "" {
+		errors["gender"] = "Gender cannot be empty"
+	}
+
+	if payload.Relation == "" {
+		errors["relation"] = "Relation cannot be empty"
+	}
+
+	if len(errors) != 0 {
+		return &serialize.ErrorResponse{
+			Errors: &errors,
+			Response: serialize.Response{
+				StatusCode: http.StatusUnprocessableEntity,
+				Message:    "Given data is invalid",
+			},
+		}
+	}
+
+	return nil
+
+}
+
+func (payload *AddOrEditRelativeDTO) CompareAndValidateRelativeDTOWithUserData(user *usermodel.UserEntity) *serialize.ErrorResponse {
+
+	errors := map[string]string{}
+
+	if payload.Email == user.Email {
+		errors["email"] = "Relative email cannot be same as your email"
+	}
+
+	if payload.PhoneCode == user.PhoneNumber.Code && payload.PhoneNumber == user.PhoneNumber.Number {
+		errors["phone_number"] = "Relative phone number cannot be same as your number"
+	}
+
+	if len(errors) != 0 {
+		return &serialize.ErrorResponse{
+			Errors: &errors,
+			Response: serialize.Response{
+				StatusCode: http.StatusUnprocessableEntity,
+				Message:    "Given data is invalid",
+			},
+		}
+	}
+
+	return nil
+
+}
+
+func (payload *AddOrEditDeliveryAddressDTO) ValidateUserDeliveryAddressDTO() *serialize.ErrorResponse {
+
+	var errors = map[string]string{}
+
+	if payload.Name == "" {
+		errors["name"] = "Name cannot be empty"
+	}
+
+	if payload.Address == "" {
+		errors["address"] = "Address cannot be empty"
+	}
+
+	if payload.State == "" {
+		errors["state"] = "state cannot be empty"
+	}
+
+	if payload.Locality == "" {
+		errors["locality"] = "Locality / Town cannot be empty"
+	}
+
+	if payload.PinCode == "" {
+		errors["pincode"] = "Pincode cannot be empty"
+	}
+
+	if payload.PhoneCode == "" {
+		errors["phone_code"] = "Phone code cannot be empty"
+	}
+
+	if payload.PhoneNumber == "" {
+		errors["phone_number"] = "Phone number cannot be empty"
+	}
+
+	if len(errors) > 0 {
+		return &serialize.ErrorResponse{
+			Errors: &errors,
+			Response: serialize.Response{
+				StatusCode: http.StatusUnprocessableEntity,
+				Message:    "Given data is invalid",
+			},
+		}
+	}
+
+	return nil
+}
+
+func (payload *RegisterDTO) ValidateRegisterDTO() *serialize.ErrorResponse {
+
+	errors := map[string]string{}
+
+	if strings.Trim(payload.Name, "") == "" {
+		errors["name"] = "Name cannot be empty"
+	}
+
+	if err := validator.ValidateEmail(payload.Email); err != nil {
+		errors["email"] = "Provided email is not valid"
+	}
+
+	if payload.PhoneCode == "" {
+		errors["phone_code"] = "Phone code cannot be empty"
+	}
+
+	if payload.PhoneNumber == "" {
+		errors["phone_number"] = "Phone number cannot be empty"
+	}
+
+	if payload.Gender == "" {
+		errors["gender"] = "Gender cannot be empty"
+	}
+
+	if payload.VerificationId == "" {
+		errors["verification_id"] = "Verification ID cannot be empty"
+	}
+
+	if len(errors) != 0 {
+		return &serialize.ErrorResponse{
+			Errors: &errors,
+			Response: serialize.Response{
+				StatusCode: http.StatusUnprocessableEntity,
+				Message:    "Given data is invalid",
+			},
+		}
+	}
+
+	return nil
+}
+
+func (payload *SignInWithPhoneDTO) ValidateSignInWithPhoneDTO() *serialize.ErrorResponse {
+
+	errors := map[string]string{}
+
+	if payload.PhoneCode == "" {
+		errors["phone_code"] = "Phone code cannot be empty"
+	}
+
+	if payload.PhoneNumber == "" {
+		errors["phone_number"] = "Phone number cannot be empty"
+	}
+
+	if payload.VerificationId == "" {
+		errors["verification_id"] = "Verification ID cannot be empty"
+	}
+
+	if len(errors) != 0 {
+		return &serialize.ErrorResponse{
+			Errors: &errors,
+			Response: serialize.Response{
+				StatusCode: http.StatusUnprocessableEntity,
+				Message:    "Given data is invalid",
+			},
+		}
+	}
+
+	return nil
 }

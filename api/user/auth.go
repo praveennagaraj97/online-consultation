@@ -17,7 +17,6 @@ import (
 	"github.com/praveennagaraj97/online-consultation/pkg/env"
 	"github.com/praveennagaraj97/online-consultation/pkg/tokens"
 	"github.com/praveennagaraj97/online-consultation/pkg/validator"
-	authvalidator "github.com/praveennagaraj97/online-consultation/pkg/validator/auth"
 	"github.com/praveennagaraj97/online-consultation/serialize"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -33,7 +32,7 @@ func (a *UserAPI) Register() gin.HandlerFunc {
 		defer ctx.Request.Body.Close()
 
 		// Validate
-		if err := authvalidator.ValidateRegisterDTO(&payload); err != nil {
+		if err := payload.ValidateRegisterDTO(); err != nil {
 			api.SendErrorResponse(ctx, err.Message, err.StatusCode, err.Errors)
 			return
 		}
@@ -119,7 +118,7 @@ func (a *UserAPI) SignInWithPhoneNumber() gin.HandlerFunc {
 		}
 		defer ctx.Request.Body.Close()
 
-		if err := authvalidator.ValidateSignInWithPhoneDTO(&payload); err != nil {
+		if err := payload.ValidateSignInWithPhoneDTO(); err != nil {
 			api.SendErrorResponse(ctx, err.Message, err.StatusCode, err.Errors)
 			return
 		}
