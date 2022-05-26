@@ -15,7 +15,6 @@ type ImageType struct {
 	BlurImagePath     string `json:"-" bson:"blur_image_path"`
 	OriginalSrc       string `json:"image_src"`
 	BlurDataURL       string `json:"blur_data_url"`
-	Width             string `json:"width" form:"width" bson:"width"`
-	Height            string `json:"height" form:"height" bson:"height"`
-	KeyID             string `json:"-" bson:"key_id"`
+	Width             uint64 `json:"width" form:"width" bson:"width"`
+	Height            uint64 `json:"height" form:"height" bson:"height"`
 }

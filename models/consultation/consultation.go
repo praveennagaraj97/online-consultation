@@ -19,5 +19,5 @@ type ConsultationEntity struct {
 	Description string                `json:"description" bson:"description"`
 	Price       float64               `json:"price" bson:"price"`
 	ActionName  string                `json:"action_name" bson:"action_name"`
-	Type        ConsultationType      `json:"type" bson:"type"`
+	Type        string                `json:"type" bson:"type"`
 }

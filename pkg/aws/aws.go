@@ -9,11 +9,12 @@ import (
 )
 
 type AWSCredentials struct {
-	S3_BUCKET_NAME   string
-	S3_BUCKET_REGION string
-	S3_ACCESS_KEY_ID string
-	S3_SECRET_ACCESS string
-	S3_PUBLIC_DOMAIN string
+	S3_BUCKET_NAME           string
+	S3_BUCKET_REGION         string
+	S3_ACCESS_KEY_ID         string
+	S3_SECRET_ACCESS         string
+	S3_PUBLIC_DOMAIN         string
+	S3_PUBLIC_ACCESS_BASEURL string
 }
 
 type AWSConfiguration struct {
@@ -26,10 +27,11 @@ func (a *AWSConfiguration) Initialize() {
 
 	// aws packages
 	awsOptions := &AWSCredentials{
-		S3_BUCKET_NAME:   env.GetEnvVariable("S3_BUCKET_NAME"),
-		S3_BUCKET_REGION: env.GetEnvVariable("S3_BUCKET_REGION"),
-		S3_ACCESS_KEY_ID: env.GetEnvVariable("S3_ACCESS_KEY_ID"),
-		S3_SECRET_ACCESS: env.GetEnvVariable("S3_SECRET_ACCESS"),
+		S3_BUCKET_NAME:           env.GetEnvVariable("S3_BUCKET_NAME"),
+		S3_BUCKET_REGION:         env.GetEnvVariable("S3_BUCKET_REGION"),
+		S3_ACCESS_KEY_ID:         env.GetEnvVariable("S3_ACCESS_KEY_ID"),
+		S3_SECRET_ACCESS:         env.GetEnvVariable("S3_SECRET_ACCESS"),
+		S3_PUBLIC_ACCESS_BASEURL: env.GetEnvVariable("S3_ACCESS_BASEURL"),
 	}
 
 	if a.options == nil {

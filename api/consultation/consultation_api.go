@@ -1,17 +1,17 @@
 package consultationapi
 
 import (
-	"bytes"
-	"io"
 	"net/http"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/praveennagaraj97/online-consultation/api"
 	"github.com/praveennagaraj97/online-consultation/app"
 	"github.com/praveennagaraj97/online-consultation/constants"
 	consultationdto "github.com/praveennagaraj97/online-consultation/dto/consultation"
+	consultationmodel "github.com/praveennagaraj97/online-consultation/models/consultation"
+	awspkg "github.com/praveennagaraj97/online-consultation/pkg/aws"
 	consultationrepository "github.com/praveennagaraj97/online-consultation/repository/consultation"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type ConsultationAPI struct {
@@ -39,37 +39,32 @@ func (a *ConsultationAPI) AddNewConsultationType() gin.HandlerFunc {
 			return
 		}
 
-		file, err := ctx.FormFile("icon")
-		if err != nil {
-			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
-			return
+		doc := &consultationmodel.ConsultationEntity{
+			ID:          primitive.NewObjectID(),
+			Title:       payload.Title,
+			Description: payload.Description,
+			Price:       payload.Price,
+			ActionName:  payload.ActionName,
+			Type:        payload.Type,
 		}
 
-		fileType := file.Header.Get("Content-Type")
+		var ch chan *awspkg.S3UploadChannelResponse = make(chan *awspkg.S3UploadChannelResponse, 1)
 
-		if !strings.Contains(fileType, "image") {
-			api.SendErrorResponse(ctx, "Provided file is not acceptable", http.StatusUnprocessableEntity, nil)
-			return
-		}
+		a.appConf.AwsUtils.UploadImageToS3(ctx, "icon", ch, doc.ID.Hex(), string(constants.ConsultationIcon))
 
-		// Read the file buffer.
-		multiPartFile, err := file.Open()
-		if err != nil {
-			api.SendErrorResponse(ctx, "Something went wrong", http.StatusBadRequest, nil)
-			return
-		}
-		buffer, err := io.ReadAll(multiPartFile)
-		if err != nil {
-			api.SendErrorResponse(ctx, "Something went wrong", http.StatusBadRequest, nil)
-			return
-		}
-
-		defer multiPartFile.Close()
-
-		_, err = a.appConf.AwsUtils.UploadAsset(bytes.NewBuffer(buffer), string(constants.ConsultationIcon), file.Filename, &fileType)
-		if err != nil {
-			api.SendErrorResponse(ctx, err.Error(), http.StatusBadRequest, nil)
-			return
+		select {
+		case value, ok := <-ch:
+			if ok {
+				if value.Err != nil {
+					api.SendErrorResponse(ctx, value.Err.Error(), http.StatusInternalServerError, nil)
+					return
+				} else {
+					doc.Icon = value.Result
+					doc.Icon.Width = payload.IconWidth
+					doc.Icon.Height = payload.IconHeight
+				}
+			}
+		default:
 		}
 
 		// image := interfaces.ImageType{
@@ -77,6 +72,10 @@ func (a *ConsultationAPI) AddNewConsultationType() gin.HandlerFunc {
 		// }
 
 		// fmt.Println(image)
+
+		ctx.JSON(200, map[string]interface{}{
+			"res": doc,
+		})
 
 	}
 }

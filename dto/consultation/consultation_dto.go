@@ -45,6 +45,10 @@ func (a *AddConsultationDTO) ValidateAddConsultationDTO() *serialize.ErrorRespon
 		errors["icon_height"] = "Icon height should be greater than zero"
 	}
 
+	if a.ActionName == "" {
+		errors["action_name"] = "Action button name cannot be empty"
+	}
+
 	if len(errors) > 0 {
 		return &serialize.ErrorResponse{
 			Errors: &errors,
