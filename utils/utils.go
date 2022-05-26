@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/h2non/bimg"
 	logger "github.com/praveennagaraj97/online-consultation/pkg/log"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -37,4 +38,22 @@ func CreateIndex(collection *mongo.Collection, keys bson.D, indexName string, un
 	}
 
 	return true
+}
+
+func CreateBlurDataForImages(buffer []byte, quality int, width int, height int) ([]byte, error) {
+
+	processed, err := bimg.NewImage(buffer).Process(bimg.Options{
+		Quality:       quality,
+		Force:         true,
+		StripMetadata: true,
+		Crop:          true,
+		Lossless:      false,
+		Width:         width,
+		Height:        height,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return processed, nil
 }

@@ -10,6 +10,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.26.10
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.7.7
+	github.com/h2non/bimg v1.1.9
 	github.com/joho/godotenv v1.4.0
 	github.com/twilio/twilio-go v0.25.0
 	go.mongodb.org/mongo-driver v1.9.1

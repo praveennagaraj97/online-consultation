@@ -11,10 +11,12 @@ func (r *Router) consultationRoutes() {
 	api.Initialize(r.app, r.repos.GetConsultationRepository())
 
 	routes := r.engine.Group("/api/v1/consultation")
+	adminRoutes := r.engine.Group("/api/v1/admin/consultation")
+
+	adminRoutes.POST("/add_new_type", r.middlewares.IsAuthorized(),
+		r.middlewares.UserRole([]constants.UserType{constants.SUPER_ADMIN}), api.AddNewConsultationType())
 
 	routes.GET("/", api.GetAll())
-
 	routes.Use(r.middlewares.IsAuthorized(), r.middlewares.UserRole([]constants.UserType{constants.USER}))
-	routes.POST("/add_new_type", api.AddNewConsultationType())
 	routes.PATCH("/:id", api.UpdateById())
 }
