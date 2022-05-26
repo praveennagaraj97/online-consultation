@@ -1,8 +1,6 @@
 package twiliopkg
 
 import (
-	"fmt"
-
 	"github.com/praveennagaraj97/online-consultation/interfaces"
 	"github.com/praveennagaraj97/online-consultation/pkg/env"
 	logger "github.com/praveennagaraj97/online-consultation/pkg/log"
@@ -24,18 +22,18 @@ func Initialize() {
 	logger.PrintLog("Twilio SMS Package Initialised 📨")
 }
 
-func SendMessage(payload *interfaces.SMSType) {
+func SendMessage(payload *interfaces.SMSType) error {
 	params := &openapi.CreateMessageParams{}
 	params.SetFrom(fromAddr)
 
 	params.SetTo(payload.To)
 	params.SetBody(payload.Message)
 
-	resp, err := twilioClient.ApiV2010.CreateMessage(params)
+	_, err := twilioClient.ApiV2010.CreateMessage(params)
 	if err != nil {
-		fmt.Println(err.Error())
-		err = nil
-	} else {
-		fmt.Println("Message Sid: " + *resp.Sid)
+		return err
 	}
+
+	return nil
+
 }

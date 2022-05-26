@@ -2,6 +2,7 @@ package userapi
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -11,6 +12,7 @@ import (
 	userdto "github.com/praveennagaraj97/online-consultation/dto/user"
 	"github.com/praveennagaraj97/online-consultation/interfaces"
 	otpmodel "github.com/praveennagaraj97/online-consultation/models/otp"
+	twiliopkg "github.com/praveennagaraj97/online-consultation/pkg/sms/twilio"
 	"github.com/praveennagaraj97/online-consultation/serialize"
 	"github.com/praveennagaraj97/online-consultation/utils"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -40,12 +42,20 @@ func (a *UserAPI) SendVerificationCode() gin.HandlerFunc {
 		}
 
 		// Send OTP
+		if err := twiliopkg.SendMessage(&interfaces.SMSType{
+			Message: fmt.Sprintf("%s is your verification code to register with Online Consultation", verifyCode),
+			To:      fmt.Sprintf("%s%s", payload.Code, payload.Number),
+		}); err != nil {
+			log.Default().Println(err.Error())
+			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, nil)
+			return
+		}
 
 		ctx.JSON(http.StatusCreated, serialize.DataResponse[*otpmodel.OneTimePasswordEntity]{
 			Data: res,
 			Response: serialize.Response{
 				StatusCode: http.StatusCreated,
-				Message:    fmt.Sprintf("%s is your verification code to register with Online Consultation", verifyCode),
+				Message:    "A text with verification code has been sent to your mobile number",
 			},
 		})
 
