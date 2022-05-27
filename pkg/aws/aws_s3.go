@@ -31,11 +31,11 @@ func (a *AWSConfiguration) configS3() {
 
 }
 
-func (a *AWSConfiguration) UploadAsset(body io.Reader, filePath string, fileName string, contentType *string) (*s3.PutObjectOutput, error) {
+func (a *AWSConfiguration) UploadAsset(body io.Reader, fileKeyName string, contentType *string) (*s3.PutObjectOutput, error) {
 	return manager.NewUploader(a.s3Client).S3.PutObject(context.TODO(), &s3.PutObjectInput{
 		Bucket:      &a.options.S3_BUCKET_NAME,
 		Body:        body,
-		Key:         aws.String(filePath + "/" + fileName),
+		Key:         aws.String(fileKeyName),
 		ContentType: contentType,
 		ACL:         "public-read",
 	})

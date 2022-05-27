@@ -18,12 +18,14 @@ type S3UploadChannelResponse struct {
 }
 
 func (a *AWSConfiguration) UploadImageToS3(ctx *gin.Context,
-	fileKey string,
-	ch chan *S3UploadChannelResponse,
+	filePath string,
 	fileName string,
-	filePath string) {
+	formFileKey string,
+	width, height uint64,
+	ch chan *S3UploadChannelResponse,
+) {
 
-	file, err := ctx.FormFile(fileKey)
+	file, err := ctx.FormFile(formFileKey)
 	if err != nil {
 		ch <- &S3UploadChannelResponse{
 			Result: nil,
@@ -64,11 +66,11 @@ func (a *AWSConfiguration) UploadImageToS3(ctx *gin.Context,
 
 	fileExtensionClips := strings.Split(file.Filename, ".")
 	fileExtension := fileExtensionClips[len(fileExtensionClips)-1]
-	fileKeyName := fmt.Sprintf("%s.%s", fileName, fileExtension)
-	originalPath := filePath + "/original"
-	blurPath := filePath + "/blur"
 
-	_, err = a.UploadAsset(bytes.NewBuffer(buffer), originalPath, fileKeyName, &fileType)
+	originalPath := fmt.Sprintf("%s/original/%s.%s", filePath, fileName, fileExtension)
+	blurPath := strings.Replace(originalPath, "original", "blur", 1)
+
+	_, err = a.UploadAsset(bytes.NewBuffer(buffer), originalPath, &fileType)
 	if err != nil {
 		ch <- &S3UploadChannelResponse{
 			Result: nil,
@@ -77,7 +79,7 @@ func (a *AWSConfiguration) UploadImageToS3(ctx *gin.Context,
 		return
 	}
 
-	blurBuffer, err := utils.CreateBlurDataForImages(buffer, 1, 10, 10)
+	blurBuffer, err := utils.CreateBlurDataForImages(buffer, 1, int(width)/2, int(height)/2)
 	if err != nil {
 		ch <- &S3UploadChannelResponse{
 			Result: nil,
@@ -86,7 +88,7 @@ func (a *AWSConfiguration) UploadImageToS3(ctx *gin.Context,
 		return
 	}
 
-	_, err = a.UploadAsset(bytes.NewBuffer(blurBuffer), blurPath, fileKeyName, &fileType)
+	_, err = a.UploadAsset(bytes.NewBuffer(blurBuffer), blurPath, &fileType)
 	if err != nil {
 		ch <- &S3UploadChannelResponse{
 			Result: nil,
@@ -99,6 +101,10 @@ func (a *AWSConfiguration) UploadImageToS3(ctx *gin.Context,
 		Result: &interfaces.ImageType{
 			OriginalImagePath: originalPath,
 			BlurImagePath:     blurPath,
+			OriginalSrc:       fmt.Sprintf("%s/%s", a.options.S3_PUBLIC_ACCESS_BASEURL, originalPath),
+			BlurDataURL:       fmt.Sprintf("%s/%s", a.options.S3_PUBLIC_ACCESS_BASEURL, blurPath),
+			Width:             width,
+			Height:            height,
 		},
 		Err: err,
 	}

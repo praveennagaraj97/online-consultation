@@ -1,8 +1,6 @@
 package awspkg
 
 import (
-	"fmt"
-
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/praveennagaraj97/online-consultation/pkg/env"
 	logger "github.com/praveennagaraj97/online-consultation/pkg/log"
@@ -18,9 +16,8 @@ type AWSCredentials struct {
 }
 
 type AWSConfiguration struct {
-	options         *AWSCredentials
-	s3Client        *s3.Client
-	S3PUBLIC_DOMAIN string
+	options  *AWSCredentials
+	s3Client *s3.Client
 }
 
 func (a *AWSConfiguration) Initialize() {
@@ -36,7 +33,6 @@ func (a *AWSConfiguration) Initialize() {
 
 	if a.options == nil {
 		a.options = awsOptions
-		a.S3PUBLIC_DOMAIN = fmt.Sprintf("https://%s.s3.%s.amazonaws.com", awsOptions.S3_BUCKET_NAME, awsOptions.S3_BUCKET_REGION)
 	}
 
 	a.configS3()

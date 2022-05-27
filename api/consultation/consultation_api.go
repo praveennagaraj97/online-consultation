@@ -11,6 +11,7 @@ import (
 	consultationmodel "github.com/praveennagaraj97/online-consultation/models/consultation"
 	awspkg "github.com/praveennagaraj97/online-consultation/pkg/aws"
 	consultationrepository "github.com/praveennagaraj97/online-consultation/repository/consultation"
+	"github.com/praveennagaraj97/online-consultation/serialize"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -50,7 +51,7 @@ func (a *ConsultationAPI) AddNewConsultationType() gin.HandlerFunc {
 
 		var ch chan *awspkg.S3UploadChannelResponse = make(chan *awspkg.S3UploadChannelResponse, 1)
 
-		a.appConf.AwsUtils.UploadImageToS3(ctx, "icon", ch, doc.ID.Hex(), string(constants.ConsultationIcon))
+		a.appConf.AwsUtils.UploadImageToS3(ctx, string(constants.ConsultationIcon), doc.ID.Hex(), "icon", payload.IconWidth, payload.IconHeight, ch)
 
 		select {
 		case value, ok := <-ch:
@@ -60,21 +61,27 @@ func (a *ConsultationAPI) AddNewConsultationType() gin.HandlerFunc {
 					return
 				} else {
 					doc.Icon = value.Result
-					doc.Icon.Width = payload.IconWidth
-					doc.Icon.Height = payload.IconHeight
 				}
 			}
 		default:
 		}
 
-		// image := interfaces.ImageType{
-		// 	OriginalImagePath: fmt.Sprintf("%s/%s",constants.ConsultationIcon,file.Filename),
-		// }
+		if err := a.consultRepo.CreateOne(doc); err != nil {
+			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, &map[string]string{
+				"reason": err.Error(),
+			})
 
-		// fmt.Println(image)
+			a.appConf.AwsUtils.DeleteAsset(&doc.Icon.OriginalImagePath)
+			a.appConf.AwsUtils.DeleteAsset(&doc.Icon.BlurImagePath)
+			return
+		}
 
-		ctx.JSON(200, map[string]interface{}{
-			"res": doc,
+		ctx.JSON(http.StatusCreated, serialize.DataResponse[*consultationmodel.ConsultationEntity]{
+			Data: doc,
+			Response: serialize.Response{
+				StatusCode: http.StatusCreated,
+				Message:    "Consultation type added successfully",
+			},
 		})
 
 	}
