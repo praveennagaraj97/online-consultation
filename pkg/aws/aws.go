@@ -16,8 +16,9 @@ type AWSCredentials struct {
 }
 
 type AWSConfiguration struct {
-	options  *AWSCredentials
-	s3Client *s3.Client
+	options                  *AWSCredentials
+	s3Client                 *s3.Client
+	S3_PUBLIC_ACCESS_BASEURL string
 }
 
 func (a *AWSConfiguration) Initialize() {
@@ -33,6 +34,7 @@ func (a *AWSConfiguration) Initialize() {
 
 	if a.options == nil {
 		a.options = awsOptions
+		a.S3_PUBLIC_ACCESS_BASEURL = env.GetEnvVariable("S3_ACCESS_BASEURL")
 	}
 
 	a.configS3()

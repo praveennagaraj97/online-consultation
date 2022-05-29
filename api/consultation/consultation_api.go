@@ -40,6 +40,11 @@ func (a *ConsultationAPI) AddNewConsultationType() gin.HandlerFunc {
 			return
 		}
 
+		if exist := a.consultRepo.CheckIfConsultationTypeExists(payload.Type); exist {
+			api.SendErrorResponse(ctx, "Consultation with given type already exist", http.StatusUnprocessableEntity, nil)
+			return
+		}
+
 		doc := &consultationmodel.ConsultationEntity{
 			ID:          primitive.NewObjectID(),
 			Title:       payload.Title,
@@ -88,9 +93,97 @@ func (a *ConsultationAPI) AddNewConsultationType() gin.HandlerFunc {
 }
 
 func (a *ConsultationAPI) GetAll() gin.HandlerFunc {
-	return func(ctx *gin.Context) {}
+	return func(ctx *gin.Context) {
+		// get pagination/sort/filter options.
+		pgOpts := api.ParsePaginationOptions(ctx, "consultation_type")
+		srtOpts := api.ParseSortByOptions(ctx)
+		filterOpts := api.ParseFilterByOptions(ctx)
+		keySetSortby := "$gt"
+
+		// Default options | sort by latest
+		if len(*srtOpts) == 0 {
+			srtOpts = &map[string]int8{"_id": -1}
+		}
+
+		if pgOpts.PaginateId != nil {
+			for key, value := range *srtOpts {
+				if value == -1 && key == "_id" {
+					keySetSortby = "$lt"
+				}
+			}
+		}
+
+		res, err := a.consultRepo.FindAll(pgOpts, srtOpts, filterOpts, keySetSortby)
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusBadRequest, nil)
+			return
+		}
+
+		resLen := len(res)
+
+		// Paginate Options
+		var docCount int64
+		var lastResId *primitive.ObjectID
+
+		if pgOpts.PaginateId == nil {
+			docCount, err = a.consultRepo.GetDocumentsCount(filterOpts)
+			if err != nil {
+				api.SendErrorResponse(ctx, err.Error(), http.StatusInternalServerError, nil)
+				return
+			}
+		}
+
+		if resLen > 0 {
+			lastResId = &res[resLen-1].ID
+		}
+
+		count, next, prev, paginateKeySetID := api.GetPaginateOptions(docCount, pgOpts, int64(resLen), lastResId, "user_delivery_address")
+
+		for idx, value := range res {
+			value.Icon.OriginalSrc = a.appConf.AwsUtils.S3_PUBLIC_ACCESS_BASEURL + "/" + value.Icon.OriginalImagePath
+			value.Icon.BlurDataURL = a.appConf.AwsUtils.S3_PUBLIC_ACCESS_BASEURL + "/" + value.Icon.BlurImagePath
+			res[idx] = value
+		}
+
+		ctx.JSON(http.StatusOK, serialize.PaginatedDataResponse[[]consultationmodel.ConsultationEntity]{
+			Count:            count,
+			Next:             next,
+			Prev:             prev,
+			PaginateKeySetID: paginateKeySetID,
+			DataResponse: serialize.DataResponse[[]consultationmodel.ConsultationEntity]{
+				Data: res,
+				Response: serialize.Response{
+					StatusCode: http.StatusOK,
+					Message:    "List of consultation types retrieved successfully",
+				},
+			},
+		})
+
+	}
 }
 
 func (a *ConsultationAPI) UpdateById() gin.HandlerFunc {
 	return func(ctx *gin.Context) {}
+}
+
+func (a *ConsultationAPI) FindByType(typ consultationmodel.ConsultationType) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+
+		res, err := a.consultRepo.FindByType(string(typ))
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusNotFound, nil)
+			return
+		}
+
+		res.Icon.OriginalSrc = a.appConf.AwsUtils.S3_PUBLIC_ACCESS_BASEURL + "/" + res.Icon.OriginalImagePath
+		res.Icon.BlurDataURL = a.appConf.AwsUtils.S3_PUBLIC_ACCESS_BASEURL + "/" + res.Icon.BlurImagePath
+
+		ctx.JSON(http.StatusOK, serialize.DataResponse[*consultationmodel.ConsultationEntity]{
+			Data: res,
+			Response: serialize.Response{
+				StatusCode: http.StatusOK,
+				Message:    "Consultation info retrieved",
+			},
+		})
+	}
 }
