@@ -184,6 +184,30 @@ func (a *ConsultationAPI) FindByType(typ consultationmodel.ConsultationType) gin
 
 func (a *ConsultationAPI) UpdateById() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		var payload consultationdto.EditConsultationDTO
+
+		if err := ctx.ShouldBind(&payload); err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+			return
+		}
+		defer ctx.Request.Body.Close()
+
+		objectId := ctx.Param(("id"))
+
+		docId, err := primitive.ObjectIDFromHex(objectId)
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		if err := a.consultRepo.UpdateById(&docId, &payload); err != nil {
+			api.SendErrorResponse(ctx, "Something went wrong", http.StatusBadRequest, &map[string]string{
+				"reason": err.Error(),
+			})
+			return
+		}
+
+		ctx.JSON(http.StatusNoContent, nil)
 
 	}
 }

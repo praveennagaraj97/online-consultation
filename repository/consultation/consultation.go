@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/praveennagaraj97/online-consultation/api"
+	consultationdto "github.com/praveennagaraj97/online-consultation/dto/consultation"
 	consultationmodel "github.com/praveennagaraj97/online-consultation/models/consultation"
 	"github.com/praveennagaraj97/online-consultation/pkg/env"
 	"go.mongodb.org/mongo-driver/bson"
@@ -140,4 +141,12 @@ func (r *ConsultationRepository) FindByType(consType string) (*consultationmodel
 	}
 
 	return &result, nil
+}
+
+func (r *ConsultationRepository) UpdateById(id *primitive.ObjectID, payload *consultationdto.EditConsultationDTO) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	_, err := r.colln.UpdateByID(ctx, id, bson.M{"$set": payload})
+	return err
 }
