@@ -1,6 +1,7 @@
 package consultationapi
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -81,6 +82,9 @@ func (a *ConsultationAPI) AddNewConsultationType() gin.HandlerFunc {
 			return
 		}
 
+		doc.Icon.OriginalSrc = fmt.Sprintf("%s/%s", a.appConf.AwsUtils.S3_PUBLIC_ACCESS_BASEURL, doc.Icon.OriginalImagePath)
+		doc.Icon.BlurDataURL = fmt.Sprintf("%s/%s", a.appConf.AwsUtils.S3_PUBLIC_ACCESS_BASEURL, doc.Icon.BlurImagePath)
+
 		ctx.JSON(http.StatusCreated, serialize.DataResponse[*consultationmodel.ConsultationEntity]{
 			Data: doc,
 			Response: serialize.Response{
@@ -156,10 +160,6 @@ func (a *ConsultationAPI) GetAll() gin.HandlerFunc {
 	}
 }
 
-func (a *ConsultationAPI) UpdateById() gin.HandlerFunc {
-	return func(ctx *gin.Context) {}
-}
-
 func (a *ConsultationAPI) FindByType(typ consultationmodel.ConsultationType) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
@@ -179,5 +179,11 @@ func (a *ConsultationAPI) FindByType(typ consultationmodel.ConsultationType) gin
 				Message:    "Consultation info retrieved",
 			},
 		})
+	}
+}
+
+func (a *ConsultationAPI) UpdateById() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+
 	}
 }

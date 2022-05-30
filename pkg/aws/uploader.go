@@ -101,8 +101,6 @@ func (a *AWSConfiguration) UploadImageToS3(ctx *gin.Context,
 		Result: &interfaces.ImageType{
 			OriginalImagePath: originalPath,
 			BlurImagePath:     blurPath,
-			OriginalSrc:       fmt.Sprintf("%s/%s", a.options.S3_PUBLIC_ACCESS_BASEURL, originalPath),
-			BlurDataURL:       fmt.Sprintf("%s/%s", a.options.S3_PUBLIC_ACCESS_BASEURL, blurPath),
 			Width:             width,
 			Height:            height,
 		},
