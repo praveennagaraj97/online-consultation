@@ -87,6 +87,10 @@ func ParsePaginationOptions(c *gin.Context, cur string) *PaginationOptions {
 		perPage = constants.DefaultPerPageResults
 	}
 
+	if perPage > 50 {
+		perPage = 50
+	}
+
 	return &PaginationOptions{
 		PerPage:       perPage,
 		PageNum:       pageNum,
