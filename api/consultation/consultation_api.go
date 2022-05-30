@@ -139,12 +139,6 @@ func (a *ConsultationAPI) GetAll() gin.HandlerFunc {
 
 		count, next, prev, paginateKeySetID := api.GetPaginateOptions(docCount, pgOpts, int64(resLen), lastResId, "user_delivery_address")
 
-		for idx, value := range res {
-			value.Icon.OriginalSrc = a.appConf.AwsUtils.S3_PUBLIC_ACCESS_BASEURL + "/" + value.Icon.OriginalImagePath
-			value.Icon.BlurDataURL = a.appConf.AwsUtils.S3_PUBLIC_ACCESS_BASEURL + "/" + value.Icon.BlurImagePath
-			res[idx] = value
-		}
-
 		ctx.JSON(http.StatusOK, serialize.PaginatedDataResponse[[]consultationmodel.ConsultationEntity]{
 			Count:            count,
 			Next:             next,

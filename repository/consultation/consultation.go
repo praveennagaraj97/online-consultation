@@ -7,18 +7,21 @@ import (
 
 	"github.com/praveennagaraj97/online-consultation/api"
 	consultationmodel "github.com/praveennagaraj97/online-consultation/models/consultation"
+	"github.com/praveennagaraj97/online-consultation/pkg/env"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type ConsultationRepository struct {
-	colln *mongo.Collection
+	colln         *mongo.Collection
+	imageBasePath string
 }
 
 func (r *ConsultationRepository) Initialize(colln *mongo.Collection) {
 	r.colln = colln
+
+	r.imageBasePath = env.GetEnvVariable("S3_ACCESS_BASEURL")
 }
 
 func (r *ConsultationRepository) CreateOne(payload *consultationmodel.ConsultationEntity) error {
@@ -56,34 +59,40 @@ func (r *ConsultationRepository) FindAll(
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
-	opt := &options.FindOptions{}
+	var pipeline mongo.Pipeline = make(mongo.Pipeline, 0)
+	limitPipe := bson.D{{Key: "$limit", Value: pgnOpt.PerPage}}
 
-	filters := map[string]bson.M{}
-
-	if pgnOpt != nil {
-		opt.Limit = options.Find().SetLimit(int64(pgnOpt.PerPage)).Limit
-		opt.Skip = options.Find().SetSkip(int64((pgnOpt.PageNum - 1) * int(pgnOpt.PerPage))).Skip
+	if filterOpts != nil {
+		matchPipe := bson.D{{Key: "$match", Value: *filterOpts}}
+		pipeline = append(pipeline, matchPipe)
 	}
 
 	if sortOpts != nil {
-		opt.Sort = options.Find().SetSort(sortOpts).Sort
-	} else {
-		opt.Sort = options.Find().SetSort(bson.M{"created_at": -1}).Sort
-	}
 
-	if filterOpts != nil {
-		for key, value := range *filterOpts {
-			filters[key] = value
-		}
+		sortPipe := bson.D{{Key: "$sort", Value: sortOpts}}
+		pipeline = append(pipeline, sortPipe)
+
+	} else {
+		sortPipe := bson.D{{Key: "$sort", Value: bson.M{"_id": -1}}}
+		pipeline = append(pipeline, sortPipe)
 	}
 
 	if pgnOpt.PaginateId != nil {
-		filters["_id"] = bson.M{keySetSortby: pgnOpt.PaginateId}
+		// Key Set ID
+		keySetPipe := bson.D{{Key: "$match", Value: bson.D{{Key: "_id", Value: bson.M{keySetSortby: pgnOpt.PaginateId}}}}}
+		pipeline = append(pipeline, keySetPipe)
 	} else {
-		opt.Skip = options.Find().SetSkip(int64((pgnOpt.PageNum - 1) * int(pgnOpt.PerPage))).Skip
+		skipPipe := bson.D{{Key: "$skip", Value: (pgnOpt.PageNum - 1) * pgnOpt.PerPage}}
+		pipeline = append(pipeline, skipPipe)
 	}
 
-	cur, err := r.colln.Find(ctx, filters, opt)
+	// Map Image fields
+	addFieldsPipe := bson.D{{Key: "$addFields", Value: bson.M{"icon.image_src": bson.M{"$concat": bson.A{r.imageBasePath, "/", "$icon.original_image_path"}},
+		"icon.blur_data_url": bson.M{"$concat": bson.A{r.imageBasePath, "/", "$icon.blur_image_path"}}},
+	}}
+
+	pipeline = append(pipeline, limitPipe, addFieldsPipe)
+	cur, err := r.colln.Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, errors.New("Couldn't find any results")
 	}

@@ -121,7 +121,7 @@ func (r *UserRelativesRepository) FindAll(
 	if sortOpts != nil {
 		opt.Sort = options.Find().SetSort(sortOpts).Sort
 	} else {
-		opt.Sort = options.Find().SetSort(bson.M{"created_at": -1}).Sort
+		opt.Sort = options.Find().SetSort(bson.M{"_id": -1}).Sort
 	}
 
 	if filterOpts != nil {
