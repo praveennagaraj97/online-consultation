@@ -9,7 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/praveennagaraj97/online-consultation/interfaces"
-	"github.com/praveennagaraj97/online-consultation/utils"
+	imageprocessing "github.com/praveennagaraj97/online-consultation/pkg/image"
 )
 
 type S3UploadChannelResponse struct {
@@ -64,8 +64,14 @@ func (a *AWSConfiguration) UploadImageToS3(ctx *gin.Context,
 
 	defer multiPartFile.Close()
 
-	fileExtensionClips := strings.Split(file.Filename, ".")
-	fileExtension := fileExtensionClips[len(fileExtensionClips)-1]
+	fileExtension, err := imageprocessing.GetExtensionFromFileName(file.Filename)
+	if err != nil {
+		ch <- &S3UploadChannelResponse{
+			Result: nil,
+			Err:    err,
+		}
+		return
+	}
 
 	originalPath := fmt.Sprintf("%s/original/%s.%s", filePath, fileName, fileExtension)
 	blurPath := strings.Replace(originalPath, "original", "blur", 1)
@@ -79,8 +85,9 @@ func (a *AWSConfiguration) UploadImageToS3(ctx *gin.Context,
 		return
 	}
 
-	blurBuffer, err := utils.CreateBlurDataForImages(buffer, 1, int(width)/2, int(height)/2)
+	blurBuffer, err := imageprocessing.CreateBlurDataForImages(buffer, 1, int(width)/2, int(height)/2, blurPath)
 	if err != nil {
+		a.DeleteAsset(&originalPath)
 		ch <- &S3UploadChannelResponse{
 			Result: nil,
 			Err:    err,
@@ -90,6 +97,7 @@ func (a *AWSConfiguration) UploadImageToS3(ctx *gin.Context,
 
 	_, err = a.UploadAsset(bytes.NewBuffer(blurBuffer), blurPath, &fileType)
 	if err != nil {
+		a.DeleteAsset(&originalPath)
 		ch <- &S3UploadChannelResponse{
 			Result: nil,
 			Err:    err,

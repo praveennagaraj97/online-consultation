@@ -143,6 +143,25 @@ func (r *ConsultationRepository) FindByType(consType string) (*consultationmodel
 	return &result, nil
 }
 
+func (r *ConsultationRepository) FindById(id *primitive.ObjectID) (*consultationmodel.ConsultationEntity, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	res := r.colln.FindOne(ctx, bson.M{"_id": id})
+
+	if res.Err() != nil {
+		return nil, errors.New("Couldn't find any results")
+	}
+
+	var result consultationmodel.ConsultationEntity
+
+	if err := res.Decode(&result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
+
 func (r *ConsultationRepository) UpdateById(id *primitive.ObjectID, payload *consultationdto.EditConsultationDTO) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()

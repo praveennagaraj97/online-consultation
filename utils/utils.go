@@ -2,9 +2,9 @@ package utils
 
 import (
 	"context"
+	"math/rand"
 	"time"
 
-	"github.com/h2non/bimg"
 	logger "github.com/praveennagaraj97/online-consultation/pkg/log"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -40,20 +40,13 @@ func CreateIndex(collection *mongo.Collection, keys bson.D, indexName string, un
 	return true
 }
 
-func CreateBlurDataForImages(buffer []byte, quality int, width int, height int) ([]byte, error) {
+func GenerateRandomCode(length int) string {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	var codes []byte = make([]byte, length)
 
-	processed, err := bimg.NewImage(buffer).Process(bimg.Options{
-		Quality:       quality,
-		Force:         true,
-		StripMetadata: true,
-		Crop:          true,
-		Lossless:      false,
-		Width:         width,
-		Height:        height,
-	})
-	if err != nil {
-		return nil, err
+	for i := 0; i < length; i++ {
+		codes[i] = uint8(48 + r.Intn(10))
 	}
 
-	return processed, nil
+	return string(codes)
 }

@@ -5,14 +5,10 @@ RUN useradd -m praveen
 
 FROM base as dev
 
-RUN apt-get update 
+RUN apt-get update -y
 
 # AIR
 RUN curl -sSfL https://raw.githubusercontent.com/cosmtrek/air/master/install.sh | sh -s -- -b $(go env GOPATH)/bin
-
-# image processing library
-RUN apt-get install -y libvips-dev --fix-missing     
-
 
 WORKDIR /src/app
 COPY . .

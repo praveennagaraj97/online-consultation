@@ -12,6 +12,7 @@ func (r *Router) consultationRoutes() {
 	api.Initialize(r.app, r.repos.GetConsultationRepository())
 
 	routes := r.engine.Group("/api/v1/consultation")
+
 	adminRoutes := r.engine.Group("/api/v1/admin/consultation")
 
 	adminRoutes.POST("/add_new_type", r.middlewares.IsAuthorized(),

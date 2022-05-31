@@ -200,6 +200,35 @@ func (a *ConsultationAPI) UpdateById() gin.HandlerFunc {
 			return
 		}
 
+		file, _ := ctx.FormFile("icon")
+
+		if file != nil {
+			res, err := a.consultRepo.FindById(&docId)
+			if err != nil {
+				api.SendErrorResponse(ctx, err.Error(), http.StatusNotFound, nil)
+				return
+			}
+
+			a.appConf.AwsUtils.DeleteAsset(&res.Icon.OriginalImagePath)
+			a.appConf.AwsUtils.DeleteAsset(&res.Icon.BlurImagePath)
+
+			var ch chan *awspkg.S3UploadChannelResponse = make(chan *awspkg.S3UploadChannelResponse, 1)
+			a.appConf.AwsUtils.UploadImageToS3(ctx, string(constants.ConsultationIcon), docId.Hex(), "icon", payload.IconWidth, payload.IconHeight, ch)
+
+			select {
+			case value, ok := <-ch:
+				if ok {
+					if value.Err != nil {
+						api.SendErrorResponse(ctx, value.Err.Error(), http.StatusInternalServerError, nil)
+						return
+					} else {
+						payload.Icon = value.Result
+					}
+				}
+			default:
+			}
+		}
+
 		if err := a.consultRepo.UpdateById(&docId, &payload); err != nil {
 			api.SendErrorResponse(ctx, "Something went wrong", http.StatusBadRequest, &map[string]string{
 				"reason": err.Error(),

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/praveennagaraj97/online-consultation/interfaces"
 	consultationmodel "github.com/praveennagaraj97/online-consultation/models/consultation"
 	"github.com/praveennagaraj97/online-consultation/serialize"
 )
@@ -64,10 +65,11 @@ func (a *AddConsultationDTO) ValidateAddConsultationDTO() *serialize.ErrorRespon
 }
 
 type EditConsultationDTO struct {
-	Title       string  `json:"title,omitempty" form:"title,omitempty"`
-	Description string  `json:"description,omitempty" form:"description,omitempty"`
-	Price       float64 `json:"price,omitempty" form:"price,omitempty"`
-	ActionName  string  `json:"action_name,omitempty" form:"action_name,omitempty"`
-	IconWidth   uint64  `json:"icon_width,omitempty" form:"icon_width,omitempty"`
-	IconHeight  uint64  `json:"icon_height,omitempty" form:"icon_height,omitempty"`
+	Title       string                `json:"title,omitempty" form:"title,omitempty"`
+	Description string                `json:"description,omitempty" form:"description,omitempty"`
+	Price       float64               `json:"price,omitempty" form:"price,omitempty"`
+	ActionName  string                `json:"action_name,omitempty" form:"action_name,omitempty"`
+	IconWidth   uint64                `json:"icon_width,omitempty" form:"icon_width,omitempty"`
+	IconHeight  uint64                `json:"icon_height,omitempty" form:"icon_height,omitempty"`
+	Icon        *interfaces.ImageType `json:"-" form:"-" bson:"icon,omitempty"`
 }

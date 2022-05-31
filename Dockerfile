@@ -5,10 +5,7 @@ RUN useradd -m praveen
 
 FROM base as dev
 
-RUN apt-get update 
-
-# image processing library
-RUN apt-get install -y libvips-dev --fix-missing     
+RUN apt-get update -y
 
 
 WORKDIR /src/app
@@ -17,9 +14,6 @@ COPY . .
 RUN chown praveen /src/app
 
 USER praveen
-
-
-
 
 EXPOSE 4200
 

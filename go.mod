@@ -9,8 +9,8 @@ require (
 	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.11.12
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.26.10
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/disintegration/imaging v1.6.2
 	github.com/gin-gonic/gin v1.7.7
-	github.com/h2non/bimg v1.1.9
 	github.com/joho/godotenv v1.4.0
 	github.com/twilio/twilio-go v0.25.0
 	go.mongodb.org/mongo-driver v1.9.1
@@ -52,8 +52,9 @@ require (
 	github.com/xdg-go/scram v1.0.2 // indirect
 	github.com/xdg-go/stringprep v1.0.2 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20181117223130-1be2e3e5546d // indirect
+	golang.org/x/image v0.0.0-20191009234506-e7c1f5e7dbb8 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
 	golang.org/x/sys v0.0.0-20210510120138-977fb7262007 // indirect
-	golang.org/x/text v0.3.5 // indirect
+	golang.org/x/text v0.3.6 // indirect
 	gopkg.in/yaml.v2 v2.2.8 // indirect
 )
