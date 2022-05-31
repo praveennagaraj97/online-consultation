@@ -169,3 +169,11 @@ func (r *ConsultationRepository) UpdateById(id *primitive.ObjectID, payload *con
 	_, err := r.colln.UpdateByID(ctx, id, bson.M{"$set": payload})
 	return err
 }
+
+func (r *ConsultationRepository) DeleteById(id *primitive.ObjectID) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	_, err := r.colln.DeleteOne(ctx, bson.M{"_id": id})
+	return err
+}

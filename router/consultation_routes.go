@@ -19,6 +19,8 @@ func (r *Router) consultationRoutes() {
 		r.middlewares.UserRole([]constants.UserType{constants.SUPER_ADMIN}), api.AddNewConsultationType())
 	adminRoutes.PATCH("/:id", r.middlewares.IsAuthorized(), r.middlewares.UserRole([]constants.UserType{
 		constants.ADMIN, constants.SUPER_ADMIN}), api.UpdateById())
+	adminRoutes.DELETE("/:id", r.middlewares.IsAuthorized(),
+		r.middlewares.UserRole([]constants.UserType{constants.SUPER_ADMIN}), api.DeleteConsultationType())
 
 	routes.GET("/", api.GetAll())
 	routes.GET("/instant", api.FindByType(consultationmodel.Instant))

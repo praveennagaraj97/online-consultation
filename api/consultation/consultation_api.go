@@ -240,3 +240,25 @@ func (a *ConsultationAPI) UpdateById() gin.HandlerFunc {
 
 	}
 }
+
+func (a *ConsultationAPI) DeleteConsultationType() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		objectId := ctx.Param("id")
+
+		docId, err := primitive.ObjectIDFromHex(objectId)
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		if err = a.consultRepo.DeleteById(&docId); err != nil {
+			api.SendErrorResponse(ctx, "Something went wrong", http.StatusBadRequest, &map[string]string{
+				"reason": err.Error(),
+			})
+			return
+		}
+
+		ctx.JSON(http.StatusNoContent, nil)
+
+	}
+}
