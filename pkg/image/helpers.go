@@ -22,7 +22,7 @@ func GetExtensionFromFileName(filename string) (string, error) {
 	formattedExt := strings.ToLower(strings.TrimPrefix(ext, "."))
 
 	if formatExts[formattedExt] == 0 {
-		return "", errors.New("Unsupported file")
+		return "", errors.New(formattedExt + " format is not supported")
 	}
 
 	return formattedExt, nil

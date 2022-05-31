@@ -6,6 +6,7 @@ import (
 	adminrepository "github.com/praveennagaraj97/online-consultation/repository/admin"
 	consultationrepository "github.com/praveennagaraj97/online-consultation/repository/consultation"
 	onetimepasswordrepository "github.com/praveennagaraj97/online-consultation/repository/onetimepassword"
+	specialityrepository "github.com/praveennagaraj97/online-consultation/repository/specialities"
 	userrepository "github.com/praveennagaraj97/online-consultation/repository/user"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -17,6 +18,7 @@ type Repository struct {
 	otpRepo                 *onetimepasswordrepository.OneTimePasswordRepository
 	consultationRepo        *consultationrepository.ConsultationRepository
 	adminRepo               *adminrepository.AdminRepository
+	specialityRepo          *specialityrepository.SpecialitysRepository
 }
 
 func (r *Repository) Initialize(mgoClient *mongo.Client, dbName string) {
@@ -28,6 +30,10 @@ func (r *Repository) Initialize(mgoClient *mongo.Client, dbName string) {
 	// User Repo
 	r.userRepo = &userrepository.UserRepository{}
 	r.userRepo.InitializeRepository(db.OpenCollection(mgoClient, dbName, "user"))
+
+	// Admin Repo
+	r.adminRepo = &adminrepository.AdminRepository{}
+	r.adminRepo.Initialize(db.OpenCollection(mgoClient, dbName, "admin"))
 
 	// User relatives repo
 	r.userRelativeRepo = &userrepository.UserRelativesRepository{}
@@ -41,9 +47,9 @@ func (r *Repository) Initialize(mgoClient *mongo.Client, dbName string) {
 	r.consultationRepo = &consultationrepository.ConsultationRepository{}
 	r.consultationRepo.Initialize(db.OpenCollection(mgoClient, dbName, "consultation"))
 
-	// Admin Repo
-	r.adminRepo = &adminrepository.AdminRepository{}
-	r.adminRepo.Initialize(db.OpenCollection(mgoClient, dbName, "admin"))
+	// Speciality Repo
+	r.specialityRepo = &specialityrepository.SpecialitysRepository{}
+	r.specialityRepo.Initialize(db.OpenCollection(mgoClient, dbName, "speciality"))
 
 	logger.PrintLog("Repositories initialized 📜")
 }
@@ -70,4 +76,8 @@ func (r *Repository) GetConsultationRepository() *consultationrepository.Consult
 
 func (r *Repository) GetAdminRepository() *adminrepository.AdminRepository {
 	return r.adminRepo
+}
+
+func (r *Repository) GetSpecialityRepository() *specialityrepository.SpecialitysRepository {
+	return r.specialityRepo
 }

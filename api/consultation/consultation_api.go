@@ -56,6 +56,7 @@ func (a *ConsultationAPI) AddNewConsultationType() gin.HandlerFunc {
 		}
 
 		var ch chan *awspkg.S3UploadChannelResponse = make(chan *awspkg.S3UploadChannelResponse, 1)
+		defer close(ch)
 
 		a.appConf.AwsUtils.UploadImageToS3(ctx, string(constants.ConsultationIcon), doc.ID.Hex(), "icon", payload.IconWidth, payload.IconHeight, ch)
 

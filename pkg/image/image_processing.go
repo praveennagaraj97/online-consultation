@@ -39,6 +39,7 @@ func CreateBlurDataForImages(buffer []byte, quality int, width int, height int, 
 
 	case "bmp":
 		err = bmp.Encode(buf, resizedImg)
+
 	default:
 		err = jpeg.Encode(buf, resizedImg, &jpeg.Options{Quality: 1})
 	}
