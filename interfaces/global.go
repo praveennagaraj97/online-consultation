@@ -18,3 +18,8 @@ type ImageType struct {
 	Width             uint64 `json:"width" form:"width" bson:"width"`
 	Height            uint64 `json:"height" form:"height" bson:"height"`
 }
+
+type LocationType struct {
+	Longitude int    `json:"longitude" bson:"x" form:"longitude"`
+	Latitute  string `json:"latitude" bson:"y" form:"latitude"`
+}
