@@ -8,6 +8,7 @@ import (
 type SpecialityEntity struct {
 	ID          primitive.ObjectID    `json:"id" bson:"_id"`
 	Title       string                `json:"title" bson:"title"`
-	Description string                `json:"description" bson:"description"`
+	Slug        string                `json:"slug" bson:"slug"`
+	Description string                `json:"description,omitempty" bson:"description,omitempty"`
 	Thumbnail   *interfaces.ImageType `json:"thumbnail" bson:"thumbnail"`
 }

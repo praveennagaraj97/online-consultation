@@ -16,7 +16,10 @@ func (r *Router) specialityRoutes() {
 	adminRoutes.Use(r.middlewares.IsAuthorized())
 
 	adminRoutes.POST("", r.middlewares.UserRole([]constants.UserType{constants.ADMIN, constants.SUPER_ADMIN}), api.AddNewSpeciality())
+	adminRoutes.DELETE("/:id", r.middlewares.UserRole([]constants.UserType{constants.ADMIN, constants.SUPER_ADMIN}), api.DeleteById())
+	adminRoutes.PATCH("/:id", r.middlewares.UserRole([]constants.UserType{constants.ADMIN, constants.EDITOR, constants.SUPER_ADMIN}), api.UpdateById())
 
 	routes.GET("", api.GetAll())
+	routes.GET("/:id", api.GetById())
 
 }

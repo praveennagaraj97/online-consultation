@@ -213,6 +213,11 @@ func (a *ConsultationAPI) UpdateById() gin.HandlerFunc {
 			a.appConf.AwsUtils.DeleteAsset(&res.Icon.OriginalImagePath)
 			a.appConf.AwsUtils.DeleteAsset(&res.Icon.BlurImagePath)
 
+			if payload.IconWidth == 0 || payload.IconHeight == 0 {
+				payload.IconWidth = res.Icon.Width
+				payload.IconHeight = res.Icon.Height
+			}
+
 			var ch chan *awspkg.S3UploadChannelResponse = make(chan *awspkg.S3UploadChannelResponse, 1)
 			a.appConf.AwsUtils.UploadImageToS3(ctx, string(constants.ConsultationIcon), docId.Hex(), "icon", payload.IconWidth, payload.IconHeight, ch)
 
@@ -251,6 +256,15 @@ func (a *ConsultationAPI) DeleteConsultationType() gin.HandlerFunc {
 			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
 			return
 		}
+
+		doc, err := a.consultRepo.FindById(&docId)
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusNotFound, nil)
+			return
+		}
+
+		a.appConf.AwsUtils.DeleteAsset(&doc.Icon.OriginalImagePath)
+		a.appConf.AwsUtils.DeleteAsset(&doc.Icon.BlurImagePath)
 
 		if err = a.consultRepo.DeleteById(&docId); err != nil {
 			api.SendErrorResponse(ctx, "Something went wrong", http.StatusBadRequest, &map[string]string{

@@ -17,10 +17,10 @@ func (r *Router) consultationRoutes() {
 
 	adminRoutes.POST("/add_new_type", r.middlewares.IsAuthorized(),
 		r.middlewares.UserRole([]constants.UserType{constants.SUPER_ADMIN}), api.AddNewConsultationType())
-	adminRoutes.PATCH("/:id", r.middlewares.IsAuthorized(), r.middlewares.UserRole([]constants.UserType{
-		constants.ADMIN, constants.SUPER_ADMIN}), api.UpdateById())
 	adminRoutes.DELETE("/:id", r.middlewares.IsAuthorized(),
 		r.middlewares.UserRole([]constants.UserType{constants.SUPER_ADMIN}), api.DeleteConsultationType())
+	adminRoutes.PATCH("/:id", r.middlewares.IsAuthorized(), r.middlewares.UserRole([]constants.UserType{
+		constants.ADMIN, constants.SUPER_ADMIN, constants.EDITOR}), api.UpdateById())
 
 	routes.GET("/", api.GetAll())
 	routes.GET("/instant", api.FindByType(consultationmodel.Instant))
