@@ -128,8 +128,28 @@ func (a *SpecialityAPI) GetById() gin.HandlerFunc {
 	}
 }
 
-func (a *SpecialityAPI) GetAll() gin.HandlerFunc {
-	return func(ctx *gin.Context) {}
+func (a *SpecialityAPI) GetBySlug() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		slug := ctx.Param("slug")
+
+		result, err := a.splRepo.FindBySlug(slug)
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusNotFound, nil)
+			return
+		}
+
+		result.Thumbnail.OriginalSrc = a.conf.AwsUtils.S3_PUBLIC_ACCESS_BASEURL + "/" + result.Thumbnail.OriginalImagePath
+		result.Thumbnail.BlurDataURL = a.conf.AwsUtils.S3_PUBLIC_ACCESS_BASEURL + "/" + result.Thumbnail.BlurImagePath
+
+		ctx.JSON(http.StatusOK, serialize.DataResponse[*specialitymodel.SpecialityEntity]{
+			Data: result,
+			Response: serialize.Response{
+				StatusCode: http.StatusOK,
+				Message:    "Speciality details retrieved successfully",
+			},
+		})
+
+	}
 }
 
 func (a *SpecialityAPI) UpdateById() gin.HandlerFunc {
@@ -149,6 +169,7 @@ func (a *SpecialityAPI) UpdateById() gin.HandlerFunc {
 			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
 			return
 		}
+		defer ctx.Request.Body.Close()
 
 		var doc *specialitymodel.SpecialityEntity
 
@@ -264,6 +285,66 @@ func (a *SpecialityAPI) DeleteById() gin.HandlerFunc {
 		}
 
 		ctx.JSON(http.StatusNoContent, nil)
+
+	}
+}
+
+func (a *SpecialityAPI) GetAll() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+
+		pgOpts := api.ParsePaginationOptions(ctx, "speciality")
+		sortOpts := api.ParseSortByOptions(ctx)
+		filterOptions := api.ParseFilterByOptions(ctx)
+		keySetSortBy := "$gt"
+
+		// Default options | sort by latest
+		if len(*sortOpts) == 0 {
+			sortOpts = &map[string]int8{"_id": -1}
+		}
+
+		if pgOpts.PaginateId != nil {
+			for key, value := range *sortOpts {
+				if value == -1 && key == "_id" {
+					keySetSortBy = "$lt"
+				}
+			}
+		}
+
+		res, err := a.splRepo.FindAll(pgOpts, sortOpts, filterOptions, keySetSortBy)
+
+		resLen := len(res)
+
+		// Paginate Options
+		var docCount int64
+		var lastResId *primitive.ObjectID
+
+		if pgOpts.PaginateId == nil {
+			docCount, err = a.splRepo.GetDocumentsCount(filterOptions)
+			if err != nil {
+				api.SendErrorResponse(ctx, err.Error(), http.StatusInternalServerError, nil)
+				return
+			}
+		}
+
+		if resLen > 0 {
+			lastResId = &res[resLen-1].ID
+		}
+
+		count, next, prev, paginateKeySetID := api.GetPaginateOptions(docCount, pgOpts, int64(resLen), lastResId, "speciality")
+
+		ctx.JSON(http.StatusOK, serialize.PaginatedDataResponse[[]specialitymodel.SpecialityEntity]{
+			Count:            count,
+			Next:             next,
+			Prev:             prev,
+			PaginateKeySetID: paginateKeySetID,
+			DataResponse: serialize.DataResponse[[]specialitymodel.SpecialityEntity]{
+				Data: res,
+				Response: serialize.Response{
+					StatusCode: http.StatusOK,
+					Message:    "List of specialities retrieved successfully",
+				},
+			},
+		})
 
 	}
 }

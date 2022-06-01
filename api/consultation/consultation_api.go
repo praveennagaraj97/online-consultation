@@ -142,7 +142,7 @@ func (a *ConsultationAPI) GetAll() gin.HandlerFunc {
 			lastResId = &res[resLen-1].ID
 		}
 
-		count, next, prev, paginateKeySetID := api.GetPaginateOptions(docCount, pgOpts, int64(resLen), lastResId, "user_delivery_address")
+		count, next, prev, paginateKeySetID := api.GetPaginateOptions(docCount, pgOpts, int64(resLen), lastResId, "consultation_type")
 
 		ctx.JSON(http.StatusOK, serialize.PaginatedDataResponse[[]consultationmodel.ConsultationEntity]{
 			Count:            count,

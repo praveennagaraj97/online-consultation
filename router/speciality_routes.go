@@ -20,6 +20,7 @@ func (r *Router) specialityRoutes() {
 	adminRoutes.PATCH("/:id", r.middlewares.UserRole([]constants.UserType{constants.ADMIN, constants.EDITOR, constants.SUPER_ADMIN}), api.UpdateById())
 
 	routes.GET("", api.GetAll())
+	routes.GET("/slug/:slug", api.GetBySlug())
 	routes.GET("/:id", api.GetById())
 
 }
