@@ -55,6 +55,10 @@ func GetPaginateOptions(docCount int64, pgOpts *PaginationOptions, docLen int64,
 		}
 	}
 
+	if !next {
+		paginateId = nil
+	}
+
 	return &count, &next, &prev, paginateId
 
 }
