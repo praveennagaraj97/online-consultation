@@ -35,7 +35,7 @@ type UpdateUserDTO struct {
 }
 
 type SignInWithPhoneDTO struct {
-	VerificationId string `json:"verify_code" form:"verify_code"`
+	VerificationId string `json:"verification_id" form:"verification_id"`
 	PhoneCode      string `json:"phone_code" form:"phone_code"`
 	PhoneNumber    string `json:"phone_number" form:"phone_number"`
 }
