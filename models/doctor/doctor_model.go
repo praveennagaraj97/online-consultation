@@ -29,6 +29,12 @@ type DoctorSpokenLanguagesEntity struct {
 	Language *languagesmodel.LanguageEntity `json:"language" bson:"language"`
 }
 
+type DoctorSpecialitiesEntity struct {
+	ID         primitive.ObjectID `json:"id" bson:"_id"`
+	DoctorId   primitive.ObjectID `json:"doctor_id" bson:"doctor_id"`
+	Speciality primitive.ObjectID `json:"speciality_id" bson:"speciality_id"`
+}
+
 type DoctorEntity struct {
 	ID                primitive.ObjectID                 `json:"id" bson:"_id"`
 	Name              string                             `json:"name" bson:"name"`
