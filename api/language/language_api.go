@@ -10,6 +10,7 @@ import (
 	languagesmodel "github.com/praveennagaraj97/online-consultation/models/languages"
 	languagerepo "github.com/praveennagaraj97/online-consultation/repository/language"
 	"github.com/praveennagaraj97/online-consultation/serialize"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type LanguageAPI struct {
@@ -25,7 +26,7 @@ func (a *LanguageAPI) Initialize(lngrepo *languagerepo.LanguageRepository, conf 
 
 func (a *LanguageAPI) AddNewLanguage() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var payload languagedto.AddLanguageDTO
+		var payload languagedto.AddOrEditLanguageDTO
 
 		if err := ctx.ShouldBind(&payload); err != nil {
 			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
@@ -38,7 +39,7 @@ func (a *LanguageAPI) AddNewLanguage() gin.HandlerFunc {
 		}
 
 		// Check If same language already exist
-		if exist := a.lngRepo.ChechIfExistByName(payload.Name, payload.LocaleName); exist {
+		if exist := a.lngRepo.CheckIfExistByName(payload.Name, payload.LocaleName); exist {
 			api.SendErrorResponse(ctx, "Language with given name or locale name already exist", http.StatusUnprocessableEntity, nil)
 			return
 		}
@@ -63,17 +64,116 @@ func (a *LanguageAPI) AddNewLanguage() gin.HandlerFunc {
 }
 
 func (a *LanguageAPI) GetAllLanguages() gin.HandlerFunc {
-	return func(ctx *gin.Context) {}
+	return func(ctx *gin.Context) {
+
+		pgOpts := api.ParsePaginationOptions(ctx, "languages_list")
+		sortOpts := api.ParseSortByOptions(ctx)
+		filterOptions := api.ParseFilterByOptions(ctx)
+		keySortById := "$gt"
+
+		if len(*sortOpts) == 0 {
+			sortOpts = &map[string]int8{"_id": -1}
+		}
+
+		if pgOpts.PaginateId != nil {
+			for key, value := range *sortOpts {
+				if value == -1 && key == "_id" {
+					keySortById = "$lt"
+				}
+			}
+		}
+
+		res, err := a.lngRepo.Find(pgOpts, sortOpts, filterOptions, keySortById)
+		if err != nil {
+			api.SendErrorResponse(ctx, "Something went wrong", http.StatusBadRequest, &map[string]string{
+				"reason": err.Error(),
+			})
+			return
+		}
+
+		resLen := len(res)
+
+		// Paginate Options
+		var docCount int64
+		var lastResId *primitive.ObjectID
+
+		if pgOpts.PaginateId == nil {
+			docCount, err = a.lngRepo.GetDocumentsCount(filterOptions)
+			if err != nil {
+				api.SendErrorResponse(ctx, err.Error(), http.StatusInternalServerError, nil)
+				return
+			}
+		}
+
+		if resLen > 0 {
+			lastResId = &res[resLen-1].ID
+		}
+
+		count, next, prev, paginateKeySetID := api.GetPaginateOptions(docCount, pgOpts, int64(resLen), lastResId, "languages_list")
+
+		ctx.JSON(http.StatusOK, serialize.PaginatedDataResponse[[]languagesmodel.LanguageEntity]{
+			Count:            count,
+			Next:             next,
+			Prev:             prev,
+			PaginateKeySetID: paginateKeySetID,
+			DataResponse: serialize.DataResponse[[]languagesmodel.LanguageEntity]{
+				Data: res,
+				Response: serialize.Response{
+					StatusCode: http.StatusOK,
+					Message:    "List of languages retrieved successfully",
+				},
+			},
+		})
+
+	}
 }
 
 func (a *LanguageAPI) GetLanguageById() gin.HandlerFunc {
-	return func(ctx *gin.Context) {}
-}
+	return func(ctx *gin.Context) {
 
-func (a *LanguageAPI) UpdateLanguageById() gin.HandlerFunc {
-	return func(ctx *gin.Context) {}
+		id := ctx.Param("id")
+
+		objectId, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		res, err := a.lngRepo.FindById(&objectId)
+
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusNotFound, nil)
+			return
+		}
+
+		ctx.JSON(http.StatusOK, serialize.DataResponse[*languagesmodel.LanguageEntity]{
+			Data: res,
+			Response: serialize.Response{
+				StatusCode: http.StatusOK,
+				Message:    "Language details retrieved successfully",
+			},
+		})
+
+	}
 }
 
 func (a *LanguageAPI) DeleteLanguageById() gin.HandlerFunc {
-	return func(ctx *gin.Context) {}
+	return func(ctx *gin.Context) {
+		id := ctx.Param("id")
+
+		objectId, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		err = a.lngRepo.DeleteById(&objectId)
+
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusNotFound, nil)
+			return
+		}
+
+		ctx.JSON(http.StatusNoContent, nil)
+	}
 }

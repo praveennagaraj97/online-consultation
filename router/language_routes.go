@@ -16,8 +16,7 @@ func (r *Router) languageRoutes() {
 	adminRoutes.Use(r.middlewares.IsAuthorized())
 
 	adminRoutes.POST("", r.middlewares.UserRole([]constants.UserType{constants.ADMIN, constants.EDITOR, constants.SUPER_ADMIN}), api.AddNewLanguage())
-	adminRoutes.PATCH("", r.middlewares.UserRole([]constants.UserType{constants.ADMIN, constants.EDITOR, constants.SUPER_ADMIN}), api.UpdateLanguageById())
-	adminRoutes.DELETE("", r.middlewares.UserRole([]constants.UserType{constants.ADMIN, constants.EDITOR, constants.SUPER_ADMIN}), api.DeleteLanguageById())
+	adminRoutes.DELETE("/:id", r.middlewares.UserRole([]constants.UserType{constants.ADMIN, constants.EDITOR, constants.SUPER_ADMIN}), api.DeleteLanguageById())
 
 	routes.GET("", api.GetAllLanguages())
 	routes.GET("/:id", api.GetLanguageById())
