@@ -146,3 +146,13 @@ func (r *LanguageRepository) DeleteById(id *primitive.ObjectID) error {
 	return err
 
 }
+
+func (r *LanguageRepository) UpdateById(id *primitive.ObjectID, dto *languagedto.AddOrEditLanguageDTO) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	_, err := r.colln.UpdateByID(ctx, id, bson.M{"$set": dto})
+
+	return err
+
+}

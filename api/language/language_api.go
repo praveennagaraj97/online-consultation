@@ -177,3 +177,37 @@ func (a *LanguageAPI) DeleteLanguageById() gin.HandlerFunc {
 		ctx.JSON(http.StatusNoContent, nil)
 	}
 }
+
+func (a *LanguageAPI) UpdateLanguageById() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		id := ctx.Param("id")
+
+		objectId, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		var payload languagedto.AddOrEditLanguageDTO
+
+		if err := ctx.ShouldBind(&payload); err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		if payload.Name == "" && payload.LocaleName == "" {
+			api.SendErrorResponse(ctx, "Formdata is empty", http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		err = a.lngRepo.UpdateById(&objectId, &payload)
+
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusNotFound, nil)
+			return
+		}
+
+		ctx.JSON(http.StatusNoContent, nil)
+
+	}
+}
