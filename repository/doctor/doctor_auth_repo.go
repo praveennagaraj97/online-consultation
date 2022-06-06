@@ -2,11 +2,12 @@ package doctorrepo
 
 import (
 	"context"
+	"errors"
 	"time"
 
-	doctordto "github.com/praveennagaraj97/online-consultation/dto/doctor"
 	"github.com/praveennagaraj97/online-consultation/interfaces"
 	doctormodel "github.com/praveennagaraj97/online-consultation/models/doctor"
+	"github.com/praveennagaraj97/online-consultation/pkg/env"
 	"github.com/praveennagaraj97/online-consultation/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -14,11 +15,14 @@ import (
 )
 
 type DoctorAuthRepository struct {
-	colln *mongo.Collection
+	colln         *mongo.Collection
+	imageBasePath string
 }
 
 func (r *DoctorAuthRepository) Initialize(colln *mongo.Collection) {
 	r.colln = colln
+
+	r.imageBasePath = env.GetEnvVariable("S3_ACCESS_BASEURL")
 
 	utils.CreateIndex(colln, bson.D{
 		{Key: "phone.number", Value: 1},
@@ -30,28 +34,17 @@ func (r *DoctorAuthRepository) Initialize(colln *mongo.Collection) {
 		"Email", true)
 }
 
-func (r *DoctorAuthRepository) CreateOne(dto *doctordto.AddNewDoctorDTO) (*doctormodel.DoctorEntity, error) {
+func (r *DoctorAuthRepository) CreateOne(doc *doctormodel.DoctorEntity) error {
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
-	doc := doctormodel.DoctorEntity{
-		ID:                primitive.NewObjectID(),
-		Name:              dto.Name,
-		Email:             dto.Email,
-		Phone:             &interfaces.PhoneType{Code: dto.PhoneCode, Number: dto.PhoneNumber},
-		Type:              dto.ConsultationType,
-		ProfessionalTitle: dto.ProfessionalTitle,
-		Experience:        dto.Experience,
-		RefreshToken:      "",
-	}
-
 	_, err := r.colln.InsertOne(ctx, doc)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return &doc, nil
+	return nil
 
 }
 
@@ -75,7 +68,7 @@ func (r *DoctorAuthRepository) CheckIfDoctorExistsByEmailOrPhone(email string, p
 	return count > 0
 }
 
-func (r *DoctorAuthRepository) FindById(id *primitive.ObjectID) interface{} {
+func (r *DoctorAuthRepository) FindById(id *primitive.ObjectID) (*doctormodel.DoctorEntity, error) {
 
 	filterPipe := bson.D{{Key: "$match", Value: bson.M{"_id": id}}}
 
@@ -99,22 +92,48 @@ func (r *DoctorAuthRepository) FindById(id *primitive.ObjectID) interface{} {
 		setTypePipe,
 	}
 
+	// Add Prefix to image
+	setImagePrefixPipe := bson.D{{Key: "$set",
+		Value: bson.M{"profile_pic.image_src": bson.M{"$cond": bson.D{
+			{Key: "if", Value: bson.M{"$eq": bson.A{"$profile_pic", nil}}},
+			{Key: "then", Value: nil},
+			{Key: "else", Value: bson.M{"$concat": bson.A{r.imageBasePath, "/", "$profile_pic.original_image_path"}}},
+		}}}}}
+	setBlurImagePrefixPipe := bson.D{{Key: "$set",
+		Value: bson.M{"profile_pic.blur_data_url": bson.M{"$cond": bson.D{
+			{Key: "if", Value: bson.M{"$eq": bson.A{"$profile_pic", nil}}},
+			{Key: "then", Value: nil},
+			{Key: "else", Value: bson.M{"$concat": bson.A{r.imageBasePath, "/", "$profile_pic.blur_image_path"}}},
+		}}}}}
+	resetNullImagePipe := bson.D{{Key: "$set", Value: bson.M{
+		"profile_pic": bson.M{"$cond": bson.D{
+			{Key: "if", Value: bson.M{"$eq": bson.A{"$profile_pic.image_src", nil}}},
+			{Key: "then", Value: nil},
+			{Key: "else", Value: "$profile_pic"},
+		}},
+	}}}
+	pipeLine = append(pipeLine, setImagePrefixPipe, setBlurImagePrefixPipe, resetNullImagePipe)
+
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
-	res, _ := r.colln.Aggregate(ctx, pipeLine)
+	cur, err := r.colln.Aggregate(ctx, pipeLine)
+	if err != nil {
+		return nil, errors.New("Couldn't find any doctor matching gived id")
+	}
 
 	var result []doctormodel.DoctorEntity
 
-	if err := res.All(ctx, &result); err != nil {
+	defer cur.Close(context.TODO())
 
-		return err
+	if err := cur.All(ctx, &result); err != nil {
+		return nil, err
 	}
 
 	if len(result) == 1 {
-		return result[0]
+		return &result[0], nil
 	}
 
-	return nil
+	return nil, errors.New("Couldn't find any doctor matching gived id")
 
 }

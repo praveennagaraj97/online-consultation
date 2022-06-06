@@ -17,6 +17,8 @@ type AddNewDoctorDTO struct {
 	ProfessionalTitle string              `json:"professional_title" form:"professional_title"`
 	Experience        uint8               `json:"experience" form:"experience"`
 	ConsultationType  *primitive.ObjectID `json:"-" form:"-"`
+	ProfilePicWidth   uint64              `json:"profile_pic_width" form:"profile_pic_width"`
+	ProfilePicHeight  uint64              `json:"profile_pic_height" form:"profile_pic_height"`
 }
 
 func (a *AddNewDoctorDTO) Validate() *serialize.ErrorResponse {
@@ -57,6 +59,11 @@ func (a *AddNewDoctorDTO) Validate() *serialize.ErrorResponse {
 		} else {
 			a.ConsultationType = &objectId
 		}
+	}
+
+	if a.ProfilePicWidth == 0 || a.ProfilePicHeight == 0 {
+		a.ProfilePicWidth = 110
+		a.ProfilePicHeight = 110
 	}
 
 	if len(errs) > 0 {
