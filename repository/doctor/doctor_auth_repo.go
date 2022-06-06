@@ -2,7 +2,6 @@ package doctorrepo
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	doctordto "github.com/praveennagaraj97/online-consultation/dto/doctor"
@@ -108,8 +107,8 @@ func (r *DoctorAuthRepository) FindById(id *primitive.ObjectID) interface{} {
 	var result []doctormodel.DoctorEntity
 
 	if err := res.All(ctx, &result); err != nil {
-		fmt.Println(err)
-		return err.Error()
+
+		return err
 	}
 
 	if len(result) == 1 {

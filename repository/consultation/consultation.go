@@ -104,6 +104,8 @@ func (r *ConsultationRepository) FindAll(
 		return nil, err
 	}
 
+	defer cur.Close(context.TODO())
+
 	return result, nil
 }
 

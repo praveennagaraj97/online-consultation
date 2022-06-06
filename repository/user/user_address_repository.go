@@ -106,7 +106,7 @@ func (r *UserDeliveryAddressRepository) FindAll(pgnOpt *api.PaginationOptions,
 		return nil, err
 	}
 
-	defer cur.Close(ctx)
+	defer cur.Close(context.TODO())
 
 	return results, nil
 }

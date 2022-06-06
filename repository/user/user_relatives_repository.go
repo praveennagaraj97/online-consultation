@@ -147,7 +147,7 @@ func (r *UserRelativesRepository) FindAll(
 		return nil, err
 	}
 
-	defer cur.Close(ctx)
+	defer cur.Close(context.TODO())
 
 	return results, nil
 

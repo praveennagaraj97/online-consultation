@@ -3,7 +3,6 @@ package languagerepo
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/praveennagaraj97/online-consultation/api"
@@ -104,7 +103,7 @@ func (r *LanguageRepository) Find(
 		return nil, err
 	}
 
-	fmt.Println(result)
+	defer cur.Close(context.TODO())
 
 	return result, nil
 
