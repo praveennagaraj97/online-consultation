@@ -5,6 +5,7 @@ import (
 	logger "github.com/praveennagaraj97/online-consultation/pkg/log"
 	adminrepository "github.com/praveennagaraj97/online-consultation/repository/admin"
 	consultationrepository "github.com/praveennagaraj97/online-consultation/repository/consultation"
+	doctorrepo "github.com/praveennagaraj97/online-consultation/repository/doctor"
 	languagerepo "github.com/praveennagaraj97/online-consultation/repository/language"
 	onetimepasswordrepository "github.com/praveennagaraj97/online-consultation/repository/onetimepassword"
 	specialityrepository "github.com/praveennagaraj97/online-consultation/repository/specialities"
@@ -21,6 +22,7 @@ type Repository struct {
 	adminRepo               *adminrepository.AdminRepository
 	specialityRepo          *specialityrepository.SpecialitysRepository
 	languageRepo            *languagerepo.LanguageRepository
+	doctorAuthRepo          *doctorrepo.DoctorAuthRepository
 }
 
 func (r *Repository) Initialize(mgoClient *mongo.Client, dbName string) {
@@ -57,6 +59,10 @@ func (r *Repository) Initialize(mgoClient *mongo.Client, dbName string) {
 	r.languageRepo = &languagerepo.LanguageRepository{}
 	r.languageRepo.Initialize(db.OpenCollection(mgoClient, dbName, "language"))
 
+	// Doctor Auth Repo
+	r.doctorAuthRepo = &doctorrepo.DoctorAuthRepository{}
+	r.doctorAuthRepo.Initialize(db.OpenCollection(mgoClient, dbName, "doctor"))
+
 	logger.PrintLog("Repositories initialized 📜")
 }
 
@@ -90,4 +96,8 @@ func (r *Repository) GetSpecialityRepository() *specialityrepository.Specialitys
 
 func (r *Repository) GetLanguageRepository() *languagerepo.LanguageRepository {
 	return r.languageRepo
+}
+
+func (r *Repository) GetDoctorAuthRepository() *doctorrepo.DoctorAuthRepository {
+	return r.doctorAuthRepo
 }

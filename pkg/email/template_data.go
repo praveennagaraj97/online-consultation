@@ -18,6 +18,15 @@ type ConfirmEmailTemplateData struct {
 	ButtonName             string
 }
 
+type NewDoctorAddedTemplateData struct {
+	MetaInfo *EmailMetaInfoTemplateData
+	Profile  struct {
+		Name string
+		Role string
+	}
+	LoginLink string
+}
+
 func GetRegisterEmailTemplateData(name, verifyLink string) *ConfirmEmailTemplateData {
 
 	return &ConfirmEmailTemplateData{
@@ -88,5 +97,21 @@ func GetForgotEmailLinkTemplateData(name, link string) *ConfirmEmailTemplateData
 		FooterMessage: `You received this email because we received a request for
                   resetting your password.`,
 		ButtonName: "Reset now",
+	}
+}
+
+func GetNewDoctorAddedTemplateData(name, role, loginLink string) *NewDoctorAddedTemplateData {
+	return &NewDoctorAddedTemplateData{
+		MetaInfo: &EmailMetaInfoTemplateData{
+			MetaTitle: "Welcome to Online Consultation",
+		},
+		Profile: struct {
+			Name string
+			Role string
+		}{
+			Name: name,
+			Role: role,
+		},
+		LoginLink: loginLink,
 	}
 }

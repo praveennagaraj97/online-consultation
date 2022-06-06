@@ -2,12 +2,11 @@ package doctormodel
 
 import (
 	"github.com/praveennagaraj97/online-consultation/interfaces"
-	consultationmodel "github.com/praveennagaraj97/online-consultation/models/consultation"
 	languagesmodel "github.com/praveennagaraj97/online-consultation/models/languages"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type DoctorHospitalEntity struct {
+type DoctorHospital struct {
 	ID       primitive.ObjectID       `json:"id" bson:"_id"`
 	Name     string                   `json:"name" bson:"name"`
 	City     string                   `json:"city" bson:"city"`
@@ -36,14 +35,15 @@ type DoctorSpecialitiesEntity struct {
 }
 
 type DoctorEntity struct {
-	ID                primitive.ObjectID                 `json:"id" bson:"_id"`
-	Name              string                             `json:"name" bson:"name"`
-	Email             string                             `json:"email" bson:"email"`
-	Phone             *interfaces.PhoneType              `json:"phone" bson:"phone"`
-	Type              consultationmodel.ConsultationType `json:"-" bson:"type"`
-	ProfessionalTitle string                             `json:"professional_title" bson:"professional_title"`
-	Experience        uint8                              `json:"experience" bson:"experience"`
-	ProfilePic        *interfaces.ImageType              `json:"profile_pic" bson:"profile_pic"`
-	Hospital          *DoctorHospitalEntity              `json:"hospital" bson:"hospital"`
-	RefreshToken      string                             `json:"refresh_token" bson:"refresh_token"`
+	ID                primitive.ObjectID    `json:"id" bson:"_id"`
+	Name              string                `json:"name" bson:"name"`
+	Email             string                `json:"email" bson:"email"`
+	Phone             *interfaces.PhoneType `json:"phone" bson:"phone"`
+	Type              *primitive.ObjectID   `json:"-" bson:"type"`
+	ConsultationType  string                `json:"consultation_type,omitempty" bson:"consultation_type,omitempty"`
+	ProfessionalTitle string                `json:"professional_title" bson:"professional_title"`
+	Experience        uint8                 `json:"experience" bson:"experience"`
+	ProfilePic        *interfaces.ImageType `json:"profile_pic" bson:"profile_pic"`
+	Hospital          *DoctorHospital       `json:"hospital" bson:"hospital"`
+	RefreshToken      string                `json:"-" bson:"refresh_token"`
 }

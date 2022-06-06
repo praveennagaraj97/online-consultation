@@ -44,11 +44,11 @@ func (m *Mailer) Initialize() {
 }
 
 // send mail template with formated data to client
-func (m *Mailer) SendNoReplyMail(to []string, subject string, templateName string, baseTemplateNam string, td interface{}) error {
+func (m *Mailer) SendNoReplyMail(to []string, subject string, templateName string, baseTemplateName string, td interface{}) error {
 
 	smtpAuth := smtp.PlainAuth("", m.sender.username, m.sender.password, m.smtp.host)
 
-	t := m.parseTemplate(templateName)
+	t := m.parseTemplate(templateName, baseTemplateName)
 
 	var body bytes.Buffer
 
@@ -65,7 +65,7 @@ func (m *Mailer) SendNoReplyMail(to []string, subject string, templateName strin
 	body.Write([]byte(fmt.Sprintf("To: %v \nFrom: %s \nSubject: %s \n%s\n\n", recievers,
 		m.noreply, subject, mimeHeaders)))
 
-	err := t.ExecuteTemplate(&body, baseTemplateNam, td)
+	err := t.ExecuteTemplate(&body, baseTemplateName, td)
 
 	if err != nil {
 		return err
@@ -85,14 +85,14 @@ var emailTemplatesFS embed.FS
 
 var funcs = template.FuncMap{}
 
-func (m *Mailer) parseTemplate(file string) *template.Template {
+func (m *Mailer) parseTemplate(file, baseFile string) *template.Template {
 
 	if m.templateCache[file] != nil {
 		return m.templateCache[file]
 	}
 	t, err := template.New(
 		fmt.Sprintf("%s.gotmpl", file)).Funcs(funcs).ParseFS(
-		emailTemplatesFS, "templates/layouts/base.layout.gotmpl",
+		emailTemplatesFS, fmt.Sprintf("templates/layouts/%s.layout.gotmpl", baseFile),
 		fmt.Sprintf("templates/%s.gotmpl", file))
 
 	m.templateCache[file] = t
