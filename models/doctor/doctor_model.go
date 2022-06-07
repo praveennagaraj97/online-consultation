@@ -2,17 +2,9 @@ package doctormodel
 
 import (
 	"github.com/praveennagaraj97/online-consultation/interfaces"
+	hospitalmodel "github.com/praveennagaraj97/online-consultation/models/hospital"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
-
-type DoctorHospitalEntity struct {
-	ID       primitive.ObjectID                 `json:"id" bson:"_id"`
-	Name     string                             `json:"name" bson:"name"`
-	City     string                             `json:"city" bson:"city"`
-	Country  string                             `json:"country" bson:"country"`
-	Address  string                             `json:"address" bson:"address"`
-	Location *interfaces.MongoPointLocationType `json:"location,omitempty" bson:"location,omitempty"`
-}
 
 type DoctorQualificationEntity struct {
 	ID              primitive.ObjectID `json:"id" bson:"_id"`
@@ -33,8 +25,8 @@ type DoctorEntity struct {
 	RefreshToken      string                `json:"-" bson:"refresh_token"`
 
 	// Populate fields
-	ConsultationType string                `json:"consultation_type,omitempty" bson:"consultation_type,omitempty"`
-	Hospital         *DoctorHospitalEntity `json:"hospital" bson:"hospital,omitempty"`
+	ConsultationType string                        `json:"consultation_type,omitempty" bson:"consultation_type,omitempty"`
+	Hospital         *hospitalmodel.HospitalEntity `json:"hospital" bson:"hospital,omitempty"`
 
 	// reference fields
 	TypeId     *primitive.ObjectID `json:"-" bson:"type"`

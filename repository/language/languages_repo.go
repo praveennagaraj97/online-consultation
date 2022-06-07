@@ -26,7 +26,7 @@ func (r *LanguageRepository) Initialize(colln *mongo.Collection) {
 	utils.CreateIndex(colln, bson.D{{Key: "locale_name", Value: 1}}, "Unique locale name", true)
 }
 
-func (r *LanguageRepository) CreateOne(payload *languagedto.AddOrEditLanguageDTO) (*languagesmodel.LanguageEntity, error) {
+func (r *LanguageRepository) CreateOne(payload *languagedto.AddLanguageDTO) (*languagesmodel.LanguageEntity, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
@@ -146,7 +146,7 @@ func (r *LanguageRepository) DeleteById(id *primitive.ObjectID) error {
 
 }
 
-func (r *LanguageRepository) UpdateById(id *primitive.ObjectID, dto *languagedto.AddOrEditLanguageDTO) error {
+func (r *LanguageRepository) UpdateById(id *primitive.ObjectID, dto *languagedto.EditLanguageDTO) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 

@@ -1,4 +1,4 @@
-package doctordto
+package hospitaldto
 
 import (
 	"net/http"
@@ -6,8 +6,8 @@ import (
 	"github.com/praveennagaraj97/online-consultation/serialize"
 )
 
-type AddDoctorHospitalDTO struct {
-	Name      string  `json:"name" form:"name"`
+type AddHospitalDTO struct {
+	Name      string  `json:"name,omitempty" form:"name"`
 	City      string  `json:"city" form:"city"`
 	Country   string  `json:"country" form:"country"`
 	Address   string  `json:"address" form:"address"`
@@ -15,7 +15,7 @@ type AddDoctorHospitalDTO struct {
 	Longitude float64 `json:"longitude" form:"longitude,omitempty"`
 }
 
-func (a *AddDoctorHospitalDTO) Validate() *serialize.ErrorResponse {
+func (a *AddHospitalDTO) Validate() *serialize.ErrorResponse {
 	errs := map[string]string{}
 
 	if a.Name == "" {

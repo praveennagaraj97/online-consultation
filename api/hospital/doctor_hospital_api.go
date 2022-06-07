@@ -6,9 +6,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/praveennagaraj97/online-consultation/api"
 	"github.com/praveennagaraj97/online-consultation/app"
-	doctordto "github.com/praveennagaraj97/online-consultation/dto/doctor"
+	hospitaldto "github.com/praveennagaraj97/online-consultation/dto/hospital"
 	"github.com/praveennagaraj97/online-consultation/interfaces"
-	doctormodel "github.com/praveennagaraj97/online-consultation/models/doctor"
+	hospitalmodel "github.com/praveennagaraj97/online-consultation/models/hospital"
 	hospitalrepo "github.com/praveennagaraj97/online-consultation/repository/hospital"
 	"github.com/praveennagaraj97/online-consultation/serialize"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -26,7 +26,7 @@ func (a *HospitalAPI) Initialize(conf *app.ApplicationConfig, hspRepo *hospitalr
 
 func (a *HospitalAPI) AddNewHospital() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var payload doctordto.AddDoctorHospitalDTO
+		var payload hospitaldto.AddHospitalDTO
 
 		if err := ctx.ShouldBind(&payload); err != nil {
 			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
@@ -38,7 +38,7 @@ func (a *HospitalAPI) AddNewHospital() gin.HandlerFunc {
 			return
 		}
 
-		doc := doctormodel.DoctorHospitalEntity{
+		doc := hospitalmodel.HospitalEntity{
 			ID:      primitive.NewObjectID(),
 			Name:    payload.Name,
 			City:    payload.City,
@@ -62,7 +62,7 @@ func (a *HospitalAPI) AddNewHospital() gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(http.StatusCreated, serialize.DataResponse[*doctormodel.DoctorHospitalEntity]{
+		ctx.JSON(http.StatusCreated, serialize.DataResponse[*hospitalmodel.HospitalEntity]{
 			Data: &doc,
 			Response: serialize.Response{
 				StatusCode: http.StatusCreated,
@@ -89,13 +89,19 @@ func (a *HospitalAPI) GetHospitalById() gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(http.StatusOK, serialize.DataResponse[*doctormodel.DoctorHospitalEntity]{
+		ctx.JSON(http.StatusOK, serialize.DataResponse[*hospitalmodel.HospitalEntity]{
 			Data: res,
 			Response: serialize.Response{
 				StatusCode: http.StatusOK,
 				Message:    "Hospital details retrieved successfully",
 			},
 		})
+
+	}
+}
+
+func (a *HospitalAPI) UpdateHospitalById() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
 
 	}
 }

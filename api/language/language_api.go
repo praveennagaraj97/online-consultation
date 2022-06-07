@@ -26,7 +26,7 @@ func (a *LanguageAPI) Initialize(lngrepo *languagerepo.LanguageRepository, conf 
 
 func (a *LanguageAPI) AddNewLanguage() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var payload languagedto.AddOrEditLanguageDTO
+		var payload languagedto.AddLanguageDTO
 
 		if err := ctx.ShouldBind(&payload); err != nil {
 			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
@@ -188,7 +188,7 @@ func (a *LanguageAPI) UpdateLanguageById() gin.HandlerFunc {
 			return
 		}
 
-		var payload languagedto.AddOrEditLanguageDTO
+		var payload languagedto.EditLanguageDTO
 
 		if err := ctx.ShouldBind(&payload); err != nil {
 			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)

@@ -5,7 +5,7 @@ import (
 	"errors"
 	"time"
 
-	doctormodel "github.com/praveennagaraj97/online-consultation/models/doctor"
+	hospitalmodel "github.com/praveennagaraj97/online-consultation/models/hospital"
 	"github.com/praveennagaraj97/online-consultation/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -22,7 +22,7 @@ func (r *HospitalRepository) Initialize(colln *mongo.Collection) {
 	utils.CreateIndex(colln, bson.D{{Key: "name", Value: 1}}, "Hospital name", true)
 }
 
-func (r *HospitalRepository) CreateOne(doc *doctormodel.DoctorHospitalEntity) error {
+func (r *HospitalRepository) CreateOne(doc *hospitalmodel.HospitalEntity) error {
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
@@ -44,7 +44,7 @@ func (r *HospitalRepository) CheckIfExistByName(name string) bool {
 	return count > 0
 }
 
-func (r *HospitalRepository) FindById(id *primitive.ObjectID) (*doctormodel.DoctorHospitalEntity, error) {
+func (r *HospitalRepository) FindById(id *primitive.ObjectID) (*hospitalmodel.HospitalEntity, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
@@ -54,7 +54,7 @@ func (r *HospitalRepository) FindById(id *primitive.ObjectID) (*doctormodel.Doct
 		return nil, errors.New("Couldn't find any matching hosiptal with given ID")
 	}
 
-	var result doctormodel.DoctorHospitalEntity
+	var result hospitalmodel.HospitalEntity
 
 	if err := cur.Decode(&result); err != nil {
 		return nil, err
@@ -63,5 +63,3 @@ func (r *HospitalRepository) FindById(id *primitive.ObjectID) (*doctormodel.Doct
 	return &result, nil
 
 }
-
-func (r *HospitalRepository) FindAll() {}
