@@ -28,5 +28,6 @@ func (r *Router) hospitalRoutes() {
 	}), api.DeleteById())
 
 	routes.GET("/:id", api.GetHospitalById())
+	routes.GET("", api.GetAllHospitals())
 
 }

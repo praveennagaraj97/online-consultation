@@ -167,3 +167,68 @@ func (a *HospitalAPI) DeleteById() gin.HandlerFunc {
 
 	}
 }
+
+func (a *HospitalAPI) GetAllHospitals() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		pgOpts := api.ParsePaginationOptions(ctx, "hospitals")
+		fltsOpts := api.ParseFilterByOptions(ctx)
+		sortOpts := api.ParseSortByOptions(ctx)
+		keySortBy := "$gt"
+
+		if len(*sortOpts) == 0 {
+			sortOpts = &map[string]int8{"_id": -1}
+		}
+
+		if pgOpts.PaginateId != nil {
+			for key, value := range *sortOpts {
+				if key == "_id" && value == -1 {
+					keySortBy = "$lt"
+				}
+			}
+		}
+
+		res, err := a.hspRepo.FindAll(pgOpts, fltsOpts, sortOpts, keySortBy)
+
+		if err != nil {
+			api.SendErrorResponse(ctx, "Something went wrong", http.StatusBadRequest, &map[string]string{
+				"reason": err.Error(),
+			})
+			return
+		}
+
+		resLen := len(res)
+
+		// Paginate Options
+		var docCount int64
+		var lastResId *primitive.ObjectID
+
+		if pgOpts.PaginateId == nil {
+			docCount, err = a.hspRepo.GetDocumentsCount(fltsOpts)
+			if err != nil {
+				api.SendErrorResponse(ctx, err.Error(), http.StatusInternalServerError, nil)
+				return
+			}
+		}
+
+		if resLen > 0 {
+			lastResId = &res[resLen-1].ID
+		}
+
+		count, next, prev, paginateKeySetID := api.GetPaginateOptions(docCount, pgOpts, docCount, lastResId, "hospitals")
+
+		ctx.JSON(http.StatusOK, serialize.PaginatedDataResponse[[]hospitalmodel.HospitalEntity]{
+			Count:            count,
+			Next:             next,
+			Prev:             prev,
+			PaginateKeySetID: paginateKeySetID,
+			DataResponse: serialize.DataResponse[[]hospitalmodel.HospitalEntity]{
+				Data: res,
+				Response: serialize.Response{
+					StatusCode: http.StatusOK,
+					Message:    "List of hospitals retrieved",
+				},
+			},
+		})
+
+	}
+}
