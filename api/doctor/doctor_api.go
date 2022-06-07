@@ -26,7 +26,6 @@ type DoctorAPI struct {
 func (a *DoctorAPI) Initialize(conf *app.ApplicationConfig, authRepo *doctorrepo.DoctorAuthRepository) {
 	a.authRepo = authRepo
 	a.appConf = conf
-
 }
 
 func (a *DoctorAPI) AddNewDoctor() gin.HandlerFunc {
@@ -56,7 +55,7 @@ func (a *DoctorAPI) AddNewDoctor() gin.HandlerFunc {
 			Name:              payload.Name,
 			Email:             payload.Email,
 			Phone:             &interfaces.PhoneType{Code: payload.PhoneCode, Number: payload.PhoneNumber},
-			Type:              payload.ConsultationType,
+			TypeId:            payload.ConsultationType,
 			ProfessionalTitle: payload.ProfessionalTitle,
 			Experience:        payload.Experience,
 			RefreshToken:      "",

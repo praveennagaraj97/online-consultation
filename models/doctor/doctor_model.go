@@ -2,16 +2,16 @@ package doctormodel
 
 import (
 	"github.com/praveennagaraj97/online-consultation/interfaces"
-	languagesmodel "github.com/praveennagaraj97/online-consultation/models/languages"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type DoctorHospital struct {
-	ID       primitive.ObjectID       `json:"id" bson:"_id"`
-	Name     string                   `json:"name" bson:"name"`
-	City     string                   `json:"city" bson:"city"`
-	Country  string                   `json:"country" bson:"country"`
-	Location *interfaces.LocationType `json:"location,omitempty" bson:"location,omitempty"`
+type DoctorHospitalEntity struct {
+	ID       primitive.ObjectID                 `json:"id" bson:"_id"`
+	Name     string                             `json:"name" bson:"name"`
+	City     string                             `json:"city" bson:"city"`
+	Country  string                             `json:"country" bson:"country"`
+	Address  string                             `json:"address" bson:"address"`
+	Location *interfaces.MongoPointLocationType `json:"location,omitempty" bson:"location,omitempty"`
 }
 
 type DoctorQualificationEntity struct {
@@ -22,28 +22,21 @@ type DoctorQualificationEntity struct {
 	ProcurementYear primitive.DateTime `json:"procurement_year" bson:"procurement_year"`
 }
 
-type DoctorSpokenLanguagesEntity struct {
-	ID       primitive.ObjectID             `json:"id" bson:"_id"`
-	DoctorId primitive.ObjectID             `json:"doctor_id" bson:"doctor_id"`
-	Language *languagesmodel.LanguageEntity `json:"language" bson:"language"`
-}
-
-type DoctorSpecialitiesEntity struct {
-	ID         primitive.ObjectID `json:"id" bson:"_id"`
-	DoctorId   primitive.ObjectID `json:"doctor_id" bson:"doctor_id"`
-	Speciality primitive.ObjectID `json:"speciality_id" bson:"speciality_id"`
-}
-
 type DoctorEntity struct {
 	ID                primitive.ObjectID    `json:"id" bson:"_id"`
 	Name              string                `json:"name" bson:"name"`
 	Email             string                `json:"email" bson:"email"`
 	Phone             *interfaces.PhoneType `json:"phone" bson:"phone"`
-	Type              *primitive.ObjectID   `json:"-" bson:"type"`
-	ConsultationType  string                `json:"consultation_type,omitempty" bson:"consultation_type,omitempty"`
 	ProfessionalTitle string                `json:"professional_title" bson:"professional_title"`
 	Experience        uint8                 `json:"experience" bson:"experience"`
 	ProfilePic        *interfaces.ImageType `json:"profile_pic" bson:"profile_pic"`
-	Hospital          *DoctorHospital       `json:"hospital" bson:"hospital"`
 	RefreshToken      string                `json:"-" bson:"refresh_token"`
+
+	// Populate fields
+	ConsultationType string                `json:"consultation_type,omitempty" bson:"consultation_type,omitempty"`
+	Hospital         *DoctorHospitalEntity `json:"hospital" bson:"hospital,omitempty"`
+
+	// reference fields
+	TypeId     *primitive.ObjectID `json:"-" bson:"type"`
+	HospitalId *primitive.ObjectID `json:"-" bson:"hospital"`
 }

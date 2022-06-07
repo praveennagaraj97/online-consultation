@@ -32,6 +32,8 @@ func (r *DoctorAuthRepository) Initialize(colln *mongo.Collection) {
 	utils.CreateIndex(colln, bson.D{
 		{Key: "email", Value: 1}},
 		"Email", true)
+
+	utils.CreateIndex(colln, bson.D{{Key: "type", Value: 1}}, "Consultation Type", false)
 }
 
 func (r *DoctorAuthRepository) CreateOne(doc *doctormodel.DoctorEntity) error {

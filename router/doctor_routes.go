@@ -14,7 +14,8 @@ func (r *Router) doctorRoutes() {
 
 	adminRoutes.Use(r.middlewares.IsAuthorized())
 
-	adminRoutes.POST("", r.middlewares.UserRole([]constants.UserType{constants.ADMIN, constants.SUPER_ADMIN, constants.EDITOR}), api.AddNewDoctor())
+	adminRoutes.POST("", r.middlewares.UserRole([]constants.UserType{
+		constants.ADMIN, constants.SUPER_ADMIN, constants.EDITOR}), api.AddNewDoctor())
 
 	routes.GET("/:id", api.GetDoctorById())
 

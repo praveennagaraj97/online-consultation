@@ -19,7 +19,14 @@ type ImageType struct {
 	Height            uint64 `json:"height" form:"height" bson:"height"`
 }
 
-type LocationType struct {
-	Longitude int    `json:"longitude" bson:"x" form:"longitude"`
-	Latitute  string `json:"latitude" bson:"y" form:"latitude"`
+type LocationCoordinatesType struct {
+	Longitude int `json:"longitude" bson:"x" form:"longitude"`
+	Latitute  int `json:"latitude" bson:"y" form:"latitude"`
+}
+
+type MongoPointLocationType struct {
+	// Point
+	Type string `json:"type" bson:"type"`
+	// [longitude, latitude]
+	Coordinates []float64 `json:"coordinates" bson:"coordinates"`
 }

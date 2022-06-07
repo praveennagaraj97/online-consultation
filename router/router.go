@@ -42,6 +42,7 @@ func (router *Router) ListenAndServe(conf *app.ApplicationConfig) {
 	router.specialityRoutes()
 	router.languageRoutes()
 	router.doctorRoutes()
+	router.hospitalRoutes()
 
 	// 404
 	r.Use(func(ctx *gin.Context) {
