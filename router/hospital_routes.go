@@ -19,6 +19,14 @@ func (r *Router) hospitalRoutes() {
 		constants.ADMIN, constants.EDITOR, constants.SUPER_ADMIN,
 	}), api.AddNewHospital())
 
+	adminRoutes.PATCH("/:id", r.middlewares.UserRole([]constants.UserType{
+		constants.ADMIN, constants.EDITOR, constants.SUPER_ADMIN,
+	}), api.UpdateHospitalById())
+
+	adminRoutes.DELETE("/:id", r.middlewares.UserRole([]constants.UserType{
+		constants.ADMIN, constants.SUPER_ADMIN,
+	}), api.DeleteById())
+
 	routes.GET("/:id", api.GetHospitalById())
 
 }

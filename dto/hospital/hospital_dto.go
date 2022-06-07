@@ -7,7 +7,7 @@ import (
 )
 
 type AddHospitalDTO struct {
-	Name      string  `json:"name,omitempty" form:"name"`
+	Name      string  `json:"name" form:"name"`
 	City      string  `json:"city" form:"city"`
 	Country   string  `json:"country" form:"country"`
 	Address   string  `json:"address" form:"address"`
@@ -46,4 +46,13 @@ func (a *AddHospitalDTO) Validate() *serialize.ErrorResponse {
 
 	return nil
 
+}
+
+type EditHospitalDTO struct {
+	Name      string  `json:"name" form:"name"`
+	City      string  `json:"city" form:"city"`
+	Country   string  `json:"country" form:"country"`
+	Address   string  `json:"address" form:"address"`
+	Latitude  float64 `json:"latitude" form:"latitude,omitempty"`
+	Longitude float64 `json:"longitude" form:"longitude,omitempty"`
 }

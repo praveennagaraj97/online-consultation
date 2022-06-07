@@ -5,6 +5,7 @@ import (
 	"errors"
 	"time"
 
+	hospitaldto "github.com/praveennagaraj97/online-consultation/dto/hospital"
 	hospitalmodel "github.com/praveennagaraj97/online-consultation/models/hospital"
 	"github.com/praveennagaraj97/online-consultation/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -62,4 +63,23 @@ func (r *HospitalRepository) FindById(id *primitive.ObjectID) (*hospitalmodel.Ho
 
 	return &result, nil
 
+}
+
+func (r *HospitalRepository) UpdateById(id *primitive.ObjectID, payload *hospitaldto.EditHospitalDTO) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	_, err := r.colln.UpdateByID(ctx, id, bson.M{"$set": payload})
+
+	return err
+
+}
+
+func (r *HospitalRepository) DeleteById(id *primitive.ObjectID) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	_, err := r.colln.DeleteOne(ctx, bson.M{"_id": id})
+
+	return err
 }

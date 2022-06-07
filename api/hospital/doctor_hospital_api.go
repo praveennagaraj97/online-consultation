@@ -32,6 +32,7 @@ func (a *HospitalAPI) AddNewHospital() gin.HandlerFunc {
 			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
 			return
 		}
+		defer ctx.Request.Body.Close()
 
 		if errs := payload.Validate(); errs != nil {
 			api.SendErrorResponse(ctx, errs.Message, errs.StatusCode, errs.Errors)
@@ -102,6 +103,67 @@ func (a *HospitalAPI) GetHospitalById() gin.HandlerFunc {
 
 func (a *HospitalAPI) UpdateHospitalById() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+
+		id := ctx.Param("id")
+
+		objectId, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		var payload hospitaldto.EditHospitalDTO
+
+		if err := ctx.ShouldBind(&payload); err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+			return
+		}
+		defer ctx.Request.Body.Close()
+
+		if payload.Name != "" {
+			res, _ := a.hspRepo.FindById(&objectId)
+			if payload.Name != res.Name {
+				if exists := a.hspRepo.CheckIfExistByName(payload.Name); exists {
+					api.SendErrorResponse(ctx, "Hosiptal with given name already exist", http.StatusUnprocessableEntity, nil)
+					return
+				}
+			}
+		}
+
+		err = a.hspRepo.UpdateById(&objectId, &payload)
+
+		if err != nil {
+			api.SendErrorResponse(ctx, "Something went wrong", http.StatusBadRequest, &map[string]string{
+				"reason": err.Error(),
+			})
+			return
+		}
+
+		ctx.JSON(http.StatusNoContent, nil)
+
+	}
+}
+
+func (a *HospitalAPI) DeleteById() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		id := ctx.Param("id")
+
+		objectId, err := primitive.ObjectIDFromHex(id)
+
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		err = a.hspRepo.DeleteById(&objectId)
+		if err != nil {
+			api.SendErrorResponse(ctx, "Something went wrong", http.StatusBadRequest, &map[string]string{
+				"reason": err.Error(),
+			})
+			return
+		}
+
+		ctx.JSON(http.StatusNoContent, nil)
 
 	}
 }
