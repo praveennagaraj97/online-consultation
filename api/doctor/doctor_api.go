@@ -215,16 +215,68 @@ func (a *DoctorAPI) ActivateAccount() gin.HandlerFunc {
 func (a *DoctorAPI) FindAllDoctors() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
-		res, err := a.repo.FindAll()
-		if err != nil {
-			ctx.JSON(400, map[string]interface{}{
-				"err": err,
-			})
+		pgOpts := api.ParsePaginationOptions(ctx, "doctors")
+		sortOpts := api.ParseSortByOptions(ctx)
+		fltrOpts := api.ParseFilterByOptions(ctx)
+		ketSortBy := "$gt"
+
+		if len(*sortOpts) == 0 {
+			sortOpts = &map[string]int8{
+				"_id": -1,
+			}
 		}
 
-		ctx.JSON(200, map[string]interface{}{
-			"count": len(res),
-			"res":   res,
+		// If sort option is given for latest with paginate ID.
+		if pgOpts.PaginateId != nil {
+			for key, value := range *sortOpts {
+				if key == "_id" && value == -1 {
+					ketSortBy = "$lt"
+				}
+			}
+		}
+
+		res, err := a.repo.FindAll(pgOpts, fltrOpts, sortOpts, ketSortBy)
+		if err != nil {
+			api.SendErrorResponse(ctx, "Something went wrong", http.StatusBadRequest, &map[string]string{
+				"reason": err.Error(),
+			})
+			return
+		}
+
+		resLen := len(res)
+
+		// Cached Paginate options
+		var docCount int64
+		var lastId *primitive.ObjectID
+
+		if pgOpts.PaginateId == nil {
+			docCount, err = a.repo.GetDocumentsCount(fltrOpts)
+			if err != nil {
+				api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, &map[string]string{
+					"reason": err.Error(),
+				})
+				return
+			}
+		}
+
+		if resLen > 0 {
+			lastId = &res[resLen-1].ID
+		}
+
+		count, next, prev, paginateKeySetID := api.GetPaginateOptions(docCount, pgOpts, int64(resLen), lastId, "doctors")
+
+		ctx.JSON(http.StatusOK, serialize.PaginatedDataResponse[[]doctormodel.DoctorEntity]{
+			Count:            count,
+			Next:             next,
+			Prev:             prev,
+			PaginateKeySetID: paginateKeySetID,
+			DataResponse: serialize.DataResponse[[]doctormodel.DoctorEntity]{
+				Data: res,
+				Response: serialize.Response{
+					StatusCode: http.StatusOK,
+					Message:    "List of doctors retrieved successfully",
+				},
+			},
 		})
 
 	}

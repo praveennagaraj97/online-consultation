@@ -63,7 +63,7 @@ func (r *ConsultationRepository) FindAll(
 	var pipeline mongo.Pipeline = make(mongo.Pipeline, 0)
 	limitPipe := bson.D{{Key: "$limit", Value: pgnOpt.PerPage}}
 
-	if filterOpts != nil {
+	if len(*filterOpts) != 0 {
 		matchPipe := bson.D{{Key: "$match", Value: *filterOpts}}
 		pipeline = append(pipeline, matchPipe)
 	}

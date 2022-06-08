@@ -5,6 +5,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/praveennagaraj97/online-consultation/api"
 	"github.com/praveennagaraj97/online-consultation/interfaces"
 	doctormodel "github.com/praveennagaraj97/online-consultation/models/doctor"
 	"github.com/praveennagaraj97/online-consultation/pkg/env"
@@ -36,6 +37,7 @@ func (r *DoctorRepository) Initialize(colln *mongo.Collection) {
 	utils.CreateIndex(colln, bson.D{{Key: "consultation_type_id", Value: 1}}, "Consultation Type", false)
 	utils.CreateIndex(colln, bson.D{{Key: "speciality_id", Value: 1}}, "Speciality", false)
 	utils.CreateIndex(colln, bson.D{{Key: "hospital_id", Value: 1}}, "Hospital", false)
+	utils.CreateIndex(colln, bson.D{{Key: "experience", Value: 1}, {Key: "_id", Value: 1}}, "Experience and ID", false)
 
 }
 
@@ -202,11 +204,81 @@ func (r *DoctorRepository) UpdateDoctorStatus(id *primitive.ObjectID, state bool
 
 }
 
-func (r *DoctorRepository) FindAll() ([]doctormodel.DoctorEntity, error) {
+func (r *DoctorRepository) FindAll(pgOpts *api.PaginationOptions,
+	fltrOpts *map[string]primitive.M,
+	srtOpts *map[string]int8,
+	keySortBy string) ([]doctormodel.DoctorEntity, error) {
+
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
 	pipeline := mongo.Pipeline{}
+
+	// Filter Options
+	if len(*fltrOpts) != 0 {
+		fltr := bson.D{{Key: "$match", Value: *fltrOpts}}
+		pipeline = append(pipeline, fltr)
+	}
+
+	// Sort Options
+	sortBy := bson.D{{Key: "$sort", Value: *srtOpts}}
+	pipeline = append(pipeline, sortBy)
+
+	// Pagination Options
+	if pgOpts.PaginateId != nil {
+		filter := bson.D{{Key: "$match", Value: bson.M{"_id": bson.M{keySortBy: pgOpts.PaginateId}}}}
+		pipeline = append(pipeline, filter)
+	} else if pgOpts != nil {
+		skip := bson.D{{Key: "$skip", Value: (pgOpts.PerPage * (pgOpts.PageNum - 1))}}
+		pipeline = append(pipeline, skip)
+	}
+	// Limit
+	limit := bson.D{{Key: "$limit", Value: pgOpts.PerPage}}
+	pipeline = append(pipeline, limit)
+
+	// Populate Languages
+	languageLookUp := bson.D{{Key: "$lookup", Value: bson.M{
+		"from":         "language",
+		"localField":   "languages_ids",
+		"foreignField": "_id",
+		"as":           "spoken_languages",
+	}}}
+	pipeline = append(pipeline, languageLookUp)
+
+	// Hospital Populate
+	hospitalLookUp := bson.D{{Key: "$lookup", Value: bson.M{
+		"from":         "hospital",
+		"localField":   "hospital_id",
+		"foreignField": "_id",
+		"as":           "hospital",
+	}}}
+	unwindHospital := bson.D{{Key: "$unwind", Value: bson.M{
+		"path":                       "$hospital",
+		"preserveNullAndEmptyArrays": true,
+	}}}
+	pipeline = append(pipeline, hospitalLookUp, unwindHospital)
+
+	// Add Prefix to image
+	setImagePrefixPipe := bson.D{{Key: "$set",
+		Value: bson.M{"profile_pic.image_src": bson.M{"$cond": bson.D{
+			{Key: "if", Value: bson.M{"$eq": bson.A{"$profile_pic", nil}}},
+			{Key: "then", Value: nil},
+			{Key: "else", Value: bson.M{"$concat": bson.A{r.imageBasePath, "/", "$profile_pic.original_image_path"}}},
+		}}}}}
+	setBlurImagePrefixPipe := bson.D{{Key: "$set",
+		Value: bson.M{"profile_pic.blur_data_url": bson.M{"$cond": bson.D{
+			{Key: "if", Value: bson.M{"$eq": bson.A{"$profile_pic", nil}}},
+			{Key: "then", Value: nil},
+			{Key: "else", Value: bson.M{"$concat": bson.A{r.imageBasePath, "/", "$profile_pic.blur_image_path"}}},
+		}}}}}
+	resetNullImagePipe := bson.D{{Key: "$set", Value: bson.M{
+		"profile_pic": bson.M{"$cond": bson.D{
+			{Key: "if", Value: bson.M{"$eq": bson.A{"$profile_pic.image_src", nil}}},
+			{Key: "then", Value: nil},
+			{Key: "else", Value: "$profile_pic"},
+		}},
+	}}}
+	pipeline = append(pipeline, setImagePrefixPipe, setBlurImagePrefixPipe, resetNullImagePipe)
 
 	cur, err := r.colln.Aggregate(ctx, pipeline)
 
@@ -216,10 +288,19 @@ func (r *DoctorRepository) FindAll() ([]doctormodel.DoctorEntity, error) {
 
 	var res []doctormodel.DoctorEntity
 
-	cur.All(ctx, &res)
+	if err := cur.All(ctx, &res); err != nil {
+		return nil, err
+	}
 
 	defer cur.Close(context.TODO())
 
 	return res, nil
+
+}
+
+func (r *DoctorRepository) GetDocumentsCount(filters *map[string]primitive.M) (int64, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+	return r.colln.CountDocuments(ctx, filters)
 
 }

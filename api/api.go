@@ -68,10 +68,22 @@ func ParseFilterByOptions(c *gin.Context) *map[string]bson.M {
 		if len(filterBy) > 0 && contains(filterBy[1]) {
 			var filterValue interface{} = filterKeys.Get(key)
 
-			// boolean parser
-			value, err := strconv.ParseBool(filterKeys.Get(key))
+			// Object Id Parse
+			objectId, err := primitive.ObjectIDFromHex(filterKeys.Get(key))
 			if err == nil {
-				filterValue = value
+				filterValue = objectId
+			} else {
+				// Number Parse
+				val, err := strconv.Atoi(filterKeys.Get(key))
+				if err == nil {
+					filterValue = val
+				} else {
+					// boolean parser
+					value, err := strconv.ParseBool(filterKeys.Get(key))
+					if err == nil {
+						filterValue = value
+					}
+				}
 			}
 
 			opts[filterBy[0]] = bson.M{fmt.Sprintf("$%s", filterBy[1]): filterValue}
