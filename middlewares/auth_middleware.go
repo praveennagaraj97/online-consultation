@@ -25,7 +25,10 @@ func (m *Middlewares) IsAuthorized() gin.HandlerFunc {
 				c.Abort()
 				return
 			} else {
-				token = strings.Split(authHeader, "Bearer ")[1]
+				bearerToken := strings.Split(authHeader, "Bearer ")
+				if len(bearerToken) == 2 {
+					token = bearerToken[1]
+				}
 			}
 		} else {
 			token = cookie.Value

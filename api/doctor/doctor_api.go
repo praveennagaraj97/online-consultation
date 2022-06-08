@@ -21,12 +21,12 @@ import (
 )
 
 type DoctorAPI struct {
-	authRepo *doctorrepo.DoctorRepository
-	appConf  *app.ApplicationConfig
+	repo    *doctorrepo.DoctorRepository
+	appConf *app.ApplicationConfig
 }
 
-func (a *DoctorAPI) Initialize(conf *app.ApplicationConfig, authRepo *doctorrepo.DoctorRepository) {
-	a.authRepo = authRepo
+func (a *DoctorAPI) Initialize(conf *app.ApplicationConfig, repo *doctorrepo.DoctorRepository) {
+	a.repo = repo
 	a.appConf = conf
 }
 
@@ -44,7 +44,7 @@ func (a *DoctorAPI) AddNewDoctor() gin.HandlerFunc {
 			return
 		}
 
-		if exist := a.authRepo.CheckIfDoctorExistsByEmailOrPhone(payload.Email, interfaces.PhoneType{
+		if exist := a.repo.CheckIfDoctorExistsByEmailOrPhone(payload.Email, interfaces.PhoneType{
 			Code:   payload.PhoneCode,
 			Number: payload.PhoneNumber,
 		}); exist {
@@ -89,7 +89,7 @@ func (a *DoctorAPI) AddNewDoctor() gin.HandlerFunc {
 
 		}
 
-		err := a.authRepo.CreateOne(&doc)
+		err := a.repo.CreateOne(&doc)
 
 		if err != nil {
 			api.SendErrorResponse(ctx, "Something went wrong", http.StatusBadRequest, &map[string]string{
@@ -122,7 +122,7 @@ func (a *DoctorAPI) AddNewDoctor() gin.HandlerFunc {
 			Data: &doc,
 			Response: serialize.Response{
 				StatusCode: http.StatusCreated,
-				Message:    "New doctor accounts has been added successfully",
+				Message:    "New doctor account has been added successfully",
 			},
 		})
 
@@ -140,7 +140,7 @@ func (a *DoctorAPI) GetDoctorById(filterActiveAccounts bool) gin.HandlerFunc {
 			return
 		}
 
-		res, err := a.authRepo.FindById(&objectId, filterActiveAccounts)
+		res, err := a.repo.FindById(&objectId, filterActiveAccounts)
 
 		if err != nil {
 			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
@@ -187,7 +187,7 @@ func (a *DoctorAPI) ActivateAccount() gin.HandlerFunc {
 			return
 		}
 
-		user, err := a.authRepo.FindById(&objectId, false)
+		user, err := a.repo.FindById(&objectId, false)
 		if err != nil {
 			api.SendErrorResponse(ctx, err.Error(), http.StatusNotFound, nil)
 			return
@@ -198,7 +198,7 @@ func (a *DoctorAPI) ActivateAccount() gin.HandlerFunc {
 			return
 		}
 
-		if err := a.authRepo.UpdateDoctorStatus(&objectId, true); err != nil {
+		if err := a.repo.UpdateDoctorStatus(&objectId, true); err != nil {
 			api.SendErrorResponse(ctx, "Something went wrong", http.StatusBadRequest, &map[string]string{
 				"reason": err.Error(),
 			})
@@ -212,6 +212,20 @@ func (a *DoctorAPI) ActivateAccount() gin.HandlerFunc {
 	}
 }
 
-func FindAllDoctors() gin.HandlerFunc {
-	return func(ctx *gin.Context) {}
+func (a *DoctorAPI) FindAllDoctors() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+
+		res, err := a.repo.FindAll()
+		if err != nil {
+			ctx.JSON(400, map[string]interface{}{
+				"err": err,
+			})
+		}
+
+		ctx.JSON(200, map[string]interface{}{
+			"count": len(res),
+			"res":   res,
+		})
+
+	}
 }

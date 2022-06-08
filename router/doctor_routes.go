@@ -22,5 +22,6 @@ func (r *Router) doctorRoutes() {
 
 	routes.GET("/:id", api.GetDoctorById(true))
 	routes.GET("/activate_account/:token", api.ActivateAccount())
+	routes.GET("", api.FindAllDoctors())
 
 }

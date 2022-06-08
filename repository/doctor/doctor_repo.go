@@ -201,3 +201,25 @@ func (r *DoctorRepository) UpdateDoctorStatus(id *primitive.ObjectID, state bool
 	return err
 
 }
+
+func (r *DoctorRepository) FindAll() ([]doctormodel.DoctorEntity, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	pipeline := mongo.Pipeline{}
+
+	cur, err := r.colln.Aggregate(ctx, pipeline)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var res []doctormodel.DoctorEntity
+
+	cur.All(ctx, &res)
+
+	defer cur.Close(context.TODO())
+
+	return res, nil
+
+}
