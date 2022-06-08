@@ -24,7 +24,7 @@ type NewDoctorAddedTemplateData struct {
 		Name string
 		Role string
 	}
-	LoginLink string
+	ActivateAccountLink string
 }
 
 func GetRegisterEmailTemplateData(name, verifyLink string) *ConfirmEmailTemplateData {
@@ -100,7 +100,7 @@ func GetForgotEmailLinkTemplateData(name, link string) *ConfirmEmailTemplateData
 	}
 }
 
-func GetNewDoctorAddedTemplateData(name, role, loginLink string) *NewDoctorAddedTemplateData {
+func GetNewDoctorAddedTemplateData(name, role, activateLink string) *NewDoctorAddedTemplateData {
 	return &NewDoctorAddedTemplateData{
 		MetaInfo: &EmailMetaInfoTemplateData{
 			MetaTitle: "Welcome to Online Consultation",
@@ -112,6 +112,6 @@ func GetNewDoctorAddedTemplateData(name, role, loginLink string) *NewDoctorAdded
 			Name: name,
 			Role: role,
 		},
-		LoginLink: loginLink,
+		ActivateAccountLink: activateLink,
 	}
 }

@@ -1,6 +1,7 @@
 package doctorapi
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -13,6 +14,7 @@ import (
 	awspkg "github.com/praveennagaraj97/online-consultation/pkg/aws"
 	mailer "github.com/praveennagaraj97/online-consultation/pkg/email"
 	"github.com/praveennagaraj97/online-consultation/pkg/env"
+	"github.com/praveennagaraj97/online-consultation/pkg/tokens"
 	doctorrepo "github.com/praveennagaraj97/online-consultation/repository/doctor"
 	"github.com/praveennagaraj97/online-consultation/serialize"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -51,14 +53,16 @@ func (a *DoctorAPI) AddNewDoctor() gin.HandlerFunc {
 		}
 
 		doc := doctormodel.DoctorEntity{
-			ID:                primitive.NewObjectID(),
-			Name:              payload.Name,
-			Email:             payload.Email,
-			Phone:             &interfaces.PhoneType{Code: payload.PhoneCode, Number: payload.PhoneNumber},
-			TypeId:            payload.ConsultationType,
-			ProfessionalTitle: payload.ProfessionalTitle,
-			Experience:        payload.Experience,
-			RefreshToken:      "",
+			ID:                 primitive.NewObjectID(),
+			Name:               payload.Name,
+			Email:              payload.Email,
+			Phone:              &interfaces.PhoneType{Code: payload.PhoneCode, Number: payload.PhoneNumber},
+			ProfessionalTitle:  payload.ProfessionalTitle,
+			Experience:         payload.Experience,
+			ConsultationTypeId: payload.ConsultationType,
+			HospitalId:         payload.Hospital,
+			SpecialityId:       payload.Speciality,
+			RefreshToken:       "",
 		}
 
 		multipartFile, _ := ctx.FormFile("profile_pic")
@@ -92,9 +96,17 @@ func (a *DoctorAPI) AddNewDoctor() gin.HandlerFunc {
 			return
 		}
 
+		token, err := tokens.GenerateNoExpiryTokenWithCustomType(doc.ID.Hex(), "activate-doctor", "doctor")
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusInternalServerError, nil)
+			return
+		}
+
+		activateLink := fmt.Sprintf("%s/?token=%s", env.GetEnvVariable("CLIENT_DOCTOR_ACTIVATE_ACCOUNT_LINK"), token)
+
 		if err := a.appConf.EmailClient.SendNoReplyMail([]string{doc.Email},
 			"Welcome to Online Consultation", "new-doctor", "welcome",
-			mailer.GetNewDoctorAddedTemplateData(doc.Name, doc.ProfessionalTitle, env.GetEnvVariable("CLIENT_DOCTOR_LOGIN_LINK"))); err != nil {
+			mailer.GetNewDoctorAddedTemplateData(doc.Name, doc.ProfessionalTitle, activateLink)); err != nil {
 			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, nil)
 			return
 		}
@@ -144,6 +156,56 @@ func (a *DoctorAPI) GetDoctorById() gin.HandlerFunc {
 	}
 }
 
-func (a *DoctorAPI) LinkHospitalToDoctor() gin.HandlerFunc {
-	return func(ctx *gin.Context) {}
+func (a *DoctorAPI) ActivateAccount() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+
+		token := ctx.Param("token")
+
+		if token == "" {
+			api.SendErrorResponse(ctx, "Token is required", http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		claims, err := tokens.DecodeJSONWebToken(token)
+		if err != nil {
+			api.SendErrorResponse(ctx, "Something went wrong", http.StatusBadRequest, &map[string]string{
+				"reason": err.Error(),
+			})
+			return
+		}
+
+		if claims.Type != "activate-doctor" {
+			api.SendErrorResponse(ctx, "Provided token is invalid", http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		objectId, err := primitive.ObjectIDFromHex(claims.ID)
+		if err != nil {
+			api.SendErrorResponse(ctx, "Token malformed", http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		user, err := a.authRepo.FindById(&objectId)
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusNotFound, nil)
+			return
+		}
+
+		if user.IsActive {
+			api.SendErrorResponse(ctx, "Your account is already activated", http.StatusNotAcceptable, nil)
+			return
+		}
+
+		if err := a.authRepo.UpdateDoctorStatus(&objectId, true); err != nil {
+			api.SendErrorResponse(ctx, "Something went wrong", http.StatusBadRequest, &map[string]string{
+				"reason": err.Error(),
+			})
+			return
+		}
+
+		ctx.JSON(http.StatusOK, serialize.Response{
+			StatusCode: http.StatusOK,
+			Message:    "Account activated successfully",
+		})
+	}
 }

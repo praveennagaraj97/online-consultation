@@ -9,16 +9,22 @@ import (
 )
 
 type AddNewDoctorDTO struct {
-	Name              string              `json:"name" form:"name"`
-	Email             string              `json:"email" form:"email"`
-	PhoneCode         string              `json:"phone_code" form:"phone_code"`
-	PhoneNumber       string              `json:"phone_number" form:"phone_number"`
-	Type              string              `json:"type" form:"type"`
-	ProfessionalTitle string              `json:"professional_title" form:"professional_title"`
-	Experience        uint8               `json:"experience" form:"experience"`
-	ConsultationType  *primitive.ObjectID `json:"-" form:"-"`
-	ProfilePicWidth   uint64              `json:"profile_pic_width" form:"profile_pic_width"`
-	ProfilePicHeight  uint64              `json:"profile_pic_height" form:"profile_pic_height"`
+	Name              string `json:"name" form:"name"`
+	Email             string `json:"email" form:"email"`
+	PhoneCode         string `json:"phone_code" form:"phone_code"`
+	PhoneNumber       string `json:"phone_number" form:"phone_number"`
+	ProfessionalTitle string `json:"professional_title" form:"professional_title"`
+	Experience        uint8  `json:"experience" form:"experience"`
+	ProfilePicWidth   uint64 `json:"profile_pic_width" form:"profile_pic_width"`
+	ProfilePicHeight  uint64 `json:"profile_pic_height" form:"profile_pic_height"`
+
+	HospitalId         string `json:"hospital_id" form:"hospital_id"`
+	ConsultationTypeId string `json:"consultation_type_id" form:"consultation_type_id"`
+	SpecialityId       string `json:"speciality_id" form:"speciality_id"`
+
+	Hospital         *primitive.ObjectID `json:"-" bson:"-"`
+	ConsultationType *primitive.ObjectID `json:"-" form:"-"`
+	Speciality       *primitive.ObjectID `json:"-" form:"-"`
 }
 
 func (a *AddNewDoctorDTO) Validate() *serialize.ErrorResponse {
@@ -44,18 +50,22 @@ func (a *AddNewDoctorDTO) Validate() *serialize.ErrorResponse {
 		errs["phone_number"] = "Phone number cannot be empty"
 	}
 
-	if a.Type == "" {
-		errs["type"] = "Type cannot be empty"
+	if a.ConsultationTypeId == "" {
+		errs["consultation_type_id"] = "Consultation Id cannot be empty"
+	}
+
+	if a.HospitalId == "" {
+		errs["hospital_id"] = "Hospital Id cannot be empty"
 	}
 
 	if a.ProfessionalTitle == "" {
 		errs["professional_title"] = "Professional title cannot be empty"
 	}
 
-	if a.Type != "" {
-		objectId, err := primitive.ObjectIDFromHex(a.Type)
+	if a.ConsultationTypeId != "" {
+		objectId, err := primitive.ObjectIDFromHex(a.ConsultationTypeId)
 		if err != nil {
-			errs["type"] = "Type should be valid consultation id"
+			errs["consultation_type_id"] = "Consultation Id should be valid primitive objectId"
 		} else {
 			a.ConsultationType = &objectId
 		}
@@ -64,6 +74,24 @@ func (a *AddNewDoctorDTO) Validate() *serialize.ErrorResponse {
 	if a.ProfilePicWidth == 0 || a.ProfilePicHeight == 0 {
 		a.ProfilePicWidth = 110
 		a.ProfilePicHeight = 110
+	}
+
+	if a.HospitalId != "" {
+		objectId, err := primitive.ObjectIDFromHex(a.HospitalId)
+		if err != nil {
+			errs["hospital_id"] = "Hospital Id should be valid primitive objectId"
+		} else {
+			a.Hospital = &objectId
+		}
+	}
+
+	if a.SpecialityId != "" {
+		objectId, err := primitive.ObjectIDFromHex(a.SpecialityId)
+		if err != nil {
+			errs["speciality_id"] = "Speciality Id should be valid primitive objectId"
+		} else {
+			a.Speciality = &objectId
+		}
 	}
 
 	if len(errs) > 0 {

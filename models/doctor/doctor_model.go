@@ -23,12 +23,15 @@ type DoctorEntity struct {
 	Experience        uint8                 `json:"experience" bson:"experience"`
 	ProfilePic        *interfaces.ImageType `json:"profile_pic" bson:"profile_pic"`
 	RefreshToken      string                `json:"-" bson:"refresh_token"`
+	IsActive          bool                  `json:"-" bson:"is_active"`
 
 	// Populate fields
+	Speciality       string                        `json:"speciality,omitempty" bson:"speciality,omitempty"`
 	ConsultationType string                        `json:"consultation_type,omitempty" bson:"consultation_type,omitempty"`
-	Hospital         *hospitalmodel.HospitalEntity `json:"hospital" bson:"hospital,omitempty"`
+	Hospital         *hospitalmodel.HospitalEntity `json:"hospital,omitempty" bson:"hospital,omitempty"`
 
 	// reference fields
-	TypeId     *primitive.ObjectID `json:"-" bson:"type"`
-	HospitalId *primitive.ObjectID `json:"-" bson:"hospital"`
+	ConsultationTypeId *primitive.ObjectID `json:"-" bson:"consultation_type_id"`
+	HospitalId         *primitive.ObjectID `json:"-" bson:"hospital_id"`
+	SpecialityId       *primitive.ObjectID `json:"-" bson:"speciality_id"`
 }

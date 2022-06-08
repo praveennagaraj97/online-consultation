@@ -18,5 +18,6 @@ func (r *Router) doctorRoutes() {
 		constants.ADMIN, constants.SUPER_ADMIN, constants.EDITOR}), api.AddNewDoctor())
 
 	routes.GET("/:id", api.GetDoctorById())
+	routes.GET("/activate_account/:token", api.ActivateAccount())
 
 }

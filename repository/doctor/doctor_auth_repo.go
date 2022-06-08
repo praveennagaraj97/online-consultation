@@ -33,7 +33,9 @@ func (r *DoctorAuthRepository) Initialize(colln *mongo.Collection) {
 		{Key: "email", Value: 1}},
 		"Email", true)
 
-	utils.CreateIndex(colln, bson.D{{Key: "type", Value: 1}}, "Consultation Type", false)
+	utils.CreateIndex(colln, bson.D{{Key: "consultation_type_id", Value: 1}}, "Consultation Type", false)
+	utils.CreateIndex(colln, bson.D{{Key: "speciality_id", Value: 1}}, "Speciality", false)
+	utils.CreateIndex(colln, bson.D{{Key: "hospital_id", Value: 1}}, "Hospital", false)
 }
 
 func (r *DoctorAuthRepository) CreateOne(doc *doctormodel.DoctorEntity) error {
@@ -77,13 +79,13 @@ func (r *DoctorAuthRepository) FindById(id *primitive.ObjectID) (*doctormodel.Do
 	// Consultation ID Populate
 	typeMatchPipe := bson.D{{Key: "$lookup", Value: bson.M{
 		"from":         "consultation",
-		"localField":   "type",
+		"localField":   "consultation_type_id",
 		"foreignField": "_id",
 		"as":           "consultation_type",
 	}}}
 	unwindTypePipe := bson.D{{Key: "$unwind", Value: bson.M{
 		"path":                       "$consultation_type",
-		"preserveNullAndEmptyArrays": false,
+		"preserveNullAndEmptyArrays": true,
 	}}}
 	setTypePipe := bson.D{{Key: "$set", Value: bson.M{"consultation_type": "$consultation_type.type"}}}
 
@@ -116,12 +118,46 @@ func (r *DoctorAuthRepository) FindById(id *primitive.ObjectID) (*doctormodel.Do
 	}}}
 	pipeLine = append(pipeLine, setImagePrefixPipe, setBlurImagePrefixPipe, resetNullImagePipe)
 
+	// Populate hospital
+	lookUpHospital := bson.D{{Key: "$lookup", Value: bson.M{
+		"from":         "hospital",
+		"localField":   "hospital_id",
+		"foreignField": "_id",
+		"as":           "hospital",
+	}}}
+
+	unwindHospiatl := bson.D{{Key: "$unwind", Value: bson.M{
+		"path":                       "$hospital",
+		"preserveNullAndEmptyArrays": true,
+	}}}
+
+	pipeLine = append(pipeLine, lookUpHospital, unwindHospiatl)
+
+	// Populate Speciality
+	lookupSpeciality := bson.D{{Key: "$lookup", Value: bson.M{
+		"from":         "speciality",
+		"as":           "speciality",
+		"localField":   "speciality_id",
+		"foreignField": "_id",
+	}}}
+
+	unwindSpeciality := bson.D{{Key: "$unwind", Value: bson.M{
+		"path":                       "$speciality",
+		"preserveNullAndEmptyArrays": true,
+	}}}
+
+	setSpecialityTitle := bson.D{{Key: "$set", Value: bson.M{
+		"speciality": "$speciality.title",
+	}}}
+
+	pipeLine = append(pipeLine, lookupSpeciality, unwindSpeciality, setSpecialityTitle)
+
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
 	cur, err := r.colln.Aggregate(ctx, pipeLine)
 	if err != nil {
-		return nil, errors.New("Couldn't find any doctor matching gived id")
+		return nil, err
 	}
 
 	var result []doctormodel.DoctorEntity
@@ -137,5 +173,15 @@ func (r *DoctorAuthRepository) FindById(id *primitive.ObjectID) (*doctormodel.Do
 	}
 
 	return nil, errors.New("Couldn't find any doctor matching gived id")
+
+}
+
+func (r *DoctorAuthRepository) UpdateDoctorStatus(id *primitive.ObjectID, state bool) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	_, err := r.colln.UpdateByID(ctx, id, bson.M{"$set": bson.M{"is_active": state}})
+
+	return err
 
 }
