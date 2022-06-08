@@ -14,17 +14,21 @@ type AddNewDoctorDTO struct {
 	PhoneCode         string `json:"phone_code" form:"phone_code"`
 	PhoneNumber       string `json:"phone_number" form:"phone_number"`
 	ProfessionalTitle string `json:"professional_title" form:"professional_title"`
+	Education         string `json:"education" form:"education"`
 	Experience        uint8  `json:"experience" form:"experience"`
 	ProfilePicWidth   uint64 `json:"profile_pic_width" form:"profile_pic_width"`
 	ProfilePicHeight  uint64 `json:"profile_pic_height" form:"profile_pic_height"`
 
-	HospitalId         string `json:"hospital_id" form:"hospital_id"`
-	ConsultationTypeId string `json:"consultation_type_id" form:"consultation_type_id"`
-	SpecialityId       string `json:"speciality_id" form:"speciality_id"`
+	// Input ref fields
+	HospitalId         string   `json:"hospital_id" form:"hospital_id"`
+	ConsultationTypeId string   `json:"consultation_type_id" form:"consultation_type_id"`
+	SpecialityId       string   `json:"speciality_id" form:"speciality_id"`
+	SpokenLanguagesIds []string `json:"spoken_language_id" form:"spoken_language_id"`
 
-	Hospital         *primitive.ObjectID `json:"-" bson:"-"`
-	ConsultationType *primitive.ObjectID `json:"-" form:"-"`
-	Speciality       *primitive.ObjectID `json:"-" form:"-"`
+	Hospital         *primitive.ObjectID  `json:"-" bson:"-"`
+	ConsultationType *primitive.ObjectID  `json:"-" form:"-"`
+	Speciality       *primitive.ObjectID  `json:"-" form:"-"`
+	SpokenLanguages  []primitive.ObjectID `json:"-" form:"-"`
 }
 
 func (a *AddNewDoctorDTO) Validate() *serialize.ErrorResponse {
@@ -62,6 +66,14 @@ func (a *AddNewDoctorDTO) Validate() *serialize.ErrorResponse {
 		errs["professional_title"] = "Professional title cannot be empty"
 	}
 
+	if a.Education == "" {
+		errs["education"] = "Education cannot be empty"
+	}
+
+	if len(a.SpokenLanguagesIds) == 0 {
+		errs["spoken_language_id"] = "Spoken languages cannot be empty"
+	}
+
 	if a.ConsultationTypeId != "" {
 		objectId, err := primitive.ObjectIDFromHex(a.ConsultationTypeId)
 		if err != nil {
@@ -92,6 +104,15 @@ func (a *AddNewDoctorDTO) Validate() *serialize.ErrorResponse {
 		} else {
 			a.Speciality = &objectId
 		}
+	}
+
+	// Validate language ids
+	for i := 0; i < len(a.SpokenLanguagesIds); i++ {
+		objectId, err := primitive.ObjectIDFromHex(a.SpokenLanguagesIds[i])
+		if err != nil {
+			errs["spoken_language_id"] = "Spoken language Id should be valid primitive Object Id"
+		}
+		a.SpokenLanguages = append(a.SpokenLanguages, objectId)
 	}
 
 	if len(errs) > 0 {

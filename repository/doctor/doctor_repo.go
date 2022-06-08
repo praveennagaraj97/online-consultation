@@ -14,12 +14,12 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type DoctorAuthRepository struct {
+type DoctorRepository struct {
 	colln         *mongo.Collection
 	imageBasePath string
 }
 
-func (r *DoctorAuthRepository) Initialize(colln *mongo.Collection) {
+func (r *DoctorRepository) Initialize(colln *mongo.Collection) {
 	r.colln = colln
 
 	r.imageBasePath = env.GetEnvVariable("S3_ACCESS_BASEURL")
@@ -39,7 +39,7 @@ func (r *DoctorAuthRepository) Initialize(colln *mongo.Collection) {
 
 }
 
-func (r *DoctorAuthRepository) CreateOne(doc *doctormodel.DoctorEntity) error {
+func (r *DoctorRepository) CreateOne(doc *doctormodel.DoctorEntity) error {
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
@@ -53,7 +53,7 @@ func (r *DoctorAuthRepository) CreateOne(doc *doctormodel.DoctorEntity) error {
 
 }
 
-func (r *DoctorAuthRepository) CheckIfDoctorExistsByEmailOrPhone(email string, phone interfaces.PhoneType) bool {
+func (r *DoctorRepository) CheckIfDoctorExistsByEmailOrPhone(email string, phone interfaces.PhoneType) bool {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
@@ -73,7 +73,7 @@ func (r *DoctorAuthRepository) CheckIfDoctorExistsByEmailOrPhone(email string, p
 	return count > 0
 }
 
-func (r *DoctorAuthRepository) FindById(id *primitive.ObjectID, showInActive bool) (*doctormodel.DoctorEntity, error) {
+func (r *DoctorRepository) FindById(id *primitive.ObjectID, showInActive bool) (*doctormodel.DoctorEntity, error) {
 
 	var filterPipe bson.D = make(bson.D, 0)
 
@@ -156,8 +156,17 @@ func (r *DoctorAuthRepository) FindById(id *primitive.ObjectID, showInActive boo
 	setSpecialityTitle := bson.D{{Key: "$set", Value: bson.M{
 		"speciality": "$speciality.title",
 	}}}
-
 	pipeLine = append(pipeLine, lookupSpeciality, unwindSpeciality, setSpecialityTitle)
+
+	// Populate Languages
+	languagesLookUp := bson.D{{Key: "$lookup", Value: bson.M{
+		"from":         "language",
+		"localField":   "languages_ids",
+		"foreignField": "_id",
+		"as":           "spoken_languages",
+	}}}
+
+	pipeLine = append(pipeLine, languagesLookUp)
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
@@ -183,7 +192,7 @@ func (r *DoctorAuthRepository) FindById(id *primitive.ObjectID, showInActive boo
 
 }
 
-func (r *DoctorAuthRepository) UpdateDoctorStatus(id *primitive.ObjectID, state bool) error {
+func (r *DoctorRepository) UpdateDoctorStatus(id *primitive.ObjectID, state bool) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 

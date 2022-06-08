@@ -8,7 +8,7 @@ import (
 func (r *Router) hospitalRoutes() {
 
 	api := hospitalapi.HospitalAPI{}
-	api.Initialize(r.app, r.repos.GetDoctorHospitalRepository())
+	api.Initialize(r.app, r.repos.GetHospitalRepository())
 
 	adminRoutes := r.engine.Group("/api/v1/admin/hospital")
 	routes := r.engine.Group("/api/v1/hospital")

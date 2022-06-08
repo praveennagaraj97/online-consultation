@@ -23,8 +23,8 @@ type Repository struct {
 	adminRepo               *adminrepository.AdminRepository
 	specialityRepo          *specialityrepository.SpecialitysRepository
 	languageRepo            *languagerepo.LanguageRepository
-	doctorAuthRepo          *doctorrepo.DoctorAuthRepository
-	doctorHospitalRepo      *hospitalrepo.HospitalRepository
+	doctorAuthRepo          *doctorrepo.DoctorRepository
+	hospitalRepo            *hospitalrepo.HospitalRepository
 }
 
 func (r *Repository) Initialize(mgoClient *mongo.Client, dbName string) {
@@ -62,12 +62,12 @@ func (r *Repository) Initialize(mgoClient *mongo.Client, dbName string) {
 	r.languageRepo.Initialize(db.OpenCollection(mgoClient, dbName, "language"))
 
 	// Doctor Auth Repo
-	r.doctorAuthRepo = &doctorrepo.DoctorAuthRepository{}
+	r.doctorAuthRepo = &doctorrepo.DoctorRepository{}
 	r.doctorAuthRepo.Initialize(db.OpenCollection(mgoClient, dbName, "doctor"))
 
 	// Hospital Repo
-	r.doctorHospitalRepo = &hospitalrepo.HospitalRepository{}
-	r.doctorHospitalRepo.Initialize(db.OpenCollection(mgoClient, dbName, "hospital"))
+	r.hospitalRepo = &hospitalrepo.HospitalRepository{}
+	r.hospitalRepo.Initialize(db.OpenCollection(mgoClient, dbName, "hospital"))
 
 	logger.PrintLog("Repositories initialized 📜")
 }
@@ -104,10 +104,10 @@ func (r *Repository) GetLanguageRepository() *languagerepo.LanguageRepository {
 	return r.languageRepo
 }
 
-func (r *Repository) GetDoctorAuthRepository() *doctorrepo.DoctorAuthRepository {
+func (r *Repository) GetDoctorRepository() *doctorrepo.DoctorRepository {
 	return r.doctorAuthRepo
 }
 
-func (r *Repository) GetDoctorHospitalRepository() *hospitalrepo.HospitalRepository {
-	return r.doctorHospitalRepo
+func (r *Repository) GetHospitalRepository() *hospitalrepo.HospitalRepository {
+	return r.hospitalRepo
 }

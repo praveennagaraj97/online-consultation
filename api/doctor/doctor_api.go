@@ -21,11 +21,11 @@ import (
 )
 
 type DoctorAPI struct {
-	authRepo *doctorrepo.DoctorAuthRepository
+	authRepo *doctorrepo.DoctorRepository
 	appConf  *app.ApplicationConfig
 }
 
-func (a *DoctorAPI) Initialize(conf *app.ApplicationConfig, authRepo *doctorrepo.DoctorAuthRepository) {
+func (a *DoctorAPI) Initialize(conf *app.ApplicationConfig, authRepo *doctorrepo.DoctorRepository) {
 	a.authRepo = authRepo
 	a.appConf = conf
 }
@@ -62,6 +62,8 @@ func (a *DoctorAPI) AddNewDoctor() gin.HandlerFunc {
 			ConsultationTypeId: payload.ConsultationType,
 			HospitalId:         payload.Hospital,
 			SpecialityId:       payload.Speciality,
+			Education:          payload.Education,
+			SpokenLanguagesIds: payload.SpokenLanguages,
 			RefreshToken:       "",
 		}
 
@@ -145,10 +147,6 @@ func (a *DoctorAPI) GetDoctorById(filterActiveAccounts bool) gin.HandlerFunc {
 			return
 		}
 
-		if filterActiveAccounts {
-			res.IsActive = nil
-		}
-
 		ctx.JSON(http.StatusOK, serialize.DataResponse[*doctormodel.DoctorEntity]{
 			Data: res,
 			Response: serialize.Response{
@@ -195,7 +193,7 @@ func (a *DoctorAPI) ActivateAccount() gin.HandlerFunc {
 			return
 		}
 
-		if *user.IsActive {
+		if user.IsActive {
 			api.SendErrorResponse(ctx, "Your account is already activated", http.StatusNotAcceptable, nil)
 			return
 		}
@@ -212,4 +210,8 @@ func (a *DoctorAPI) ActivateAccount() gin.HandlerFunc {
 			Message:    "Account activated successfully",
 		})
 	}
+}
+
+func FindAllDoctors() gin.HandlerFunc {
+	return func(ctx *gin.Context) {}
 }

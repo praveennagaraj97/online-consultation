@@ -7,7 +7,7 @@ import (
 
 func (r *Router) doctorRoutes() {
 	api := doctorapi.DoctorAPI{}
-	api.Initialize(r.app, r.repos.GetDoctorAuthRepository())
+	api.Initialize(r.app, r.repos.GetDoctorRepository())
 
 	adminRoutes := r.engine.Group("/api/v1/admin/doctor")
 	routes := r.engine.Group("/api/v1/doctor")
