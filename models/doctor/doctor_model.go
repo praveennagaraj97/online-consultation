@@ -23,7 +23,7 @@ type DoctorEntity struct {
 	Experience        uint8                 `json:"experience" bson:"experience"`
 	ProfilePic        *interfaces.ImageType `json:"profile_pic" bson:"profile_pic"`
 	RefreshToken      string                `json:"-" bson:"refresh_token"`
-	IsActive          bool                  `json:"-" bson:"is_active"`
+	IsActive          *bool                 `json:"is_active,omitempty" bson:"is_active"`
 
 	// Populate fields
 	Speciality       string                        `json:"speciality,omitempty" bson:"speciality,omitempty"`

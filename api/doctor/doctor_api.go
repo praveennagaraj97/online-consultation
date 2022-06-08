@@ -127,7 +127,7 @@ func (a *DoctorAPI) AddNewDoctor() gin.HandlerFunc {
 	}
 }
 
-func (a *DoctorAPI) GetDoctorById() gin.HandlerFunc {
+func (a *DoctorAPI) GetDoctorById(filterActiveAccounts bool) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
 		id := ctx.Param("id")
@@ -138,11 +138,15 @@ func (a *DoctorAPI) GetDoctorById() gin.HandlerFunc {
 			return
 		}
 
-		res, err := a.authRepo.FindById(&objectId)
+		res, err := a.authRepo.FindById(&objectId, filterActiveAccounts)
 
 		if err != nil {
 			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
 			return
+		}
+
+		if filterActiveAccounts {
+			res.IsActive = nil
 		}
 
 		ctx.JSON(http.StatusOK, serialize.DataResponse[*doctormodel.DoctorEntity]{
@@ -185,13 +189,13 @@ func (a *DoctorAPI) ActivateAccount() gin.HandlerFunc {
 			return
 		}
 
-		user, err := a.authRepo.FindById(&objectId)
+		user, err := a.authRepo.FindById(&objectId, false)
 		if err != nil {
 			api.SendErrorResponse(ctx, err.Error(), http.StatusNotFound, nil)
 			return
 		}
 
-		if user.IsActive {
+		if *user.IsActive {
 			api.SendErrorResponse(ctx, "Your account is already activated", http.StatusNotAcceptable, nil)
 			return
 		}

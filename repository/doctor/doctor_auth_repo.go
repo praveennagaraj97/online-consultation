@@ -36,6 +36,7 @@ func (r *DoctorAuthRepository) Initialize(colln *mongo.Collection) {
 	utils.CreateIndex(colln, bson.D{{Key: "consultation_type_id", Value: 1}}, "Consultation Type", false)
 	utils.CreateIndex(colln, bson.D{{Key: "speciality_id", Value: 1}}, "Speciality", false)
 	utils.CreateIndex(colln, bson.D{{Key: "hospital_id", Value: 1}}, "Hospital", false)
+
 }
 
 func (r *DoctorAuthRepository) CreateOne(doc *doctormodel.DoctorEntity) error {
@@ -72,9 +73,15 @@ func (r *DoctorAuthRepository) CheckIfDoctorExistsByEmailOrPhone(email string, p
 	return count > 0
 }
 
-func (r *DoctorAuthRepository) FindById(id *primitive.ObjectID) (*doctormodel.DoctorEntity, error) {
+func (r *DoctorAuthRepository) FindById(id *primitive.ObjectID, showInActive bool) (*doctormodel.DoctorEntity, error) {
 
-	filterPipe := bson.D{{Key: "$match", Value: bson.M{"_id": id}}}
+	var filterPipe bson.D = make(bson.D, 0)
+
+	if showInActive {
+		filterPipe = bson.D{{Key: "$match", Value: bson.M{"$and": bson.A{bson.M{"_id": id}, bson.M{"is_active": showInActive}}}}}
+	} else {
+		filterPipe = bson.D{{Key: "$match", Value: bson.M{"_id": id}}}
+	}
 
 	// Consultation ID Populate
 	typeMatchPipe := bson.D{{Key: "$lookup", Value: bson.M{
