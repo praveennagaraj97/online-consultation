@@ -172,22 +172,10 @@ func (a *HospitalAPI) GetAllHospitals() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		pgOpts := api.ParsePaginationOptions(ctx, "hospitals")
 		fltsOpts := api.ParseFilterByOptions(ctx)
-		sortOpts := api.ParseSortByOptions(ctx)
-		keySortBy := "$gt"
+		sortOpts := map[string]int8{"_id": -1}
+		keySortBy := "$lt"
 
-		if len(*sortOpts) == 0 {
-			sortOpts = &map[string]int8{"_id": -1}
-		}
-
-		if pgOpts.PaginateId != nil {
-			for key, value := range *sortOpts {
-				if key == "_id" && value == -1 {
-					keySortBy = "$lt"
-				}
-			}
-		}
-
-		res, err := a.hspRepo.FindAll(pgOpts, fltsOpts, sortOpts, keySortBy)
+		res, err := a.hspRepo.FindAll(pgOpts, fltsOpts, &sortOpts, keySortBy)
 
 		if err != nil {
 			api.SendErrorResponse(ctx, "Something went wrong", http.StatusBadRequest, &map[string]string{

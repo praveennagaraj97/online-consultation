@@ -67,23 +67,11 @@ func (a *LanguageAPI) GetAllLanguages() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
 		pgOpts := api.ParsePaginationOptions(ctx, "languages_list")
-		sortOpts := api.ParseSortByOptions(ctx)
+		sortOpts := map[string]int8{"_id": -1}
 		filterOptions := api.ParseFilterByOptions(ctx)
-		keySortById := "$gt"
+		keySortById := "$lt"
 
-		if len(*sortOpts) == 0 {
-			sortOpts = &map[string]int8{"_id": -1}
-		}
-
-		if pgOpts.PaginateId != nil {
-			for key, value := range *sortOpts {
-				if value == -1 && key == "_id" {
-					keySortById = "$lt"
-				}
-			}
-		}
-
-		res, err := a.lngRepo.Find(pgOpts, sortOpts, filterOptions, keySortById)
+		res, err := a.lngRepo.Find(pgOpts, &sortOpts, filterOptions, keySortById)
 		if err != nil {
 			api.SendErrorResponse(ctx, "Something went wrong", http.StatusBadRequest, &map[string]string{
 				"reason": err.Error(),

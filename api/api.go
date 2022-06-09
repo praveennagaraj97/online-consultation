@@ -38,21 +38,6 @@ func GetUserIdFromContext(c *gin.Context) (*primitive.ObjectID, error) {
 	return &id, nil
 }
 
-// Parse sorting options from request url. acceps asc | desc | ASC | DESC
-func ParseSortByOptions(c *gin.Context) *map[string]int8 {
-	sortKey := c.Request.URL.Query()["sort"]
-	var opts map[string]int8 = make(map[string]int8)
-	for i := 0; i < len(sortKey); i++ {
-		sptKey := strings.Split(sortKey[i], ",")
-		if sptKey[1] == "asc" || sptKey[1] == "ASC" {
-			opts[sptKey[0]] = 1
-		} else if sptKey[1] == "desc" || sptKey[1] == "DESC" {
-			opts[sptKey[0]] = -1
-		}
-	}
-	return &opts
-}
-
 // Parse filter Options | available options any model with ([eq], [lte], [gte], [in], [gt], [lt], [ne]).
 func ParseFilterByOptions(c *gin.Context) *map[string]bson.M {
 	var opts map[string]bson.M = make(map[string]bson.M)

@@ -216,26 +216,13 @@ func (a *DoctorAPI) FindAllDoctors() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
 		pgOpts := api.ParsePaginationOptions(ctx, "doctors")
-		sortOpts := api.ParseSortByOptions(ctx)
+		sortOpts := map[string]int8{
+			"_id": -1,
+		}
 		fltrOpts := api.ParseFilterByOptions(ctx)
-		ketSortBy := "$gt"
+		ketSortBy := "$lt"
 
-		if len(*sortOpts) == 0 {
-			sortOpts = &map[string]int8{
-				"_id": -1,
-			}
-		}
-
-		// If sort option is given for latest with paginate ID.
-		if pgOpts.PaginateId != nil {
-			for key, value := range *sortOpts {
-				if key == "_id" && value == -1 {
-					ketSortBy = "$lt"
-				}
-			}
-		}
-
-		res, err := a.repo.FindAll(pgOpts, fltrOpts, sortOpts, ketSortBy)
+		res, err := a.repo.FindAll(pgOpts, fltrOpts, &sortOpts, ketSortBy)
 		if err != nil {
 			api.SendErrorResponse(ctx, "Something went wrong", http.StatusBadRequest, &map[string]string{
 				"reason": err.Error(),

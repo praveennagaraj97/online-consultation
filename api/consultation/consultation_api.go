@@ -101,24 +101,11 @@ func (a *ConsultationAPI) GetAll() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		// get pagination/sort/filter options.
 		pgOpts := api.ParsePaginationOptions(ctx, "consultation_type")
-		srtOpts := api.ParseSortByOptions(ctx)
+		srtOpts := map[string]int8{"_id": -1}
 		filterOpts := api.ParseFilterByOptions(ctx)
-		keySetSortby := "$gt"
+		keySetSortby := "$lt"
 
-		// Default options | sort by latest
-		if len(*srtOpts) == 0 {
-			srtOpts = &map[string]int8{"_id": -1}
-		}
-
-		if pgOpts.PaginateId != nil {
-			for key, value := range *srtOpts {
-				if value == -1 && key == "_id" {
-					keySetSortby = "$lt"
-				}
-			}
-		}
-
-		res, err := a.consultRepo.FindAll(pgOpts, srtOpts, filterOpts, keySetSortby)
+		res, err := a.consultRepo.FindAll(pgOpts, &srtOpts, filterOpts, keySetSortby)
 		if err != nil {
 			api.SendErrorResponse(ctx, err.Error(), http.StatusBadRequest, nil)
 			return

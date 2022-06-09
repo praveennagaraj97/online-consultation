@@ -293,24 +293,11 @@ func (a *SpecialityAPI) GetAll() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
 		pgOpts := api.ParsePaginationOptions(ctx, "speciality")
-		sortOpts := api.ParseSortByOptions(ctx)
+		sortOpts := map[string]int8{"_id": -1}
 		filterOptions := api.ParseFilterByOptions(ctx)
-		keySetSortBy := "$gt"
+		keySetSortBy := "$lt"
 
-		// Default options | sort by latest
-		if len(*sortOpts) == 0 {
-			sortOpts = &map[string]int8{"_id": -1}
-		}
-
-		if pgOpts.PaginateId != nil {
-			for key, value := range *sortOpts {
-				if value == -1 && key == "_id" {
-					keySetSortBy = "$lt"
-				}
-			}
-		}
-
-		res, err := a.splRepo.FindAll(pgOpts, sortOpts, filterOptions, keySetSortBy)
+		res, err := a.splRepo.FindAll(pgOpts, &sortOpts, filterOptions, keySetSortBy)
 
 		resLen := len(res)
 

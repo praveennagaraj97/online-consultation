@@ -75,24 +75,11 @@ func (a *UserAPI) GetListOfRelatives() gin.HandlerFunc {
 
 		// get pagination/sort/filter options.
 		pgOpts := api.ParsePaginationOptions(ctx, "user_relative_account")
-		srtOpts := api.ParseSortByOptions(ctx)
+		srtOpts := map[string]int8{"_id": -1}
 		filterOpts := api.ParseFilterByOptions(ctx)
 		keySetSortby := "$gt"
 
-		// Default options | sort by latest
-		if len(*srtOpts) == 0 {
-			srtOpts = &map[string]int8{"_id": -1}
-		}
-		// Key Set fix for created_at desc
-		if pgOpts.PaginateId != nil {
-			for key, value := range *srtOpts {
-				if value == -1 && key == "_id" {
-					keySetSortby = "$lt"
-				}
-			}
-		}
-
-		res, err := a.relativeRepo.FindAll(pgOpts, srtOpts, filterOpts, keySetSortby, userId)
+		res, err := a.relativeRepo.FindAll(pgOpts, &srtOpts, filterOpts, keySetSortby, userId)
 
 		if err != nil {
 			api.SendErrorResponse(ctx, "Couldn't find any relatives account assoiated with ypur account", http.StatusNotFound, nil)
