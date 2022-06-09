@@ -29,6 +29,9 @@ func (r *Router) doctorRoutes() {
 	authRoutes.POST("/send_verification_code", api.SendVerificationCode())
 	authRoutes.POST("/verify_code/:verification_id", api.VerifyCode())
 	authRoutes.POST("/signin_with_phonenumber", api.SignInWithPhoneNumber())
+	authRoutes.POST("/signin_with_emaillink", api.SignInWithEmailLink())
+	authRoutes.GET("/login_with_token/:token", api.SendLoginCredentialsForEmailLink())
+	authRoutes.GET("/logout", r.middlewares.IsAuthorized(), r.middlewares.UserRole([]constants.UserType{constants.DOCTOR}), api.Logout())
 
 	authRoutes.GET("/refresh_token", r.middlewares.IsAuthorized(), r.middlewares.UserRole([]constants.UserType{constants.DOCTOR}), api.RefreshToken())
 

@@ -205,7 +205,7 @@ func (r *DoctorRepository) FindOne(id *primitive.ObjectID, email string, phone *
 		return &result[0], nil
 	}
 
-	return nil, errors.New("Couldn't find any doctor matching gived id")
+	return nil, errors.New("Couldn't find any doctor")
 
 }
 

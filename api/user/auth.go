@@ -255,7 +255,7 @@ func (a *UserAPI) SignInWithEmailLink() gin.HandlerFunc {
 }
 
 // Login Credentials for email link
-func (a UserAPI) SendLoginCredentialsForEmailLink() gin.HandlerFunc {
+func (a *UserAPI) SendLoginCredentialsForEmailLink() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		token, exists := ctx.Params.Get("token")
 		if !exists {
@@ -269,7 +269,7 @@ func (a UserAPI) SendLoginCredentialsForEmailLink() gin.HandlerFunc {
 			return
 		}
 
-		if claimedInfo.Type != "sign-in-email" {
+		if claimedInfo.Type != "sign-in-email" || claimedInfo.Role != "user" {
 			api.SendErrorResponse(ctx, "Provided token is invalid", http.StatusUnprocessableEntity, nil)
 			return
 		}

@@ -17,7 +17,7 @@ func (r *DoctorRepository) FindById(id *primitive.ObjectID) (*doctormodel.Doctor
 
 	cur := r.colln.FindOne(ctx, bson.M{"_id": id})
 	if cur.Err() != nil {
-		return nil, errors.New("Couldn't find any doctor with given number")
+		return nil, errors.New("Couldn't find any doctor with given id")
 	}
 
 	var result doctormodel.DoctorEntity
@@ -37,6 +37,23 @@ func (r *DoctorRepository) FindByPhoneNumber(phone interfaces.PhoneType) (*docto
 	cur := r.colln.FindOne(ctx, phoneFilter)
 	if cur.Err() != nil {
 		return nil, errors.New("Couldn't find any doctor with given number")
+	}
+
+	var result doctormodel.DoctorEntity
+	if err := cur.Decode(&result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
+
+func (r *DoctorRepository) FindByEmail(email string) (*doctormodel.DoctorEntity, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	cur := r.colln.FindOne(ctx, bson.M{"email": email})
+	if cur.Err() != nil {
+		return nil, errors.New("Couldn't find any doctor with given email")
 	}
 
 	var result doctormodel.DoctorEntity
