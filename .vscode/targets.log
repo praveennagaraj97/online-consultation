@@ -10,7 +10,7 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 make: *** No rule to make target `all'.  Stop.
 
 
-# Make data base, printed on Wed Jun  8 13:53:14 2022
+# Make data base, printed on Thu Jun  9 16:56:10 2022
 
 # Variables
 
@@ -43,7 +43,7 @@ VSCODE_VERBOSE_LOGGING = true
 # environment
 __CFBundleIdentifier = com.microsoft.VSCode
 # environment
-VSCODE_IPC_HOOK_EXTHOST = /var/folders/m5/t1f8t1gj4vz1j776h90v1r2h0000gn/T/vscode-ipc-513b5d1d-0e9a-4174-a2f3-92507b19c90e.sock
+VSCODE_IPC_HOOK_EXTHOST = /var/folders/m5/t1f8t1gj4vz1j776h90v1r2h0000gn/T/vscode-ipc-64bf4d5a-2bbe-45c4-a215-8568464df8cd.sock
 # environment
 VSCODE_CWD = /
 # environment
@@ -53,13 +53,15 @@ PATH = /usr/local/go/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
 # environment
 GOPATH = /Users/praveennagaraj/go
 # environment
+LaunchInstanceID = 599B12AB-B435-4B53-9F0D-189D089A4697
+# environment
 VSCODE_LOG_STACK = false
 # environment
 ELECTRON_RUN_AS_NODE = 1
 # default
 .FEATURES := target-specific order-only second-expansion else-if archives jobserver check-symlink
 # environment
-SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.Y3P4eD6Dlz/Listeners
+SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.aGalpmJ2oL/Listeners
 # automatic
 %F = $(notdir $%)
 # environment
@@ -119,7 +121,7 @@ MFLAGS = -Rrqp
 # automatic
 *D = $(patsubst %/,%,$(dir $*))
 # environment
-XPC_SERVICE_NAME = application.com.microsoft.VSCode.4027732.4027738
+XPC_SERVICE_NAME = application.com.microsoft.VSCode.5002660.5002666
 # automatic
 +D = $(patsubst %/,%,$(dir $+))
 # automatic
@@ -134,6 +136,8 @@ MAKEFILES :=
 <F = $(notdir $<)
 # environment
 LC_ALL = C
+# environment
+SECURITYSESSIONID = 186ac
 # automatic
 ^F = $(notdir $^)
 # default
@@ -145,9 +149,9 @@ MAKELEVEL := 0
 # environment
 LANG = C
 # environment
-VSCODE_PID = 1764
+VSCODE_PID = 2117
 # variable set hash-table stats:
-# Load=66/1024=6%, Rehash=0, Collisions=2/90=2%
+# Load=68/1024=7%, Rehash=0, Collisions=2/92=2%
 
 # Pattern-specific Variable Values
 
@@ -228,6 +232,6 @@ stop_dev:
 # strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
-# Finished Make data base on Wed Jun  8 13:53:14 2022
+# Finished Make data base on Thu Jun  9 16:56:10 2022
 
  

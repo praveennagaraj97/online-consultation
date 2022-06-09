@@ -2,13 +2,18 @@ package utils
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"math/rand"
+	"net/url"
+	"strings"
 	"time"
 
+	"github.com/praveennagaraj97/online-consultation/interfaces"
 	logger "github.com/praveennagaraj97/online-consultation/pkg/log"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -57,4 +62,31 @@ func PrettyPrintPipe(pipeline mongo.Pipeline) {
 	json, _ := json.MarshalIndent(pipeline, "", "  ")
 
 	fmt.Println(string(json))
+}
+
+// Decode Phone Veridication ID
+func DecodeVerificationID(verification_query_str string) (*primitive.ObjectID, *interfaces.PhoneType, error) {
+
+	decodedStr, err := base64.StdEncoding.DecodeString(verification_query_str)
+	if err != nil {
+
+		return nil, nil, err
+	}
+
+	parsedQuery, err := url.ParseQuery(string(decodedStr))
+	if err != nil {
+		return nil, nil, err
+	}
+
+	objectId, err := primitive.ObjectIDFromHex(parsedQuery.Get("_id"))
+	if err != nil {
+		return nil, nil, err
+	}
+
+	phone := interfaces.PhoneType{
+		Code:   strings.Replace("+"+parsedQuery.Get("phone_code"), " ", "", 1),
+		Number: parsedQuery.Get("phone_number"),
+	}
+
+	return &objectId, &phone, nil
 }

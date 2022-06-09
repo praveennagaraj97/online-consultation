@@ -16,18 +16,21 @@ import (
 	"github.com/praveennagaraj97/online-consultation/pkg/env"
 	"github.com/praveennagaraj97/online-consultation/pkg/tokens"
 	doctorrepo "github.com/praveennagaraj97/online-consultation/repository/doctor"
+	onetimepasswordrepository "github.com/praveennagaraj97/online-consultation/repository/onetimepassword"
 	"github.com/praveennagaraj97/online-consultation/serialize"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type DoctorAPI struct {
 	repo    *doctorrepo.DoctorRepository
+	otpRepo *onetimepasswordrepository.OneTimePasswordRepository
 	appConf *app.ApplicationConfig
 }
 
-func (a *DoctorAPI) Initialize(conf *app.ApplicationConfig, repo *doctorrepo.DoctorRepository) {
+func (a *DoctorAPI) Initialize(conf *app.ApplicationConfig, repo *doctorrepo.DoctorRepository, otpRepo *onetimepasswordrepository.OneTimePasswordRepository) {
 	a.repo = repo
 	a.appConf = conf
+	a.otpRepo = otpRepo
 }
 
 func (a *DoctorAPI) AddNewDoctor() gin.HandlerFunc {

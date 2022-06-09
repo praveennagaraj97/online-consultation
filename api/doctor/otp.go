@@ -1,8 +1,6 @@
-package userapi
+package doctorapi
 
 import (
-	"fmt"
-	"log"
 	"net/http"
 	"time"
 
@@ -12,17 +10,14 @@ import (
 	userdto "github.com/praveennagaraj97/online-consultation/dto/user"
 	"github.com/praveennagaraj97/online-consultation/interfaces"
 	otpmodel "github.com/praveennagaraj97/online-consultation/models/otp"
-	twiliopkg "github.com/praveennagaraj97/online-consultation/pkg/sms/twilio"
 	"github.com/praveennagaraj97/online-consultation/pkg/validator"
 	"github.com/praveennagaraj97/online-consultation/serialize"
 	"github.com/praveennagaraj97/online-consultation/utils"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// Send Verification code to login via - SMS Gateway
-func (a *UserAPI) SendVerificationCode() gin.HandlerFunc {
+func (a *DoctorAPI) SendVerificationCode() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-
 		var payload interfaces.PhoneType
 
 		if err := ctx.ShouldBind(&payload); err != nil {
@@ -30,13 +25,25 @@ func (a *UserAPI) SendVerificationCode() gin.HandlerFunc {
 			return
 		}
 
+		defer ctx.Request.Body.Close()
+
 		// Validate
 		if errs := validator.ValidatePhoneNumber(payload); errs != nil {
 			api.SendErrorResponse(ctx, "Given data is invalid", http.StatusUnprocessableEntity, errs)
 			return
 		}
 
-		defer ctx.Request.Body.Close()
+		// Check if doctor exists with given number
+		usr, err := a.repo.FindByPhoneNumber(payload)
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusNotFound, nil)
+			return
+		}
+
+		if !usr.IsActive {
+			api.SendErrorResponse(ctx, "Your account is not activated. Please check your email or contact admin.", http.StatusNotAcceptable, nil)
+			return
+		}
 
 		// Generate OTP
 		verifyCode := utils.GenerateRandomCode(6)
@@ -49,30 +56,28 @@ func (a *UserAPI) SendVerificationCode() gin.HandlerFunc {
 		}
 
 		// Send OTP
-		if err := twiliopkg.SendMessage(&interfaces.SMSType{
-			Message: fmt.Sprintf("%s is your verification code for Online Consultation", verifyCode),
-			To:      fmt.Sprintf("%s%s", payload.Code, payload.Number),
-		}); err != nil {
-			log.Default().Println(err.Error())
-			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, nil)
-			return
-		}
+		// if err := twiliopkg.SendMessage(&interfaces.SMSType{
+		// 	Message: fmt.Sprintf("%s is your verification code for Online Consultation", verifyCode),
+		// 	To:      fmt.Sprintf("%s%s", payload.Code, payload.Number),
+		// }); err != nil {
+		// 	log.Default().Println(err.Error())
+		// 	api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, nil)
+		// 	return
+		// }
 
 		ctx.JSON(http.StatusCreated, serialize.DataResponse[*otpmodel.OneTimePasswordEntity]{
 			Data: res,
 			Response: serialize.Response{
 				StatusCode: http.StatusCreated,
-				Message:    "A text with verification code has been sent to your mobile number",
+				Message:    "A text with verification code has been sent to your mobile number" + " " + verifyCode,
 			},
 		})
 
 	}
 }
 
-// Verify Code
-func (a *UserAPI) VerifyCode() gin.HandlerFunc {
+func (a *DoctorAPI) VerifyCode() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-
 		verification_query_str, exists := ctx.Params.Get("verification_id")
 		if !exists {
 			api.SendErrorResponse(ctx, "Verification ID is missing", http.StatusUnprocessableEntity, nil)
@@ -157,4 +162,5 @@ func (a *UserAPI) VerifyCode() gin.HandlerFunc {
 		})
 
 	}
+
 }

@@ -6,5 +6,6 @@ echo "Development Container Stopped"
 echo "Starting Development Container"
 docker-compose -f docker-compose-dev.yml up --build
 echo "Development Container Running"
+ 
 make: Leaving directory `/Volumes/Workspace/online-consultation-api'
  

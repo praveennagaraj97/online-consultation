@@ -7,9 +7,10 @@ import (
 
 func (r *Router) doctorRoutes() {
 	api := doctorapi.DoctorAPI{}
-	api.Initialize(r.app, r.repos.GetDoctorRepository())
+	api.Initialize(r.app, r.repos.GetDoctorRepository(), r.repos.GetOneTimePasswordRepository())
 
 	adminRoutes := r.engine.Group("/api/v1/admin/doctor")
+	authRoutes := r.engine.Group("/api/v1/doctor/auth")
 	routes := r.engine.Group("/api/v1/doctor")
 
 	adminRoutes.Use(r.middlewares.IsAuthorized())
@@ -23,5 +24,9 @@ func (r *Router) doctorRoutes() {
 	routes.GET("/:id", api.GetDoctorById(true))
 	routes.GET("/activate_account/:token", api.ActivateAccount())
 	routes.GET("", api.FindAllDoctors())
+
+	// Auth Routes
+	authRoutes.POST("/send_verification_code", api.SendVerificationCode())
+	authRoutes.POST("/verify_code/:verification_id", api.VerifyCode())
 
 }
