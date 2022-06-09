@@ -2,6 +2,8 @@ package utils
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"math/rand"
 	"time"
 
@@ -49,4 +51,10 @@ func GenerateRandomCode(length int) string {
 	}
 
 	return string(codes)
+}
+
+func PrettyPrintPipe(pipeline mongo.Pipeline) {
+	json, _ := json.MarshalIndent(pipeline, "", "  ")
+
+	fmt.Println(string(json))
 }
