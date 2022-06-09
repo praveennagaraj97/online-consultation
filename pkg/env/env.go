@@ -11,7 +11,7 @@ func init() {
 
 	err := godotenv.Load(".env")
 	if err != nil {
-		logger.ErrorLogFatal("Failed to load env variables")
+		logger.PrintLog("Failed to load env variables")
 	}
 
 	logger.PrintLog("Environment Variables Loaded ⚙️ ")
