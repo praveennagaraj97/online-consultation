@@ -1,9 +1,13 @@
 package doctormodel
 
 import (
+	"time"
+
+	"github.com/praveennagaraj97/online-consultation/constants"
 	"github.com/praveennagaraj97/online-consultation/interfaces"
 	hospitalmodel "github.com/praveennagaraj97/online-consultation/models/hospital"
 	languagesmodel "github.com/praveennagaraj97/online-consultation/models/languages"
+	"github.com/praveennagaraj97/online-consultation/pkg/tokens"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -30,4 +34,23 @@ type DoctorEntity struct {
 	HospitalId         *primitive.ObjectID  `json:"-" bson:"hospital_id"`
 	SpecialityId       *primitive.ObjectID  `json:"-" bson:"speciality_id"`
 	SpokenLanguagesIds []primitive.ObjectID `json:"-" bson:"languages_ids"`
+}
+
+func (a *DoctorEntity) GetAccessAndRefreshToken(acessExpires bool) (string, string, int, error) {
+
+	var access, refresh string
+	var err error
+	var accessTime int = constants.CookieRefreshExpiryTime
+
+	if acessExpires {
+		accessTime = constants.CookieAccessExpiryTime
+		access, err = tokens.GenerateTokenWithExpiryTimeAndType(a.ID.Hex(),
+			time.Now().Local().Add(time.Minute*constants.JWT_AccessTokenExpiry).Unix(), "access", "doctor")
+	} else {
+		access, err = tokens.GenerateNoExpiryTokenWithCustomType(a.ID.Hex(), "access", "doctor")
+
+	}
+	refresh, err = tokens.GenerateNoExpiryTokenWithCustomType(a.ID.Hex(), "refresh", "doctor")
+
+	return access, refresh, accessTime, err
 }

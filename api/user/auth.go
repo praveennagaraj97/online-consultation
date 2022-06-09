@@ -91,7 +91,7 @@ func (a *UserAPI) Register() gin.HandlerFunc {
 			log.Println("Register email failed to send")
 		}
 
-		ctx.JSON(http.StatusCreated, serialize.AuthResponse{
+		ctx.JSON(http.StatusCreated, serialize.AuthResponse[*usermodel.UserEntity]{
 			AccessToken:  access,
 			RefreshToken: refresh,
 			DataResponse: serialize.DataResponse[*usermodel.UserEntity]{
@@ -148,7 +148,12 @@ func (a *UserAPI) SignInWithPhoneNumber() gin.HandlerFunc {
 
 		access, refresh, accessTime, err := res.GetAccessAndRefreshToken(!shouldExp)
 
-		a.userRepo.UpdateRefreshToken(&res.ID, refresh)
+		if err := a.userRepo.UpdateRefreshToken(&res.ID, refresh); err != nil {
+			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, &map[string]string{
+				"reason": err.Error(),
+			})
+			return
+		}
 
 		// Set Access Token
 		ctx.SetCookie(string(constants.AUTH_TOKEN),
@@ -165,7 +170,7 @@ func (a *UserAPI) SignInWithPhoneNumber() gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(http.StatusOK, serialize.AuthResponse{
+		ctx.JSON(http.StatusOK, serialize.AuthResponse[*usermodel.UserEntity]{
 			AccessToken:  access,
 			RefreshToken: refresh,
 			DataResponse: serialize.DataResponse[*usermodel.UserEntity]{
@@ -309,7 +314,7 @@ func (a UserAPI) SendLoginCredentialsForEmailLink() gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(http.StatusOK, serialize.AuthResponse{
+		ctx.JSON(http.StatusOK, serialize.AuthResponse[*usermodel.UserEntity]{
 			AccessToken:  access,
 			RefreshToken: refresh,
 			DataResponse: serialize.DataResponse[*usermodel.UserEntity]{

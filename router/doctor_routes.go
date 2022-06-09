@@ -28,5 +28,6 @@ func (r *Router) doctorRoutes() {
 	// Auth Routes
 	authRoutes.POST("/send_verification_code", api.SendVerificationCode())
 	authRoutes.POST("/verify_code/:verification_id", api.VerifyCode())
+	authRoutes.POST("/signin_with_phonenumber", api.SignInWithPhoneNumber())
 
 }

@@ -317,6 +317,16 @@ func (r *DoctorRepository) FindAll(pgOpts *api.PaginationOptions,
 func (r *DoctorRepository) GetDocumentsCount(filters *map[string]primitive.M) (int64, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
+
 	return r.colln.CountDocuments(ctx, filters)
+}
+
+func (r *DoctorRepository) UpdateRefreshToken(id *primitive.ObjectID, token string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	_, err := r.colln.UpdateByID(ctx, id, bson.M{"$set": bson.M{"refresh_token": token}})
+
+	return err
 
 }

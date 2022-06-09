@@ -126,7 +126,7 @@ func (a *AdminAPI) Login() gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(http.StatusOK, serialize.AdminAuthResponse{
+		ctx.JSON(http.StatusOK, serialize.AuthResponse[*adminmodel.AdminEntity]{
 			AccessToken:  access,
 			RefreshToken: refresh,
 			DataResponse: serialize.DataResponse[*adminmodel.AdminEntity]{
