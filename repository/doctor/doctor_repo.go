@@ -72,33 +72,32 @@ func (r *DoctorRepository) CheckIfDoctorExistsByEmailOrPhone(email string, phone
 	return count > 0
 }
 
-func (r *DoctorRepository) FindByPhoneNumber(phone interfaces.PhoneType) (*doctormodel.DoctorEntity, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
-	defer cancel()
-
-	phoneFilter := bson.M{"$and": bson.A{bson.M{"phone.code": phone.Code}, bson.M{"phone.number": phone.Number}}}
-
-	cur := r.colln.FindOne(ctx, phoneFilter)
-	if cur.Err() != nil {
-		return nil, errors.New("Couldn't find any doctor with given number")
-	}
-
-	var result doctormodel.DoctorEntity
-	if err := cur.Decode(&result); err != nil {
-		return nil, err
-	}
-
-	return &result, nil
-}
-
-func (r *DoctorRepository) FindById(id *primitive.ObjectID, showInActive bool) (*doctormodel.DoctorEntity, error) {
+func (r *DoctorRepository) FindOne(id *primitive.ObjectID, email string, phone *interfaces.PhoneType, showInActive bool) (*doctormodel.DoctorEntity, error) {
 
 	var filterPipe bson.D = make(bson.D, 0)
 
-	if showInActive {
-		filterPipe = bson.D{{Key: "$match", Value: bson.M{"$and": bson.A{bson.M{"_id": id}, bson.M{"is_active": showInActive}}}}}
-	} else {
-		filterPipe = bson.D{{Key: "$match", Value: bson.M{"_id": id}}}
+	if id != nil {
+		if showInActive {
+			filterPipe = bson.D{{Key: "$match", Value: bson.M{"$and": bson.A{bson.M{"_id": id}, bson.M{"is_active": showInActive}}}}}
+		} else {
+			filterPipe = bson.D{{Key: "$match", Value: bson.M{"_id": id}}}
+		}
+	}
+
+	if email != "" {
+		if showInActive {
+			filterPipe = bson.D{{Key: "$match", Value: bson.M{"$and": bson.A{bson.M{"email": email}, bson.M{"is_active": showInActive}}}}}
+		} else {
+			filterPipe = bson.D{{Key: "$match", Value: bson.M{"email": email}}}
+		}
+	}
+
+	if phone != nil {
+		if showInActive {
+			filterPipe = bson.D{{Key: "$match", Value: bson.M{"$and": bson.A{bson.M{"phone.code": phone.Code}, bson.M{"phone.number": phone.Number}, bson.M{"is_active": showInActive}}}}}
+		} else {
+			filterPipe = bson.D{{Key: "$match", Value: bson.M{"$and": bson.A{bson.M{"phone.code": phone.Code}, bson.M{"phone.number": phone.Number}}}}}
+		}
 	}
 
 	// Consultation ID Populate

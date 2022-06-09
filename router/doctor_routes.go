@@ -30,4 +30,6 @@ func (r *Router) doctorRoutes() {
 	authRoutes.POST("/verify_code/:verification_id", api.VerifyCode())
 	authRoutes.POST("/signin_with_phonenumber", api.SignInWithPhoneNumber())
 
+	authRoutes.GET("/refresh_token", r.middlewares.IsAuthorized(), r.middlewares.UserRole([]constants.UserType{constants.DOCTOR}), api.RefreshToken())
+
 }
