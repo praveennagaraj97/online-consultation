@@ -98,11 +98,11 @@ func (a *DoctorAPI) AddNewDoctor() gin.HandlerFunc {
 			return
 		}
 
-		token, err := tokens.GenerateNoExpiryTokenWithCustomType(doc.ID.Hex(), "activate-doctor", "doctor")
-		if err != nil {
-			api.SendErrorResponse(ctx, err.Error(), http.StatusInternalServerError, nil)
-			return
-		}
+		// token, err := tokens.GenerateNoExpiryTokenWithCustomType(doc.ID.Hex(), "activate-doctor", "doctor")
+		// if err != nil {
+		// 	api.SendErrorResponse(ctx, err.Error(), http.StatusInternalServerError, nil)
+		// 	return
+		// }
 
 		// activateLink := fmt.Sprintf("%s/?token=%s", env.GetEnvVariable("CLIENT_DOCTOR_ACTIVATE_ACCOUNT_LINK"), token)
 
