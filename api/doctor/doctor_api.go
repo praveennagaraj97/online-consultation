@@ -1,6 +1,7 @@
 package doctorapi
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -11,6 +12,8 @@ import (
 	"github.com/praveennagaraj97/online-consultation/interfaces"
 	doctormodel "github.com/praveennagaraj97/online-consultation/models/doctor"
 	awspkg "github.com/praveennagaraj97/online-consultation/pkg/aws"
+	mailer "github.com/praveennagaraj97/online-consultation/pkg/email"
+	"github.com/praveennagaraj97/online-consultation/pkg/env"
 	"github.com/praveennagaraj97/online-consultation/pkg/tokens"
 	doctorrepo "github.com/praveennagaraj97/online-consultation/repository/doctor"
 	onetimepasswordrepository "github.com/praveennagaraj97/online-consultation/repository/onetimepassword"
@@ -98,25 +101,25 @@ func (a *DoctorAPI) AddNewDoctor() gin.HandlerFunc {
 			return
 		}
 
-		// token, err := tokens.GenerateNoExpiryTokenWithCustomType(doc.ID.Hex(), "activate-doctor", "doctor")
-		// if err != nil {
-		// 	api.SendErrorResponse(ctx, err.Error(), http.StatusInternalServerError, nil)
-		// 	return
-		// }
+		token, err := tokens.GenerateNoExpiryTokenWithCustomType(doc.ID.Hex(), "activate-doctor", "doctor")
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusInternalServerError, nil)
+			return
+		}
 
-		// activateLink := fmt.Sprintf("%s/?token=%s", env.GetEnvVariable("CLIENT_DOCTOR_ACTIVATE_ACCOUNT_LINK"), token)
+		activateLink := fmt.Sprintf("%s/?token=%s", env.GetEnvVariable("CLIENT_DOCTOR_ACTIVATE_ACCOUNT_LINK"), token)
 
-		// if err := a.appConf.EmailClient.SendNoReplyMail([]string{doc.Email},
-		// 	"Welcome to Online Consultation", "new-doctor", "welcome",
-		// 	mailer.GetNewDoctorAddedTemplateData(doc.Name, doc.ProfessionalTitle, activateLink)); err != nil {
-		// 	api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, nil)
-		// 	return
-		// }
+		if err := a.appConf.EmailClient.SendNoReplyMail([]string{doc.Email},
+			"Welcome to Online Consultation", "new-doctor", "welcome",
+			mailer.GetNewDoctorAddedTemplateData(doc.Name, doc.ProfessionalTitle, activateLink)); err != nil {
+			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, nil)
+			return
+		}
 
-		// if multipartFile != nil {
-		// 	doc.ProfilePic.OriginalSrc = a.appConf.AwsUtils.S3_PUBLIC_ACCESS_BASEURL + "/" + doc.ProfilePic.OriginalImagePath
-		// 	doc.ProfilePic.BlurDataURL = a.appConf.AwsUtils.S3_PUBLIC_ACCESS_BASEURL + "/" + doc.ProfilePic.BlurImagePath
-		// }
+		if multipartFile != nil {
+			doc.ProfilePic.OriginalSrc = a.appConf.AwsUtils.S3_PUBLIC_ACCESS_BASEURL + "/" + doc.ProfilePic.OriginalImagePath
+			doc.ProfilePic.BlurDataURL = a.appConf.AwsUtils.S3_PUBLIC_ACCESS_BASEURL + "/" + doc.ProfilePic.BlurImagePath
+		}
 
 		ctx.JSON(http.StatusCreated, serialize.DataResponse[*doctormodel.DoctorEntity]{
 			Data: &doc,
