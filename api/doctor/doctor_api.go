@@ -297,8 +297,84 @@ func (a *DoctorAPI) FindAllDoctors(showInActive bool) gin.HandlerFunc {
 // Update doctor By ID - Admin Via Query | Doctor via context.
 func (a *DoctorAPI) UpdateById() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		var objectId *primitive.ObjectID
+		var err error
 
-		//
+		id := ctx.Param("id")
+		if id != "" {
+			oId, err := primitive.ObjectIDFromHex(id)
+			if err != nil {
+				api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+				return
+			}
+			objectId = &oId
+		} else {
+			objectId, err = api.GetUserIdFromContext(ctx)
+			if err != nil {
+				api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+				return
+			}
+		}
+
+		var payload doctordto.EditDoctorDTO
+
+		if err := ctx.ShouldBind(&payload); err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		// For Doctor Profile Page update ignore fields.
+		if id == "" {
+			payload.ConsultationType = nil
+			payload.Hospital = nil
+			payload.Speciality = nil
+			payload.SpokenLanguages = nil
+		}
+
+		// Update Profile Pic
+		file, err := ctx.FormFile("profile_pic")
+		if err == nil && file != nil {
+			// Get existing profile
+			doc, err := a.repo.FindById(objectId)
+			if err != nil {
+				api.SendErrorResponse(ctx, err.Error(), http.StatusNotFound, nil)
+				return
+			}
+
+			// Delete existing pic
+			if doc.ProfilePic != nil {
+				a.appConf.AwsUtils.DeleteAsset(&doc.ProfilePic.OriginalImagePath)
+				a.appConf.AwsUtils.DeleteAsset(&doc.ProfilePic.BlurImagePath)
+			}
+
+			var ch chan *awspkg.S3UploadChannelResponse = make(chan *awspkg.S3UploadChannelResponse, 1)
+			defer close(ch)
+			a.appConf.AwsUtils.UploadImageToS3(ctx, string(constants.DoctorProfilePic), doc.ID.Hex(), "profile_pic",
+				payload.ProfilePicWidth, payload.ProfilePicHeight, ch)
+
+			select {
+			case value, ok := <-ch:
+				if ok {
+					if value.Err != nil {
+						api.SendErrorResponse(ctx, value.Err.Error(), http.StatusInternalServerError, nil)
+						return
+					} else {
+						doc.ProfilePic = value.Result
+					}
+				}
+			default:
+			}
+
+		}
+
+		if err = a.repo.UpdateById(objectId, &payload); err != nil {
+			api.SendErrorResponse(ctx, "Something went wrong", http.StatusBadRequest, &map[string]string{
+				"reason": err.Error(),
+			})
+			return
+		}
+
+		ctx.JSON(http.StatusNoContent, nil)
 
 	}
 }

@@ -215,8 +215,11 @@ func (a *SpecialityAPI) UpdateById() gin.HandlerFunc {
 					return
 				}
 			}
-			a.conf.AwsUtils.DeleteAsset(&doc.Thumbnail.BlurImagePath)
-			a.conf.AwsUtils.DeleteAsset(&doc.Thumbnail.OriginalImagePath)
+
+			if doc.Thumbnail != nil {
+				a.conf.AwsUtils.DeleteAsset(&doc.Thumbnail.OriginalImagePath)
+				a.conf.AwsUtils.DeleteAsset(&doc.Thumbnail.BlurImagePath)
+			}
 
 			var ch chan *awspkg.S3UploadChannelResponse = make(chan *awspkg.S3UploadChannelResponse, 1)
 			defer close(ch)
@@ -274,8 +277,10 @@ func (a *SpecialityAPI) DeleteById() gin.HandlerFunc {
 			return
 		}
 
-		a.conf.AwsUtils.DeleteAsset(&doc.Thumbnail.OriginalImagePath)
-		a.conf.AwsUtils.DeleteAsset(&doc.Thumbnail.BlurImagePath)
+		if doc.Thumbnail != nil {
+			a.conf.AwsUtils.DeleteAsset(&doc.Thumbnail.OriginalImagePath)
+			a.conf.AwsUtils.DeleteAsset(&doc.Thumbnail.BlurImagePath)
+		}
 
 		if err := a.splRepo.DeleteById(&objectId); err != nil {
 			api.SendErrorResponse(ctx, "Something went wrong", http.StatusBadRequest, &map[string]string{

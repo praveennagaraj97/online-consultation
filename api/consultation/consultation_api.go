@@ -197,8 +197,10 @@ func (a *ConsultationAPI) UpdateById() gin.HandlerFunc {
 				return
 			}
 
-			a.appConf.AwsUtils.DeleteAsset(&res.Icon.OriginalImagePath)
-			a.appConf.AwsUtils.DeleteAsset(&res.Icon.BlurImagePath)
+			if res.Icon != nil {
+				a.appConf.AwsUtils.DeleteAsset(&res.Icon.OriginalImagePath)
+				a.appConf.AwsUtils.DeleteAsset(&res.Icon.BlurImagePath)
+			}
 
 			if payload.IconWidth == 0 || payload.IconHeight == 0 {
 				payload.IconWidth = res.Icon.Width
@@ -250,8 +252,10 @@ func (a *ConsultationAPI) DeleteConsultationType() gin.HandlerFunc {
 			return
 		}
 
-		a.appConf.AwsUtils.DeleteAsset(&doc.Icon.OriginalImagePath)
-		a.appConf.AwsUtils.DeleteAsset(&doc.Icon.BlurImagePath)
+		if doc.Icon != nil {
+			a.appConf.AwsUtils.DeleteAsset(&doc.Icon.OriginalImagePath)
+			a.appConf.AwsUtils.DeleteAsset(&doc.Icon.BlurImagePath)
+		}
 
 		if err = a.consultRepo.DeleteById(&docId); err != nil {
 			api.SendErrorResponse(ctx, "Something went wrong", http.StatusBadRequest, &map[string]string{

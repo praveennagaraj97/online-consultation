@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/praveennagaraj97/online-consultation/api"
+	doctordto "github.com/praveennagaraj97/online-consultation/dto/doctor"
 	"github.com/praveennagaraj97/online-consultation/interfaces"
 	doctormodel "github.com/praveennagaraj97/online-consultation/models/doctor"
 	"github.com/praveennagaraj97/online-consultation/pkg/env"
@@ -360,4 +361,13 @@ func (r *DoctorRepository) UpdateRefreshToken(id *primitive.ObjectID, token stri
 
 	return err
 
+}
+
+func (r *DoctorRepository) UpdateById(id *primitive.ObjectID, payload *doctordto.EditDoctorDTO) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	_, err := r.colln.UpdateByID(ctx, id, bson.M{"$set": payload})
+
+	return err
 }
