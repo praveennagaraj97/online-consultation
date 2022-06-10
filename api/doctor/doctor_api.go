@@ -412,8 +412,6 @@ func (a *DoctorAPI) UpdateById() gin.HandlerFunc {
 
 		}
 
-		fmt.Println(payload.SpokenLanguages)
-
 		if err = a.repo.UpdateById(objectId, &payload); err != nil {
 			api.SendErrorResponse(ctx, "Something went wrong", http.StatusBadRequest, &map[string]string{
 				"reason": err.Error(),

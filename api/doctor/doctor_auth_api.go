@@ -260,8 +260,6 @@ func (a *DoctorAPI) SendLoginCredentialsForEmailLink() gin.HandlerFunc {
 			return
 		}
 
-		fmt.Println(claimedInfo)
-
 		if claimedInfo.Type != "sign-in-email" || claimedInfo.Role != "doctor" {
 			api.SendErrorResponse(ctx, "Provided token is invalid", http.StatusUnprocessableEntity, nil)
 			return
