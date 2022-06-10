@@ -65,11 +65,11 @@ func (a *AddConsultationDTO) ValidateAddConsultationDTO() *serialize.ErrorRespon
 }
 
 type EditConsultationDTO struct {
-	Title       string                `json:"title,omitempty" form:"title,omitempty"`
-	Description string                `json:"description,omitempty" form:"description,omitempty"`
-	Price       float64               `json:"price,omitempty" form:"price,omitempty"`
-	ActionName  string                `json:"action_name,omitempty" form:"action_name,omitempty"`
-	IconWidth   uint64                `json:"icon_width,omitempty" form:"icon_width,omitempty"`
-	IconHeight  uint64                `json:"icon_height,omitempty" form:"icon_height,omitempty"`
+	Title       string                `json:"title,omitempty" form:"title,omitempty" bson:"title,omitempty"`
+	Description string                `json:"description,omitempty" form:"description,omitempty" bson:"description,omitempty"`
+	Price       float64               `json:"price,omitempty" form:"price,omitempty" bson:"price,omitempty"`
+	ActionName  string                `json:"action_name,omitempty" form:"action_name,omitempty" bson:"action_name,omitempty"`
+	IconWidth   uint64                `json:"icon_width,omitempty" form:"icon_width,omitempty" bson:"icon_width,omitempty"`
+	IconHeight  uint64                `json:"icon_height,omitempty" form:"icon_height,omitempty" bson:"icon_height,omitempty"`
 	Icon        *interfaces.ImageType `json:"-" form:"-" bson:"icon,omitempty"`
 }

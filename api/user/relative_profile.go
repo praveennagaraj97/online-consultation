@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/praveennagaraj97/online-consultation/api"
 	userdto "github.com/praveennagaraj97/online-consultation/dto/user"
+	"github.com/praveennagaraj97/online-consultation/interfaces"
 	usermodel "github.com/praveennagaraj97/online-consultation/models/user"
 	"github.com/praveennagaraj97/online-consultation/serialize"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -45,7 +46,7 @@ func (a *UserAPI) AddRelative() gin.HandlerFunc {
 			return
 		}
 
-		payload.UserId = *userId
+		payload.UserId = userId
 
 		res, err := a.relativeRepo.CreateOne(&payload)
 
@@ -140,7 +141,7 @@ func (a *UserAPI) GetRelativeProfileById() gin.HandlerFunc {
 
 		res, err := a.relativeRepo.FindById(userId, &docId)
 		if err != nil {
-			api.SendErrorResponse(ctx, err.Error(), http.StatusBadRequest, nil)
+			api.SendErrorResponse(ctx, err.Error(), http.StatusNotFound, nil)
 			return
 		}
 
@@ -177,6 +178,13 @@ func (a *UserAPI) UpdateRelativeProfileById() gin.HandlerFunc {
 			return
 		}
 		defer ctx.Request.Body.Close()
+
+		if payload.PhoneCode != "" && payload.PhoneNumber != "" {
+			payload.Phone = &interfaces.PhoneType{
+				Code:   payload.PhoneCode,
+				Number: payload.PhoneNumber,
+			}
+		}
 
 		if err := a.relativeRepo.UpdateByID(userId, &docId, &payload); err != nil {
 			api.SendErrorResponse(ctx, err.Error(), http.StatusBadRequest, nil)

@@ -35,7 +35,7 @@ type UpdatePasswordDTO struct {
 	ConfirmPassword string `json:"confirm_password" form:"confirm_password"`
 }
 
-type ForgorPasswordDTO struct {
+type ForgotPasswordDTO struct {
 	Email string `json:"email" form:"email"`
 }
 

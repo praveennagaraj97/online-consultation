@@ -190,7 +190,7 @@ func (a *AdminAPI) UpdatePassword() gin.HandlerFunc {
 
 func (a *AdminAPI) ForgotPassword() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var payload admindto.ForgorPasswordDTO
+		var payload admindto.ForgotPasswordDTO
 
 		if err := ctx.ShouldBind(&payload); err != nil {
 			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)

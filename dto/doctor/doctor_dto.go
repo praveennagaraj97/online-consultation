@@ -126,3 +126,23 @@ func (a *AddNewDoctorDTO) Validate() *serialize.ErrorResponse {
 
 	return nil
 }
+
+type EditDoctorDTO struct {
+	Name              string `json:"name,omitempty" form:"name,omitempty"`
+	ProfessionalTitle string `json:"professional_title,omitempty" form:"professional_title,omitempty"`
+	Education         string `json:"education,omitempty" form:"education,omitempty"`
+	Experience        uint8  `json:"experience,omitempty" form:"experience,omitempty"`
+	ProfilePicWidth   uint64 `json:"profile_pic_width,omitempty" form:"profile_pic_width,omitempty"`
+	ProfilePicHeight  uint64 `json:"profile_pic_height,omitempty" form:"profile_pic_height,omitempty"`
+
+	// Input ref fields
+	HospitalId         string   `json:"hospital_id,omitempty" form:"hospital_id,omitempty"`
+	ConsultationTypeId string   `json:"consultation_type_id,omitempty" form:"consultation_type_id,omitempty"`
+	SpecialityId       string   `json:"speciality_id,omitempty" form:"speciality_id,omitempty"`
+	SpokenLanguagesIds []string `json:"spoken_language_id,omitempty" form:"spoken_language_id,omitempty"`
+
+	Hospital         *primitive.ObjectID  `json:"-" bson:"-"`
+	ConsultationType *primitive.ObjectID  `json:"-" form:"-"`
+	Speciality       *primitive.ObjectID  `json:"-" form:"-"`
+	SpokenLanguages  []primitive.ObjectID `json:"-" form:"-"`
+}

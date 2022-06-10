@@ -47,7 +47,7 @@ func (r *UserRelativesRepository) InitializeRepository(colln *mongo.Collection) 
 func (r *UserRelativesRepository) CreateOne(payload *userdto.AddOrEditRelativeDTO) (*usermodel.RelativeEntity, error) {
 
 	if exists := r.checkIfRelativeExist(payload.Email,
-		interfaces.PhoneType{Code: payload.PhoneCode, Number: payload.PhoneNumber}, &payload.UserId); exists {
+		interfaces.PhoneType{Code: payload.PhoneCode, Number: payload.PhoneNumber}, payload.UserId); exists {
 		return nil, errors.New("Relative account with given credentials already exist")
 	}
 

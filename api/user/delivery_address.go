@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/praveennagaraj97/online-consultation/api"
 	userdto "github.com/praveennagaraj97/online-consultation/dto/user"
+	"github.com/praveennagaraj97/online-consultation/interfaces"
 	usermodel "github.com/praveennagaraj97/online-consultation/models/user"
 	"github.com/praveennagaraj97/online-consultation/serialize"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -32,7 +33,7 @@ func (a *UserAPI) AddNewAddress() gin.HandlerFunc {
 			return
 		}
 
-		payload.UserId = *userId
+		payload.UserId = userId
 
 		res, err := a.delvrAddrRepo.CreateOne(&payload)
 
@@ -126,7 +127,7 @@ func (a *UserAPI) GetAddressById() gin.HandlerFunc {
 
 		res, err := a.delvrAddrRepo.FindById(userId, &docId)
 		if err != nil {
-			api.SendErrorResponse(ctx, err.Error(), http.StatusBadRequest, nil)
+			api.SendErrorResponse(ctx, err.Error(), http.StatusNotFound, nil)
 			return
 		}
 
@@ -164,6 +165,13 @@ func (a *UserAPI) UpdateAddressById() gin.HandlerFunc {
 			return
 		}
 		defer ctx.Request.Body.Close()
+
+		if payload.PhoneCode != "" && payload.PhoneNumber != "" {
+			payload.Phone = &interfaces.PhoneType{
+				Code:   payload.PhoneCode,
+				Number: payload.PhoneNumber,
+			}
+		}
 
 		if err := a.delvrAddrRepo.UpdateById(userId, &docId, &payload); err != nil {
 			api.SendErrorResponse(ctx, err.Error(), http.StatusBadRequest, nil)

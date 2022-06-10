@@ -49,10 +49,10 @@ func (a *AddHospitalDTO) Validate() *serialize.ErrorResponse {
 }
 
 type EditHospitalDTO struct {
-	Name      string  `json:"name" form:"name"`
-	City      string  `json:"city" form:"city"`
-	Country   string  `json:"country" form:"country"`
-	Address   string  `json:"address" form:"address"`
-	Latitude  float64 `json:"latitude" form:"latitude,omitempty"`
-	Longitude float64 `json:"longitude" form:"longitude,omitempty"`
+	Name      string  `json:"name,omitempty" form:"name,omitempty" bson:"name,omitempty"`
+	City      string  `json:"city,omitempty" form:"city,omitempty" bson:"city,omitempty"`
+	Country   string  `json:"country,omitempty" form:"country,omitempty" bson:"country,omitempty"`
+	Address   string  `json:"address,omitempty" form:"address,omitempty" bson:"address,omitempty"`
+	Latitude  float64 `json:"latitude" form:"latitude,omitempty" bson:"latitude,omitempty"`
+	Longitude float64 `json:"longitude" form:"longitude,omitempty" bson:"longitude,omitempty"`
 }

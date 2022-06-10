@@ -135,16 +135,27 @@ func (a *DoctorAPI) AddNewDoctor() gin.HandlerFunc {
 
 func (a *DoctorAPI) GetDoctorById(filterActiveAccounts bool) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		var objectId *primitive.ObjectID
+		var err error
 
 		id := ctx.Param("id")
 
-		objectId, err := primitive.ObjectIDFromHex(id)
-		if err != nil {
-			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
-			return
+		if id == "" {
+			objectId, err = api.GetUserIdFromContext(ctx)
+			if err != nil {
+				api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+				return
+			}
+		} else {
+			id, err := primitive.ObjectIDFromHex(id)
+			if err != nil {
+				api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+				return
+			}
+			objectId = &id
 		}
 
-		res, err := a.repo.FindOne(&objectId, "", nil, filterActiveAccounts)
+		res, err := a.repo.FindOne(objectId, "", nil, filterActiveAccounts)
 
 		if err != nil {
 			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
@@ -279,6 +290,15 @@ func (a *DoctorAPI) FindAllDoctors(showInActive bool) gin.HandlerFunc {
 				},
 			},
 		})
+
+	}
+}
+
+// Update doctor By ID - Admin Via Query | Doctor via context.
+func (a *DoctorAPI) UpdateById() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+
+		//
 
 	}
 }

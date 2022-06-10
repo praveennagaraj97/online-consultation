@@ -36,6 +36,6 @@ func (a *AddLanguageDTO) Validate() *serialize.ErrorResponse {
 }
 
 type EditLanguageDTO struct {
-	Name       string `json:"name,omitempty" form:"name,omitempty"`
-	LocaleName string `json:"locale_name,omitempty" form:"locale_name,omitempty"`
+	Name       string `json:"name,omitempty" form:"name,omitempty" bson:"name,omitempty"`
+	LocaleName string `json:"locale_name,omitempty" form:"locale_name,omitempty" bson:"locale_name,omitempty"`
 }

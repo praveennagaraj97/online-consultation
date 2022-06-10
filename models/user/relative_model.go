@@ -13,5 +13,5 @@ type RelativeEntity struct {
 	DateOfBirth string               `json:"date_of_birth" bson:"date_of_birth"`
 	Gender      string               `json:"gender" bson:"gender"`
 	Relation    string               `json:"relation" bson:"relation"`
-	UserId      primitive.ObjectID   `json:"-" bson:"user_id"`
+	UserId      *primitive.ObjectID  `json:"-" bson:"user_id"`
 }

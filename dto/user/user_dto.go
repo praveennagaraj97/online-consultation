@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/praveennagaraj97/online-consultation/interfaces"
 	usermodel "github.com/praveennagaraj97/online-consultation/models/user"
 	"github.com/praveennagaraj97/online-consultation/pkg/validator"
 	"github.com/praveennagaraj97/online-consultation/serialize"
@@ -51,26 +52,28 @@ type RequestEmailVerifyDTO struct {
 }
 
 type AddOrEditRelativeDTO struct {
-	Name        string             `json:"name,omitempty" form:"name,omitempty"`
-	Email       string             `json:"email,omitempty" form:"email,omitempty"`
-	PhoneCode   string             `json:"phone_code,omitempty" form:"phone_code,omitempty"`
-	PhoneNumber string             `json:"phone_number,omitempty" form:"phone_number,omitempty"`
-	DateOfBirth string             `json:"date_of_birth,omitempty" form:"date_of_birth,omitempty"`
-	Gender      string             `json:"gender,omitempty" form:"gender,omitempty"`
-	Relation    string             `json:"relation,omitempty" form:"relation,omitempty"`
-	UserId      primitive.ObjectID `json:"-,omitempty" form:"-,omitempty"`
+	Name        string                `json:"name,omitempty" form:"name,omitempty" bson:"name,omitempty"`
+	Email       string                `json:"email,omitempty" form:"email,omitempty" bson:"email,omitempty"`
+	PhoneCode   string                `json:"phone_code,omitempty" form:"phone_code,omitempty" bson:"phone_code,omitempty"`
+	PhoneNumber string                `json:"phone_number,omitempty" form:"phone_number,omitempty" bson:"phone_number,omitempty"`
+	DateOfBirth string                `json:"date_of_birth,omitempty" form:"date_of_birth,omitempty" bson:"date_of_birth,omitempty"`
+	Gender      string                `json:"gender,omitempty" form:"gender,omitempty" bson:"gender,omitempty"`
+	Relation    string                `json:"relation,omitempty" form:"relation,omitempty" bson:"relation,omitempty"`
+	UserId      *primitive.ObjectID   `json:"-,omitempty" form:"-,omitempty"`
+	Phone       *interfaces.PhoneType `json:"-" form:"-" bson:"phone,omitempty"`
 }
 
 type AddOrEditDeliveryAddressDTO struct {
-	Name        string             `json:"name,omitempty" form:"name,omitempty"`
-	Address     string             `json:"address,omitempty" form:"address,omitempty"`
-	State       string             `json:"state,omitempty" form:"state,omitempty"`
-	Locality    string             `json:"locality,omitempty" form:"locality,omitempty"`
-	PinCode     string             `json:"pincode,omitempty" form:"pincode,omitempty"`
-	PhoneCode   string             `json:"phone_code,omitempty" form:"phone_code,omitempty"`
-	PhoneNumber string             `json:"phone_number,omitempty" form:"phone_number,omitempty"`
-	UserId      primitive.ObjectID `json:"-,omitempty" form:"-,omitempty"`
-	IsDefault   bool
+	Name        string                `json:"name,omitempty" form:"name,omitempty" bson:"name,omitempty"`
+	Address     string                `json:"address,omitempty" form:"address,omitempty" bson:"address,omitempty"`
+	State       string                `json:"state,omitempty" form:"state,omitempty" bson:"state,omitempty"`
+	Locality    string                `json:"locality,omitempty" form:"locality,omitempty" bson:"locality,omitempty"`
+	PinCode     string                `json:"pincode,omitempty" form:"pincode,omitempty" bson:"pincode,omitempty"`
+	PhoneCode   string                `json:"phone_code,omitempty" form:"phone_code,omitempty"`
+	PhoneNumber string                `json:"phone_number,omitempty" form:"phone_number,omitempty"`
+	UserId      *primitive.ObjectID   `json:"-,omitempty" form:"-,omitempty" bson:"user_id,omitempty"`
+	IsDefault   bool                  `bson:"is_default,omitempty"`
+	Phone       *interfaces.PhoneType `form:"-" json:"-" bson:"phone,omitempty"`
 }
 
 func (payload *AddOrEditRelativeDTO) ValidateRelativeDTO() *serialize.ErrorResponse {

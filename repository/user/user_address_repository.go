@@ -46,7 +46,7 @@ func (r *UserDeliveryAddressRepository) CreateOne(payload *userdto.AddOrEditDeli
 			Number: payload.PhoneNumber,
 		},
 		IsDefault: payload.IsDefault,
-		UserId:    payload.UserId,
+		UserId:    *payload.UserId,
 	}
 
 	if _, err := r.colln.InsertOne(ctx, doc); err != nil {

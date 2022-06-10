@@ -22,10 +22,17 @@ func (r *Router) doctorRoutes() {
 		constants.ADMIN, constants.SUPER_ADMIN, constants.EDITOR}), api.GetDoctorById(false))
 	adminRoutes.GET("", r.middlewares.UserRole([]constants.UserType{
 		constants.ADMIN, constants.SUPER_ADMIN, constants.EDITOR}), api.FindAllDoctors(true))
+	adminRoutes.PATCH("/:id", r.middlewares.UserRole([]constants.UserType{
+		constants.ADMIN, constants.SUPER_ADMIN, constants.EDITOR}), api.UpdateById())
 
 	routes.GET("/:id", api.GetDoctorById(true))
 	routes.GET("/activate_account/:token", api.ActivateAccount())
 	routes.GET("", api.FindAllDoctors(false))
+
+	// Profile Options
+	routes.Use(r.middlewares.IsAuthorized(), r.middlewares.UserRole([]constants.UserType{constants.DOCTOR}))
+	routes.PATCH("", api.UpdateById())
+	routes.GET("/me", api.GetDoctorById(true))
 
 	// Auth Routes
 	authRoutes.POST("/send_verification_code", api.SendVerificationCode())
