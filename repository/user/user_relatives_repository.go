@@ -28,20 +28,20 @@ func (r *UserRelativesRepository) InitializeRepository(colln *mongo.Collection) 
 		{Key: "user_id", Value: 1},
 		{Key: "phone.number", Value: 1},
 		{Key: "phone.code", Value: 1}},
-		"Phone", true)
+		"PhoneIndex", true)
 
 	utils.CreateIndex(colln, bson.D{
 		{Key: "user_id", Value: 1},
 		{Key: "email", Value: 1}},
-		"Email", true)
+		"EmailIndex", true)
 
 	utils.CreateIndex(colln, bson.D{
 		{Key: "user_id", Value: 1}},
-		"Parent ID", false)
+		"ParentIdIndex", false)
 
 	utils.CreateIndex(colln, bson.D{
 		{Key: "user_id", Value: 1}, {Key: "_id", Value: 1}},
-		"UserId and Doc Id", false)
+		"UserIdandDocIdIndex", false)
 }
 
 func (r *UserRelativesRepository) CreateOne(payload *userdto.AddOrEditRelativeDTO) (*usermodel.RelativeEntity, error) {

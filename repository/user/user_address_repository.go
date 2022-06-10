@@ -24,9 +24,9 @@ func (r *UserDeliveryAddressRepository) Initialize(colln *mongo.Collection) {
 	r.colln = colln
 
 	utils.CreateIndex(colln,
-		bson.D{{Key: "_id", Value: 1}, {Key: "user_id", Value: 1}}, "User ID and Doc ID", false)
-	utils.CreateIndex(colln, bson.D{{Key: "user_id", Value: 1}}, "User ID", false)
-	utils.CreateIndex(colln, bson.D{{Key: "user_id", Value: 1}, {Key: "is_default", Value: 1}}, "Parent ID and Default Address", false)
+		bson.D{{Key: "_id", Value: 1}, {Key: "user_id", Value: 1}}, "UserIDAndDocIDIndex", false)
+	utils.CreateIndex(colln, bson.D{{Key: "user_id", Value: 1}}, "UserIDIndex", false)
+	utils.CreateIndex(colln, bson.D{{Key: "user_id", Value: 1}, {Key: "is_default", Value: 1}}, "ParentIDandDefaultAddressIndex", false)
 
 }
 

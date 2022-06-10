@@ -22,8 +22,8 @@ type LanguageRepository struct {
 func (r *LanguageRepository) Initialize(colln *mongo.Collection) {
 	r.colln = colln
 
-	utils.CreateIndex(colln, bson.D{{Key: "name", Value: 1}}, "Unique Name", true)
-	utils.CreateIndex(colln, bson.D{{Key: "locale_name", Value: 1}}, "Unique locale name", true)
+	utils.CreateIndex(colln, bson.D{{Key: "name", Value: 1}}, "UniqueNameIndex", true)
+	utils.CreateIndex(colln, bson.D{{Key: "locale_name", Value: 1}}, "UniqueLocaleNameIndex", true)
 }
 
 func (r *LanguageRepository) CreateOne(payload *languagedto.AddLanguageDTO) (*languagesmodel.LanguageEntity, error) {

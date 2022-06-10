@@ -24,8 +24,8 @@ func (r *SpecialitysRepository) Initialize(colln *mongo.Collection) {
 	r.colln = colln
 	r.imageBasePath = env.GetEnvVariable("S3_ACCESS_BASEURL")
 
-	utils.CreateIndex(colln, bson.D{{Key: "title", Value: 1}}, "Unique title", true)
-	utils.CreateIndex(colln, bson.D{{Key: "slug", Value: 1}}, "Unique slug", true)
+	utils.CreateIndex(colln, bson.D{{Key: "title", Value: 1}}, "UniqueTitleIndex", true)
+	utils.CreateIndex(colln, bson.D{{Key: "slug", Value: 1}}, "UniqueSlugIndex", true)
 }
 
 func (r *SpecialitysRepository) CreateOne(doc *specialitymodel.SpecialityEntity) error {
@@ -45,9 +45,7 @@ func (r *SpecialitysRepository) CheckIfExists(title, slug string) bool {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
-	regex := primitive.Regex{Pattern: title, Options: "i"}
-
-	count, _ := r.colln.CountDocuments(ctx, bson.M{"$or": bson.A{bson.M{"slug": slug}, bson.M{"title": bson.M{"$regex": regex}}}})
+	count, _ := r.colln.CountDocuments(ctx, bson.M{"$or": bson.A{bson.M{"slug": slug}, bson.M{"title": title}}})
 
 	return count > 0
 }

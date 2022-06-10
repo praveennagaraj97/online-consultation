@@ -13,6 +13,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/x/bsonx"
 )
 
 type DoctorRepository struct {
@@ -27,15 +28,16 @@ func (r *DoctorRepository) Initialize(colln *mongo.Collection) {
 
 	utils.CreateIndex(colln, bson.D{
 		{Key: "phone.number", Value: 1},
-		{Key: "phone.code", Value: 1}}, "Phone", true)
+		{Key: "phone.code", Value: 1}}, "PhoneIndex", true)
 
-	utils.CreateIndex(colln, bson.D{{Key: "email", Value: 1}}, "Email", true)
+	utils.CreateIndex(colln, bson.D{{Key: "email", Value: 1}}, "EmailIndex", true)
 
-	utils.CreateIndex(colln, bson.D{{Key: "consultation_type_id", Value: 1}}, "Consultation Type", false)
-	utils.CreateIndex(colln, bson.D{{Key: "speciality_id", Value: 1}}, "Speciality", false)
-	utils.CreateIndex(colln, bson.D{{Key: "hospital_id", Value: 1}}, "Hospital", false)
-	utils.CreateIndex(colln, bson.D{{Key: "experience", Value: 1}}, "Experience", false)
-	utils.CreateIndex(colln, bson.D{{Key: "is_active", Value: 1}}, "Account Active Status", false)
+	utils.CreateIndex(colln, bson.D{{Key: "name", Value: bsonx.String("text")}}, "TextSearchByNameIndex", false)
+	utils.CreateIndex(colln, bson.D{{Key: "consultation_type_id", Value: 1}}, "ConsultationTypeIndex", false)
+	utils.CreateIndex(colln, bson.D{{Key: "speciality_id", Value: 1}}, "SpecialityIndex", false)
+	utils.CreateIndex(colln, bson.D{{Key: "hospital_id", Value: 1}}, "HospitalIndex", false)
+	utils.CreateIndex(colln, bson.D{{Key: "experience", Value: 1}}, "ExperienceIndex", false)
+	utils.CreateIndex(colln, bson.D{{Key: "is_active", Value: 1}}, "AccountActiveStatusIndex", false)
 
 }
 
@@ -227,12 +229,19 @@ func (r *DoctorRepository) FindAll(pgOpts *api.PaginationOptions,
 	fltrOpts *map[string]primitive.M,
 	srtOpts *map[string]int8,
 	keySortBy string,
+	searchOpts *bson.M,
 	showInActive bool) ([]doctormodel.DoctorEntity, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
 	pipeline := mongo.Pipeline{}
+
+	// Search Match
+
+	if searchOpts != nil {
+		pipeline = append(pipeline, bson.D{{Key: "$match", Value: *searchOpts}})
+	}
 
 	// Filter Options
 	if len(*fltrOpts) != 0 {
@@ -322,11 +331,15 @@ func (r *DoctorRepository) FindAll(pgOpts *api.PaginationOptions,
 
 }
 
-func (r *DoctorRepository) GetDocumentsCount(filters *map[string]primitive.M, showInActive bool) (int64, error) {
+func (r *DoctorRepository) GetDocumentsCount(filters *map[string]primitive.M, searchOpts *bson.M, showInActive bool) (int64, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
 	var fltrs map[string]primitive.M = make(map[string]primitive.M, 0)
+
+	if searchOpts != nil {
+		fltrs["$text"] = *searchOpts
+	}
 
 	for key, value := range *filters {
 		fltrs[key] = value

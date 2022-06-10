@@ -22,7 +22,7 @@ type HospitalRepository struct {
 func (r *HospitalRepository) Initialize(colln *mongo.Collection) {
 	r.colln = colln
 
-	utils.CreateIndex(colln, bson.D{{Key: "name", Value: 1}}, "Hospital name", true)
+	utils.CreateIndex(colln, bson.D{{Key: "name", Value: 1}}, "HospitalNameIndex", true)
 }
 
 func (r *HospitalRepository) CreateOne(doc *hospitalmodel.HospitalEntity) error {

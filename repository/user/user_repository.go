@@ -25,11 +25,11 @@ func (r *UserRepository) InitializeRepository(colln *mongo.Collection) {
 	utils.CreateIndex(colln, bson.D{
 		{Key: "phone_number.number", Value: 1},
 		{Key: "phone_number.code", Value: 1}},
-		"Phone", true)
+		"PhoneIndex", true)
 
 	utils.CreateIndex(colln, bson.D{
 		{Key: "email", Value: 1}},
-		"Email", true)
+		"EmailIndex", true)
 }
 
 func (r *UserRepository) CreateUser(payload *userdto.RegisterDTO) (*usermodel.UserEntity, error) {

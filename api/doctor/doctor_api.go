@@ -18,6 +18,7 @@ import (
 	doctorrepo "github.com/praveennagaraj97/online-consultation/repository/doctor"
 	onetimepasswordrepository "github.com/praveennagaraj97/online-consultation/repository/onetimepassword"
 	"github.com/praveennagaraj97/online-consultation/serialize"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -225,7 +226,17 @@ func (a *DoctorAPI) FindAllDoctors(showInActive bool) gin.HandlerFunc {
 		fltrOpts := api.ParseFilterByOptions(ctx)
 		ketSortBy := "$lt"
 
-		res, err := a.repo.FindAll(pgOpts, fltrOpts, &sortOpts, ketSortBy, showInActive)
+		// Search Options
+		var searchOpts *bson.M = nil
+		var countSearch *bson.M = nil
+		name := ctx.Query("name")
+
+		if name != "" {
+			searchOpts = &bson.M{"$text": bson.M{"$search": name}}
+			countSearch = &bson.M{"$search": name}
+		}
+
+		res, err := a.repo.FindAll(pgOpts, fltrOpts, &sortOpts, ketSortBy, searchOpts, showInActive)
 		if err != nil {
 			api.SendErrorResponse(ctx, "Something went wrong", http.StatusBadRequest, &map[string]string{
 				"reason": err.Error(),
@@ -240,7 +251,7 @@ func (a *DoctorAPI) FindAllDoctors(showInActive bool) gin.HandlerFunc {
 		var lastId *primitive.ObjectID
 
 		if pgOpts.PaginateId == nil {
-			docCount, err = a.repo.GetDocumentsCount(fltrOpts, showInActive)
+			docCount, err = a.repo.GetDocumentsCount(fltrOpts, countSearch, showInActive)
 			if err != nil {
 				api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, &map[string]string{
 					"reason": err.Error(),

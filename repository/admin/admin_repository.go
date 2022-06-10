@@ -20,8 +20,8 @@ type AdminRepository struct {
 func (r *AdminRepository) Initialize(colln *mongo.Collection) {
 	r.colln = colln
 
-	utils.CreateIndex(colln, bson.D{{Key: "email", Value: 1}}, "Email", true)
-	utils.CreateIndex(colln, bson.D{{Key: "user_name", Value: 1}}, "User Name", true)
+	utils.CreateIndex(colln, bson.D{{Key: "email", Value: 1}}, "EmailIndex", true)
+	utils.CreateIndex(colln, bson.D{{Key: "user_name", Value: 1}}, "UserNameIndex", true)
 
 }
 
