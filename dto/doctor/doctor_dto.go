@@ -3,6 +3,7 @@ package doctordto
 import (
 	"net/http"
 
+	"github.com/praveennagaraj97/online-consultation/interfaces"
 	"github.com/praveennagaraj97/online-consultation/pkg/validator"
 	"github.com/praveennagaraj97/online-consultation/serialize"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -129,6 +130,9 @@ func (a *AddNewDoctorDTO) Validate() *serialize.ErrorResponse {
 
 type EditDoctorDTO struct {
 	Name              string `json:"name,omitempty" form:"name,omitempty"  bson:"name,omitempty"`
+	Email             string `json:"email,omitempty" form:"email,omitempty" bson:"email,omitempty"`
+	PhoneCode         string `json:"phone_code,omitempty" form:"phone_code,omitempty" bson:"-"`
+	PhoneNumber       string `json:"phone_number,omitempty" form:"phone_number,omitempty" bson:"-"`
 	ProfessionalTitle string `json:"professional_title,omitempty" form:"professional_title,omitempty" bson:"professional_title,omitempty"`
 	Education         string `json:"education,omitempty" form:"education,omitempty" bson:"education,omitempty"`
 	Experience        uint8  `json:"experience,omitempty" form:"experience,omitempty" bson:"experience,omitempty"`
@@ -145,6 +149,8 @@ type EditDoctorDTO struct {
 	ConsultationType *primitive.ObjectID  `json:"-" form:"-" bson:"consultation_type_id,omitempty"`
 	Speciality       *primitive.ObjectID  `json:"-" form:"-" bson:"speciality_id,omitempty"`
 	SpokenLanguages  []primitive.ObjectID `json:"-" form:"-" bson:"languages_ids,omitempty"`
+
+	Phone *interfaces.PhoneType `json:"-" form:"-" bson:"phone,omitempty"`
 }
 
 func (a *EditDoctorDTO) Validate() *serialize.ErrorResponse {
@@ -178,7 +184,7 @@ func (a *EditDoctorDTO) Validate() *serialize.ErrorResponse {
 	}
 
 	// Validate language ids
-	if len(a.SpokenLanguages) > 0 {
+	if len(a.SpokenLanguagesIds) > 0 {
 		for i := 0; i < len(a.SpokenLanguagesIds); i++ {
 			objectId, err := primitive.ObjectIDFromHex(a.SpokenLanguagesIds[i])
 			if err != nil {

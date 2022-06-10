@@ -74,7 +74,7 @@ func (m *Middlewares) UserRole(allowedRoles []constants.UserType) gin.HandlerFun
 				return
 			}
 		}
-		api.SendErrorResponse(c, "Method Not Allowed", http.StatusMethodNotAllowed, nil)
+		api.SendErrorResponse(c, "You don't have enough permission to access this route", http.StatusUnauthorized, nil)
 		c.Abort()
 	}
 }

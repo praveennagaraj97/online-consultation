@@ -317,34 +317,79 @@ func (a *DoctorAPI) UpdateById() gin.HandlerFunc {
 		}
 
 		var payload doctordto.EditDoctorDTO
+		var doc *doctormodel.DoctorEntity
 
 		if err := ctx.ShouldBind(&payload); err != nil {
 			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
 			return
 		}
+		defer ctx.Request.Body.Close()
+
+		if errs := payload.Validate(); errs != nil {
+			api.SendErrorResponse(ctx, errs.Message, errs.StatusCode, errs.Errors)
+			return
+		}
 
 		// For Doctor Profile Page update ignore fields.
 		if id == "" {
+			payload.Email = ""
+			payload.PhoneCode = ""
+			payload.PhoneNumber = ""
 			payload.ConsultationType = nil
 			payload.Hospital = nil
 			payload.Speciality = nil
 			payload.SpokenLanguages = nil
+		}
+		if payload.Email != "" || payload.PhoneCode != "" && payload.PhoneNumber != "" {
+			doc, err = a.repo.FindById(objectId)
+			if err != nil {
+				api.SendErrorResponse(ctx, err.Error(), http.StatusNotFound, nil)
+				return
+			}
+		}
+
+		if (payload.PhoneCode != "" && payload.PhoneNumber != "") &&
+			(payload.PhoneCode != doc.Phone.Code || payload.PhoneNumber != doc.Phone.Number) {
+			payload.Phone = &interfaces.PhoneType{
+				Code:   payload.PhoneCode,
+				Number: payload.PhoneNumber,
+			}
+
+			if exists := a.repo.CheckIfDoctorExistsByPhone(*payload.Phone); exists {
+				api.SendErrorResponse(ctx, "Phone number is in use by other doctor", http.StatusUnprocessableEntity, nil)
+				return
+			}
+
+		}
+
+		if payload.Email != "" && payload.Email != doc.Email {
+			if exists := a.repo.CheckIfDoctorExistsByEmail(payload.Email); exists {
+				api.SendErrorResponse(ctx, "Email is in use by other doctor", http.StatusUnprocessableEntity, nil)
+				return
+			}
 		}
 
 		// Update Profile Pic
 		file, err := ctx.FormFile("profile_pic")
 		if err == nil && file != nil {
 			// Get existing profile
-			doc, err := a.repo.FindById(objectId)
-			if err != nil {
-				api.SendErrorResponse(ctx, err.Error(), http.StatusNotFound, nil)
-				return
+			if doc == nil {
+				doc, err = a.repo.FindById(objectId)
+				if err != nil {
+					api.SendErrorResponse(ctx, err.Error(), http.StatusNotFound, nil)
+					return
+				}
 			}
 
 			// Delete existing pic
 			if doc.ProfilePic != nil {
 				a.appConf.AwsUtils.DeleteAsset(&doc.ProfilePic.OriginalImagePath)
 				a.appConf.AwsUtils.DeleteAsset(&doc.ProfilePic.BlurImagePath)
+			}
+
+			if payload.ProfilePicWidth == 0 || payload.ProfilePicHeight == 0 {
+				payload.ProfilePicWidth = doc.ProfilePic.Width
+				payload.ProfilePicHeight = doc.ProfilePic.Height
 			}
 
 			var ch chan *awspkg.S3UploadChannelResponse = make(chan *awspkg.S3UploadChannelResponse, 1)
@@ -366,6 +411,8 @@ func (a *DoctorAPI) UpdateById() gin.HandlerFunc {
 			}
 
 		}
+
+		fmt.Println(payload.SpokenLanguages)
 
 		if err = a.repo.UpdateById(objectId, &payload); err != nil {
 			api.SendErrorResponse(ctx, "Something went wrong", http.StatusBadRequest, &map[string]string{

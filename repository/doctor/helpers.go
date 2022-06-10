@@ -63,3 +63,31 @@ func (r *DoctorRepository) FindByEmail(email string) (*doctormodel.DoctorEntity,
 
 	return &result, nil
 }
+
+func (r *DoctorRepository) CheckIfDoctorExistsByEmail(email string) bool {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	emailFilter := bson.M{"email": email}
+
+	count, err := r.colln.CountDocuments(ctx, emailFilter)
+	if err != nil {
+		return false
+	}
+
+	return count > 0
+}
+
+func (r *DoctorRepository) CheckIfDoctorExistsByPhone(phone interfaces.PhoneType) bool {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	phoneFilter := bson.M{"$and": bson.A{bson.M{"phone.code": phone.Code}, bson.M{"phone.number": phone.Number}}}
+
+	count, err := r.colln.CountDocuments(ctx, phoneFilter)
+	if err != nil {
+		return false
+	}
+
+	return count > 0
+}
