@@ -215,7 +215,7 @@ func (a *DoctorAPI) ActivateAccount() gin.HandlerFunc {
 	}
 }
 
-func (a *DoctorAPI) FindAllDoctors() gin.HandlerFunc {
+func (a *DoctorAPI) FindAllDoctors(showInActive bool) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
 		pgOpts := api.ParsePaginationOptions(ctx, "doctors")
@@ -225,7 +225,7 @@ func (a *DoctorAPI) FindAllDoctors() gin.HandlerFunc {
 		fltrOpts := api.ParseFilterByOptions(ctx)
 		ketSortBy := "$lt"
 
-		res, err := a.repo.FindAll(pgOpts, fltrOpts, &sortOpts, ketSortBy)
+		res, err := a.repo.FindAll(pgOpts, fltrOpts, &sortOpts, ketSortBy, showInActive)
 		if err != nil {
 			api.SendErrorResponse(ctx, "Something went wrong", http.StatusBadRequest, &map[string]string{
 				"reason": err.Error(),
@@ -240,7 +240,7 @@ func (a *DoctorAPI) FindAllDoctors() gin.HandlerFunc {
 		var lastId *primitive.ObjectID
 
 		if pgOpts.PaginateId == nil {
-			docCount, err = a.repo.GetDocumentsCount(fltrOpts)
+			docCount, err = a.repo.GetDocumentsCount(fltrOpts, showInActive)
 			if err != nil {
 				api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, &map[string]string{
 					"reason": err.Error(),

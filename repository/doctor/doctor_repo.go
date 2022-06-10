@@ -35,6 +35,7 @@ func (r *DoctorRepository) Initialize(colln *mongo.Collection) {
 	utils.CreateIndex(colln, bson.D{{Key: "speciality_id", Value: 1}}, "Speciality", false)
 	utils.CreateIndex(colln, bson.D{{Key: "hospital_id", Value: 1}}, "Hospital", false)
 	utils.CreateIndex(colln, bson.D{{Key: "experience", Value: 1}}, "Experience", false)
+	utils.CreateIndex(colln, bson.D{{Key: "is_active", Value: 1}}, "Account Active Status", false)
 
 }
 
@@ -72,7 +73,10 @@ func (r *DoctorRepository) CheckIfDoctorExistsByEmailOrPhone(email string, phone
 	return count > 0
 }
 
-func (r *DoctorRepository) FindOne(id *primitive.ObjectID, email string, phone *interfaces.PhoneType, showInActive bool) (*doctormodel.DoctorEntity, error) {
+func (r *DoctorRepository) FindOne(id *primitive.ObjectID,
+	email string,
+	phone *interfaces.PhoneType,
+	showInActive bool) (*doctormodel.DoctorEntity, error) {
 
 	var filterPipe bson.D = make(bson.D, 0)
 
@@ -222,7 +226,8 @@ func (r *DoctorRepository) UpdateDoctorStatus(id *primitive.ObjectID, state bool
 func (r *DoctorRepository) FindAll(pgOpts *api.PaginationOptions,
 	fltrOpts *map[string]primitive.M,
 	srtOpts *map[string]int8,
-	keySortBy string) ([]doctormodel.DoctorEntity, error) {
+	keySortBy string,
+	showInActive bool) ([]doctormodel.DoctorEntity, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
@@ -233,6 +238,10 @@ func (r *DoctorRepository) FindAll(pgOpts *api.PaginationOptions,
 	if len(*fltrOpts) != 0 {
 		fltr := bson.D{{Key: "$match", Value: *fltrOpts}}
 		pipeline = append(pipeline, fltr)
+	}
+
+	if !showInActive {
+		pipeline = append(pipeline, bson.D{{Key: "$match", Value: bson.M{"is_active": true}}})
 	}
 
 	// Sort Options
@@ -313,11 +322,21 @@ func (r *DoctorRepository) FindAll(pgOpts *api.PaginationOptions,
 
 }
 
-func (r *DoctorRepository) GetDocumentsCount(filters *map[string]primitive.M) (int64, error) {
+func (r *DoctorRepository) GetDocumentsCount(filters *map[string]primitive.M, showInActive bool) (int64, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
-	return r.colln.CountDocuments(ctx, filters)
+	var fltrs map[string]primitive.M = make(map[string]primitive.M, 0)
+
+	for key, value := range *filters {
+		fltrs[key] = value
+	}
+
+	if !showInActive {
+		fltrs["is_active"] = bson.M{"$eq": true}
+	}
+
+	return r.colln.CountDocuments(ctx, fltrs)
 }
 
 func (r *DoctorRepository) UpdateRefreshToken(id *primitive.ObjectID, token string) error {

@@ -20,10 +20,12 @@ func (r *Router) doctorRoutes() {
 
 	adminRoutes.GET("/:id", r.middlewares.UserRole([]constants.UserType{
 		constants.ADMIN, constants.SUPER_ADMIN, constants.EDITOR}), api.GetDoctorById(false))
+	adminRoutes.GET("", r.middlewares.UserRole([]constants.UserType{
+		constants.ADMIN, constants.SUPER_ADMIN, constants.EDITOR}), api.FindAllDoctors(true))
 
 	routes.GET("/:id", api.GetDoctorById(true))
 	routes.GET("/activate_account/:token", api.ActivateAccount())
-	routes.GET("", api.FindAllDoctors())
+	routes.GET("", api.FindAllDoctors(false))
 
 	// Auth Routes
 	authRoutes.POST("/send_verification_code", api.SendVerificationCode())
