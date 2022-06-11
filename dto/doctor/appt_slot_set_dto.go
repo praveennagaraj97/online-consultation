@@ -24,6 +24,9 @@ func (a *AddNewAppointmentSlotSetDTO) Validate() *serialize.ErrorResponse {
 	if len(a.SlotTimeRef) == 0 {
 		errs["slot_time"] = "Slot time should have atleast one time slot"
 	} else {
+
+		visited := make(map[string]bool, 0)
+
 		for i := 0; i < len(a.SlotTimeRef); i++ {
 
 			t, err := time.Parse("15:04:05", a.SlotTimeRef[i])
@@ -31,8 +34,17 @@ func (a *AddNewAppointmentSlotSetDTO) Validate() *serialize.ErrorResponse {
 			if err != nil {
 				errs["slot_time"] = "Invalid Slot time, " + err.Error()
 			}
+
+			// check for duplicates
+			if visited[a.SlotTimeRef[i]] == true {
+				errs[a.SlotTimeRef[i]] = "Time slot is found as duplicate"
+			} else {
+				visited[a.SlotTimeRef[i]] = true
+			}
+
 			a.SlotTimes = append(a.SlotTimes, primitive.NewDateTimeFromTime(t))
 		}
+
 	}
 
 	if len(errs) > 0 {
