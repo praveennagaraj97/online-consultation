@@ -7,7 +7,10 @@ import (
 
 func (r *Router) doctorRoutes() {
 	api := doctorapi.DoctorAPI{}
-	api.Initialize(r.app, r.repos.GetDoctorRepository(), r.repos.GetOneTimePasswordRepository())
+	api.Initialize(r.app,
+		r.repos.GetDoctorRepository(),
+		r.repos.GetOneTimePasswordRepository(),
+		r.repos.GetDoctorAppointmentSlotSetRepository())
 
 	adminRoutes := r.engine.Group("/api/v1/admin/doctor")
 	authRoutes := r.engine.Group("/api/v1/doctor/auth")
@@ -33,6 +36,8 @@ func (r *Router) doctorRoutes() {
 	routes.Use(r.middlewares.IsAuthorized(), r.middlewares.UserRole([]constants.UserType{constants.DOCTOR}))
 	routes.PATCH("", api.UpdateById())
 	routes.GET("/me", api.GetDoctorById(true))
+	// Appointment Slot Set
+	routes.POST("/slot_set", api.AddNewSlotSet())
 
 	// Auth Routes
 	authRoutes.POST("/send_verification_code", api.SendVerificationCode())

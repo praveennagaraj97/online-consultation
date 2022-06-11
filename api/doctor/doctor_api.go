@@ -23,15 +23,22 @@ import (
 )
 
 type DoctorAPI struct {
-	repo    *doctorrepo.DoctorRepository
-	otpRepo *onetimepasswordrepository.OneTimePasswordRepository
-	appConf *app.ApplicationConfig
+	repo            *doctorrepo.DoctorRepository
+	apptSlotSetRepo *doctorrepo.DoctorAppointmentSlotSetRepository
+	otpRepo         *onetimepasswordrepository.OneTimePasswordRepository
+	appConf         *app.ApplicationConfig
 }
 
-func (a *DoctorAPI) Initialize(conf *app.ApplicationConfig, repo *doctorrepo.DoctorRepository, otpRepo *onetimepasswordrepository.OneTimePasswordRepository) {
+func (a *DoctorAPI) Initialize(conf *app.ApplicationConfig,
+	repo *doctorrepo.DoctorRepository,
+	otpRepo *onetimepasswordrepository.OneTimePasswordRepository,
+	apptSlotSetRepo *doctorrepo.DoctorAppointmentSlotSetRepository) {
+
 	a.repo = repo
 	a.appConf = conf
 	a.otpRepo = otpRepo
+	a.apptSlotSetRepo = apptSlotSetRepo
+
 }
 
 func (a *DoctorAPI) AddNewDoctor() gin.HandlerFunc {
@@ -143,7 +150,7 @@ func (a *DoctorAPI) GetDoctorById(filterActiveAccounts bool) gin.HandlerFunc {
 		if id == "" {
 			objectId, err = api.GetUserIdFromContext(ctx)
 			if err != nil {
-				api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+				api.SendErrorResponse(ctx, err.Error(), http.StatusInternalServerError, nil)
 				return
 			}
 		} else {
@@ -311,7 +318,7 @@ func (a *DoctorAPI) UpdateById() gin.HandlerFunc {
 		} else {
 			objectId, err = api.GetUserIdFromContext(ctx)
 			if err != nil {
-				api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+				api.SendErrorResponse(ctx, err.Error(), http.StatusInternalServerError, nil)
 				return
 			}
 		}

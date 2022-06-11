@@ -41,7 +41,7 @@ func (a *UserAPI) GetUserDetails() gin.HandlerFunc {
 
 		userId, err := api.GetUserIdFromContext(ctx)
 		if err != nil {
-			api.SendErrorResponse(ctx, err.Error(), http.StatusBadRequest, nil)
+			api.SendErrorResponse(ctx, err.Error(), http.StatusInternalServerError, nil)
 			return
 		}
 

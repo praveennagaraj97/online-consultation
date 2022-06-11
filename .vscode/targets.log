@@ -6,11 +6,8 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # PARTICULAR PURPOSE.
 
 # This program built for i386-apple-darwin11.3.0
- 
-make: *** No rule to make target `all'.  Stop.
 
-
-# Make data base, printed on Fri Jun 10 16:00:31 2022
+# Make data base, printed on Sat Jun 11 14:41:04 2022
 
 # Variables
 
@@ -43,13 +40,13 @@ VSCODE_VERBOSE_LOGGING = true
 # environment
 __CFBundleIdentifier = com.microsoft.VSCode
 # environment
-VSCODE_IPC_HOOK_EXTHOST = /var/folders/m5/t1f8t1gj4vz1j776h90v1r2h0000gn/T/vscode-ipc-9525058d-997a-47eb-80f1-6c280914357e.sock
+VSCODE_IPC_HOOK_EXTHOST = /var/folders/m5/t1f8t1gj4vz1j776h90v1r2h0000gn/T/vscode-ipc-d6314677-1d6e-4181-b86e-f2a11b4d53b0.sock
 # environment
 VSCODE_CWD = /
 # environment
 GOPROXY = https://proxy.golang.org,direct
 # environment
-PATH = /usr/local/go/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+PATH = /usr/local/go/bin:/Users/praveennagaraj/.yarn/bin:/Users/praveennagaraj/.config/yarn/global/node_modules/.bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
 # environment
 GOPATH = /Users/praveennagaraj/go
 # environment
@@ -59,7 +56,7 @@ ELECTRON_RUN_AS_NODE = 1
 # default
 .FEATURES := target-specific order-only second-expansion else-if archives jobserver check-symlink
 # environment
-SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.AVB4ERLkcE/Listeners
+SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.Dg3lmdSO3M/Listeners
 # automatic
 %F = $(notdir $%)
 # environment
@@ -145,7 +142,7 @@ MAKELEVEL := 0
 # environment
 LANG = C
 # environment
-VSCODE_PID = 8111
+VSCODE_PID = 1252
 # variable set hash-table stats:
 # Load=66/1024=6%, Rehash=0, Collisions=2/90=2%
 
@@ -155,9 +152,9 @@ VSCODE_PID = 8111
 
 # Directories
 
-# . (device 16777250, inode 15038850): 31 files, no impossibilities.
+# . (device 16777246, inode 15038850): 32 files, no impossibilities.
 
-# 31 files, no impossibilities in 1 directories.
+# 32 files, no impossibilities in 1 directories.
 
 # Implicit Rules
 
@@ -228,6 +225,8 @@ stop_dev:
 # strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
-# Finished Make data base on Fri Jun 10 16:00:31 2022
+# Finished Make data base on Sat Jun 11 14:41:04 2022
 
  
+make: *** No rule to make target `all'.  Stop.
+
