@@ -22,6 +22,7 @@ func (r *Router) doctorRoutes() {
 	adminRoutes.GET("/:id", api.GetDoctorById(false))
 	adminRoutes.GET("", api.FindAllDoctors(true))
 	adminRoutes.PATCH("/:id", api.UpdateById())
+	adminRoutes.GET("/slot_sets/:doctor_id", api.GetAllSlotSets())
 	adminRoutes.POST("/slot_set/:doctor_id", api.AddNewSlotSet())
 	adminRoutes.GET("/slot_set/:id/:doctor_id", api.GetSlotSetById())
 	adminRoutes.PATCH("/slot_set/:id/:doctor_id", api.UpdateSlotSetById())
@@ -36,6 +37,7 @@ func (r *Router) doctorRoutes() {
 	routes.PATCH("", api.UpdateById())
 	routes.GET("/me", api.GetDoctorById(true))
 	// Appointment Slot Set
+	routes.GET("/slot_sets", api.GetAllSlotSets())
 	routes.POST("/slot_set", api.AddNewSlotSet())
 	routes.GET("/slot_set/:id", api.GetSlotSetById())
 	routes.PATCH("/slot_set/:id", api.UpdateSlotSetById())

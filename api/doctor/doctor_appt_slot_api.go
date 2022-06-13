@@ -239,3 +239,78 @@ func (a *DoctorAPI) DeleteSlotById() gin.HandlerFunc {
 		ctx.JSON(http.StatusNoContent, nil)
 	}
 }
+
+func (a *DoctorAPI) GetAllSlotSets() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+
+		var doctorId primitive.ObjectID
+
+		// Doctor Id
+		doctorIdHex := ctx.Param("doctor_id")
+		if doctorIdHex != "" {
+			id, err := primitive.ObjectIDFromHex(doctorIdHex)
+			if err != nil {
+				api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+				return
+			}
+			doctorId = id
+		} else {
+			id, err := api.GetUserIdFromContext(ctx)
+			if err != nil {
+				api.SendErrorResponse(ctx, err.Error(), http.StatusInternalServerError, nil)
+				return
+			}
+			doctorId = *id
+		}
+
+		pgOpts := api.ParsePaginationOptions(ctx, "slot_sets")
+		sortOpts := map[string]int8{
+			"_id": -1,
+		}
+
+		ketSortBy := "$lt"
+
+		res, err := a.apptSlotSetRepo.FindAll(&doctorId, pgOpts, &sortOpts, ketSortBy)
+		if err != nil {
+			api.SendErrorResponse(ctx, "Something went wrong", http.StatusBadRequest, &map[string]string{
+				"reason": err.Error(),
+			})
+			return
+		}
+
+		resLen := len(res)
+
+		// Paginate Options
+		var docCount int64
+		var lastResId *primitive.ObjectID
+
+		if pgOpts.PaginateId == nil {
+			docCount, err = a.apptSlotSetRepo.ExistingSetsCount(&doctorId)
+			if err != nil {
+				api.SendErrorResponse(ctx, err.Error(), http.StatusInternalServerError, nil)
+				return
+			}
+		}
+
+		if resLen > 0 {
+			lastResId = &res[resLen-1].ID
+		}
+
+		count, next, prev, paginateKeySetID := api.GetPaginateOptions(docCount, pgOpts, docCount, lastResId, "slot_sets")
+
+		ctx.JSON(http.StatusOK, serialize.PaginatedDataResponse[[]doctormodel.AppointmentSlotSetEntity]{
+			Count:            count,
+			Next:             next,
+			Prev:             prev,
+			PaginateKeySetID: paginateKeySetID,
+			DataResponse: serialize.DataResponse[[]doctormodel.AppointmentSlotSetEntity]{
+				Data: res,
+				Response: serialize.Response{
+					StatusCode: http.StatusOK,
+					Message:    "List of appointment slot sets retrieved successfully",
+				},
+			},
+		})
+
+	}
+}
