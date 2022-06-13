@@ -19,30 +19,63 @@ type AddNewAppointmentSlotSetDTO struct {
 
 func (a *AddNewAppointmentSlotSetDTO) Validate() *serialize.ErrorResponse {
 
+	errs, slots := validateSlots(a.SlotTimeRef)
+	if errs != nil {
+		return errs
+	}
+
+	a.SlotTimes = slots
+
+	return nil
+}
+
+type UpdateAppointmentSlotSetDTO struct {
+	Title     string               `json:"title,omitempty" form:"title,omitempty" bson:"title,omitempty"`
+	SlotTimes []primitive.DateTime `json:"-" form:"-" bson:"slot_times,omitempty"`
+
+	// Input Refs
+	SlotTimeRef []string `json:"slot_time,omitempty" form:"slot_time,omitempty" bson:"-"`
+}
+
+func (a *UpdateAppointmentSlotSetDTO) Validate() *serialize.ErrorResponse {
+
+	errs, slots := validateSlots(a.SlotTimeRef)
+	if errs != nil {
+		return errs
+	}
+
+	a.SlotTimes = slots
+
+	return nil
+}
+
+func validateSlots(SlotTimeRef []string) (*serialize.ErrorResponse, []primitive.DateTime) {
 	errs := map[string]string{}
 
-	if len(a.SlotTimeRef) == 0 {
+	var SlotTimes []primitive.DateTime
+
+	if len(SlotTimeRef) == 0 {
 		errs["slot_time"] = "Slot time should have atleast one time slot"
 	} else {
 
 		visited := make(map[string]bool, 0)
 
-		for i := 0; i < len(a.SlotTimeRef); i++ {
+		for i := 0; i < len(SlotTimeRef); i++ {
 
-			t, err := time.Parse("15:04:05", a.SlotTimeRef[i])
+			t, err := time.Parse("15:04:05", SlotTimeRef[i])
 
 			if err != nil {
 				errs["slot_time"] = "Invalid Slot time, " + err.Error()
 			}
 
 			// check for duplicates
-			if visited[a.SlotTimeRef[i]] == true {
-				errs[a.SlotTimeRef[i]] = "Time slot is found as duplicate"
+			if visited[SlotTimeRef[i]] == true {
+				errs[SlotTimeRef[i]] = "Time slot is found as duplicate"
 			} else {
-				visited[a.SlotTimeRef[i]] = true
+				visited[SlotTimeRef[i]] = true
 			}
 
-			a.SlotTimes = append(a.SlotTimes, primitive.NewDateTimeFromTime(t))
+			SlotTimes = append(SlotTimes, primitive.NewDateTimeFromTime(t))
 		}
 
 	}
@@ -54,8 +87,9 @@ func (a *AddNewAppointmentSlotSetDTO) Validate() *serialize.ErrorResponse {
 				StatusCode: http.StatusUnprocessableEntity,
 				Message:    "Given data is invalid",
 			},
-		}
+		}, nil
 	}
 
-	return nil
+	return nil, SlotTimes
+
 }

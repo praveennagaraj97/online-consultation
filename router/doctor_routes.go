@@ -16,17 +16,16 @@ func (r *Router) doctorRoutes() {
 	authRoutes := r.engine.Group("/api/v1/doctor/auth")
 	routes := r.engine.Group("/api/v1/doctor")
 
-	adminRoutes.Use(r.middlewares.IsAuthorized())
-
-	adminRoutes.POST("", r.middlewares.UserRole([]constants.UserType{
-		constants.ADMIN, constants.SUPER_ADMIN, constants.EDITOR}), api.AddNewDoctor())
-
-	adminRoutes.GET("/:id", r.middlewares.UserRole([]constants.UserType{
-		constants.ADMIN, constants.SUPER_ADMIN, constants.EDITOR}), api.GetDoctorById(false))
-	adminRoutes.GET("", r.middlewares.UserRole([]constants.UserType{
-		constants.ADMIN, constants.SUPER_ADMIN, constants.EDITOR}), api.FindAllDoctors(true))
-	adminRoutes.PATCH("/:id", r.middlewares.UserRole([]constants.UserType{
-		constants.ADMIN, constants.SUPER_ADMIN, constants.EDITOR}), api.UpdateById())
+	adminRoutes.Use(r.middlewares.IsAuthorized(), r.middlewares.UserRole([]constants.UserType{
+		constants.ADMIN, constants.SUPER_ADMIN, constants.EDITOR}))
+	adminRoutes.POST("", api.AddNewDoctor())
+	adminRoutes.GET("/:id", api.GetDoctorById(false))
+	adminRoutes.GET("", api.FindAllDoctors(true))
+	adminRoutes.PATCH("/:id", api.UpdateById())
+	adminRoutes.POST("/slot_set/:doctor_id", api.AddNewSlotSet())
+	adminRoutes.GET("/slot_set/:id/:doctor_id", api.GetSlotSetById())
+	adminRoutes.PATCH("/slot_set/:id/:doctor_id", api.UpdateSlotSetById())
+	adminRoutes.DELETE("/slot_set/:id/:doctor_id", api.DeleteSlotById())
 
 	routes.GET("/:id", api.GetDoctorById(true))
 	routes.GET("/activate_account/:token", api.ActivateAccount())
@@ -38,6 +37,9 @@ func (r *Router) doctorRoutes() {
 	routes.GET("/me", api.GetDoctorById(true))
 	// Appointment Slot Set
 	routes.POST("/slot_set", api.AddNewSlotSet())
+	routes.GET("/slot_set/:id", api.GetSlotSetById())
+	routes.PATCH("/slot_set/:id", api.UpdateSlotSetById())
+	routes.DELETE("/slot_set/:id", api.DeleteSlotById())
 
 	// Auth Routes
 	authRoutes.POST("/send_verification_code", api.SendVerificationCode())
