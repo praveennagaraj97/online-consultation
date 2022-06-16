@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math/rand"
 	"net/url"
@@ -58,7 +59,7 @@ func GenerateRandomCode(length int) string {
 	return string(codes)
 }
 
-func PrettyPrintPipe(pipeline mongo.Pipeline) {
+func PrettyPrint(pipeline interface{}) {
 	json, _ := json.MarshalIndent(pipeline, "", "  ")
 
 	fmt.Println(string(json))
@@ -89,4 +90,16 @@ func DecodeVerificationID(verification_query_str string) (*primitive.ObjectID, *
 	}
 
 	return &objectId, &phone, nil
+}
+
+func IsMongoDocumentDuplicate(err error) bool {
+	var e mongo.WriteException
+	if errors.As(err, &e) {
+		for _, we := range e.WriteErrors {
+			if we.Code == 11000 {
+				return true
+			}
+		}
+	}
+	return false
 }

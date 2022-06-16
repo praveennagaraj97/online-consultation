@@ -62,11 +62,39 @@ func (r *DoctorAppointmentSlotSetRepository) FindById(doctorId, id *primitive.Ob
 	return &result, nil
 }
 
+func (r *DoctorAppointmentSlotSetRepository) FindDefault(doctorId *primitive.ObjectID) (*doctormodel.AppointmentSlotSetEntity, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	cur := r.colln.FindOne(ctx, bson.M{"$and": bson.A{bson.M{"is_default": true}, bson.M{"doctor_id": doctorId}}})
+
+	if cur.Err() != nil {
+		return nil, errors.New("Couldn't find any slot set.")
+	}
+
+	var result doctormodel.AppointmentSlotSetEntity
+
+	if err := cur.Decode(&result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
+
 func (r *DoctorAppointmentSlotSetRepository) UpdateById(doctorId, id *primitive.ObjectID, payload *doctordto.UpdateAppointmentSlotSetDTO) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
 	_, err := r.colln.UpdateByID(ctx, id, bson.M{"$set": payload})
+
+	return err
+}
+
+func (r *DoctorAppointmentSlotSetRepository) RemoveAllDefault(doctorId *primitive.ObjectID) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	_, err := r.colln.UpdateMany(ctx, bson.M{"doctor_id": doctorId}, bson.M{"$set": bson.M{"is_default": false}})
 
 	return err
 }

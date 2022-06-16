@@ -69,7 +69,7 @@ func (a *DoctorAPI) AddNewSlotSet() gin.HandlerFunc {
 			ID:        primitive.NewObjectID(),
 			DoctorId:  doctorId,
 			Title:     payload.Title,
-			SlotTime:  payload.SlotTimes,
+			SlotTimes: payload.SlotTimes,
 			IsDefault: count == 0 || payload.IsDefault,
 			AddedOn:   primitive.NewDateTimeFromTime(time.Now()),
 		}
@@ -185,6 +185,15 @@ func (a *DoctorAPI) UpdateSlotSetById() gin.HandlerFunc {
 		if err := ctx.ShouldBind(&payload); err != nil {
 			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
 			return
+		}
+
+		if payload.IsDefault != nil {
+			if err := a.apptSlotSetRepo.RemoveAllDefault(&doctorId); err != nil {
+				api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, &map[string]string{
+					"reason": err.Error(),
+				})
+				return
+			}
 		}
 
 		if err := a.apptSlotSetRepo.UpdateById(&doctorId, &slotId, &payload); err != nil {

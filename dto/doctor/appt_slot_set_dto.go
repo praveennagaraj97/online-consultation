@@ -31,6 +31,7 @@ func (a *AddNewAppointmentSlotSetDTO) Validate() *serialize.ErrorResponse {
 
 type UpdateAppointmentSlotSetDTO struct {
 	Title     string               `json:"title,omitempty" form:"title,omitempty" bson:"title,omitempty"`
+	IsDefault *bool                `json:"is_default,omitempty" form:"is_default,omitempty" bson:"is_default,omitempty"`
 	SlotTimes []primitive.DateTime `json:"-" form:"-" bson:"slot_times,omitempty"`
 
 	// Input Refs
