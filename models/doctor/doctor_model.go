@@ -5,6 +5,7 @@ import (
 
 	"github.com/praveennagaraj97/online-consultation/constants"
 	"github.com/praveennagaraj97/online-consultation/interfaces"
+	appointmentslotmodel "github.com/praveennagaraj97/online-consultation/models/appointment_slot"
 	hospitalmodel "github.com/praveennagaraj97/online-consultation/models/hospital"
 	languagesmodel "github.com/praveennagaraj97/online-consultation/models/languages"
 	"github.com/praveennagaraj97/online-consultation/pkg/tokens"
@@ -24,10 +25,11 @@ type DoctorEntity struct {
 	IsActive          bool                  `json:"is_active" bson:"is_active"`
 
 	// Populate fields
-	Speciality       string                          `json:"speciality,omitempty" bson:"speciality,omitempty"`
-	ConsultationType string                          `json:"consultation_type,omitempty" bson:"consultation_type,omitempty"`
-	Hospital         *hospitalmodel.HospitalEntity   `json:"hospital,omitempty" bson:"hospital,omitempty"`
-	SpokenLanguages  []languagesmodel.LanguageEntity `json:"spoken_languages,omitempty" bson:"spoken_languages,omitempty"`
+	Speciality        string                                      `json:"speciality,omitempty" bson:"speciality,omitempty"`
+	ConsultationType  string                                      `json:"consultation_type,omitempty" bson:"consultation_type,omitempty"`
+	Hospital          *hospitalmodel.HospitalEntity               `json:"hospital,omitempty" bson:"hospital,omitempty"`
+	SpokenLanguages   []languagesmodel.LanguageEntity             `json:"spoken_languages,omitempty" bson:"spoken_languages,omitempty"`
+	NextAvailableSlot *appointmentslotmodel.AppointmentSlotEntity `json:"next_available_slot" bson:"next_available_slot"`
 
 	// reference fields
 	ConsultationTypeId *primitive.ObjectID  `json:"-" bson:"consultation_type_id"`

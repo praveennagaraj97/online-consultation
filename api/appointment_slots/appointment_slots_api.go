@@ -7,10 +7,12 @@ import (
 	"github.com/praveennagaraj97/online-consultation/api"
 	"github.com/praveennagaraj97/online-consultation/app"
 	appointmentslotsdto "github.com/praveennagaraj97/online-consultation/dto/appointment_slots"
+	appointmentslotmodel "github.com/praveennagaraj97/online-consultation/models/appointment_slot"
 	doctormodel "github.com/praveennagaraj97/online-consultation/models/doctor"
 	appointmentslotsrepo "github.com/praveennagaraj97/online-consultation/repository/appointment_slots"
 	doctorrepo "github.com/praveennagaraj97/online-consultation/repository/doctor"
 	"github.com/praveennagaraj97/online-consultation/serialize"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type AppointmentSlotsAPI struct {
@@ -79,6 +81,39 @@ func (a *AppointmentSlotsAPI) AddNewSlots() gin.HandlerFunc {
 			Response: serialize.Response{
 				StatusCode: http.StatusCreated,
 				Message:    "Appointment Slots Created successfully",
+			},
+		})
+
+	}
+}
+
+func (a *AppointmentSlotsAPI) GetAppointmentSlotById() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		id := ctx.Param("id")
+
+		objectId, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		docId, err := api.GetUserIdFromContext(ctx)
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		res, err := a.repo.FindById(docId, &objectId)
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		ctx.JSON(http.StatusOK, serialize.DataResponse[*appointmentslotmodel.AppointmentSlotEntity]{
+			Data: res,
+			Response: serialize.Response{
+				StatusCode: http.StatusOK,
+				Message:    "Appointment slot details retrieved successfully",
 			},
 		})
 

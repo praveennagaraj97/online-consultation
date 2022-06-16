@@ -6,8 +6,11 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # PARTICULAR PURPOSE.
 
 # This program built for i386-apple-darwin11.3.0
+ 
+make: *** No rule to make target `all'.  Stop.
 
-# Make data base, printed on Sat Jun 11 14:41:04 2022
+
+# Make data base, printed on Thu Jun 16 23:07:33 2022
 
 # Variables
 
@@ -34,21 +37,15 @@ _ = /usr/bin/make
 # makefile (from `Makefile', line 1)
 MAKEFILE_LIST :=  Makefile
 # environment
-VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
-# environment
 VSCODE_VERBOSE_LOGGING = true
 # environment
 __CFBundleIdentifier = com.microsoft.VSCode
 # environment
-VSCODE_IPC_HOOK_EXTHOST = /var/folders/m5/t1f8t1gj4vz1j776h90v1r2h0000gn/T/vscode-ipc-d6314677-1d6e-4181-b86e-f2a11b4d53b0.sock
+VSCODE_IPC_HOOK_EXTHOST = /var/folders/m5/t1f8t1gj4vz1j776h90v1r2h0000gn/T/vscode-ipc-5a8b5043-ab43-4b50-b0f8-a0b06f3add9f.sock
 # environment
 VSCODE_CWD = /
 # environment
-GOPROXY = https://proxy.golang.org,direct
-# environment
-PATH = /usr/local/go/bin:/Users/praveennagaraj/.yarn/bin:/Users/praveennagaraj/.config/yarn/global/node_modules/.bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
-# environment
-GOPATH = /Users/praveennagaraj/go
+PATH = /Users/praveennagaraj/.yarn/bin:/Users/praveennagaraj/.config/yarn/global/node_modules/.bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin
 # environment
 VSCODE_LOG_STACK = false
 # environment
@@ -56,7 +53,7 @@ ELECTRON_RUN_AS_NODE = 1
 # default
 .FEATURES := target-specific order-only second-expansion else-if archives jobserver check-symlink
 # environment
-SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.Dg3lmdSO3M/Listeners
+SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.6yV5vZRUcz/Listeners
 # automatic
 %F = $(notdir $%)
 # environment
@@ -66,13 +63,13 @@ PWD = /Volumes/Workspace/online-consultation-api
 # environment
 ORIGINAL_XDG_CURRENT_DESKTOP = undefined
 # environment
-GOMODCACHE = /Users/praveennagaraj/go/pkg/mod
+VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
 # environment
 HOME = /Users/praveennagaraj
 # default
 MAKEFILEPATH = $(shell /usr/bin/xcode-select -print-path 2>/dev/null || echo /Developer)/Makefiles
 # environment
-VSCODE_CODE_CACHE_PATH = /Users/praveennagaraj/Library/Application Support/Code/CachedData/4af164ea3a06f701fe3e89a2bcbb421d2026b68f
+VSCODE_CODE_CACHE_PATH = /Users/praveennagaraj/Library/Application Support/Code/CachedData/30d9c6cd9483b2cc586687151bcbcd635f373630
 # environment
 LOGNAME = praveennagaraj
 # environment
@@ -108,7 +105,7 @@ TMPDIR = /var/folders/m5/t1f8t1gj4vz1j776h90v1r2h0000gn/T/
 # automatic
 *F = $(notdir $*)
 # environment
-VSCODE_IPC_HOOK = /Users/praveennagaraj/Library/Application Support/Code/1.68.0-main.sock
+VSCODE_IPC_HOOK = /Users/praveennagaraj/Library/Application Support/Code/1.68.1-main.sock
 # makefile
 MAKEFLAGS = Rrqp
 # environment
@@ -116,7 +113,7 @@ MFLAGS = -Rrqp
 # automatic
 *D = $(patsubst %/,%,$(dir $*))
 # environment
-XPC_SERVICE_NAME = application.com.microsoft.VSCode.7419116.7419122
+XPC_SERVICE_NAME = application.com.microsoft.VSCode.7711609.7711615
 # automatic
 +D = $(patsubst %/,%,$(dir $+))
 # automatic
@@ -142,9 +139,9 @@ MAKELEVEL := 0
 # environment
 LANG = C
 # environment
-VSCODE_PID = 1252
+VSCODE_PID = 1315
 # variable set hash-table stats:
-# Load=66/1024=6%, Rehash=0, Collisions=2/90=2%
+# Load=63/1024=6%, Rehash=0, Collisions=1/87=1%
 
 # Pattern-specific Variable Values
 
@@ -152,7 +149,7 @@ VSCODE_PID = 1252
 
 # Directories
 
-# . (device 16777246, inode 15038850): 32 files, no impossibilities.
+# . (device 16777250, inode 15038850): 32 files, no impossibilities.
 
 # 32 files, no impossibilities in 1 directories.
 
@@ -225,8 +222,6 @@ stop_dev:
 # strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
-# Finished Make data base on Sat Jun 11 14:41:04 2022
+# Finished Make data base on Thu Jun 16 23:07:33 2022
 
  
-make: *** No rule to make target `all'.  Stop.
-

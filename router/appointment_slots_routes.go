@@ -15,5 +15,6 @@ func (r *Router) appointmentSlotsRoutes() {
 	doctorRoutes.Use(r.middlewares.IsAuthorized(), r.middlewares.UserRole([]constants.UserType{constants.DOCTOR}))
 
 	doctorRoutes.POST("", api.AddNewSlots())
+	doctorRoutes.GET(":id", api.GetAppointmentSlotById())
 
 }

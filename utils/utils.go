@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"math/rand"
 	"net/url"
@@ -90,16 +89,4 @@ func DecodeVerificationID(verification_query_str string) (*primitive.ObjectID, *
 	}
 
 	return &objectId, &phone, nil
-}
-
-func IsMongoDocumentDuplicate(err error) bool {
-	var e mongo.WriteException
-	if errors.As(err, &e) {
-		for _, we := range e.WriteErrors {
-			if we.Code == 11000 {
-				return true
-			}
-		}
-	}
-	return false
 }

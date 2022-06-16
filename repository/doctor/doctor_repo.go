@@ -192,6 +192,28 @@ func (r *DoctorRepository) FindOne(id *primitive.ObjectID,
 
 	pipeLine = append(pipeLine, languagesLookUp)
 
+	// Next Available Slot
+	nextAvailableLookUp := bson.D{{Key: "$lookup", Value: bson.M{
+		"from":         "appointment_slot",
+		"localField":   "_id",
+		"foreignField": "doctor_id",
+		"as":           "next_available_slot",
+		"pipeline": bson.A{
+			bson.M{"$match": bson.M{"$and": bson.A{
+				bson.M{"is_available": true},
+				bson.M{"start": bson.M{"$gt": primitive.NewDateTimeFromTime(time.Now())}},
+			}}},
+			bson.M{"$limit": 1},
+		},
+	}}}
+
+	unwindNextAvailableSlot := bson.D{{Key: "$unwind", Value: bson.M{
+		"path":                       "$next_available_slot",
+		"preserveNullAndEmptyArrays": true,
+	}}}
+
+	pipeLine = append(pipeLine, nextAvailableLookUp, unwindNextAvailableSlot)
+
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
@@ -313,6 +335,28 @@ func (r *DoctorRepository) FindAll(pgOpts *api.PaginationOptions,
 		}},
 	}}}
 	pipeline = append(pipeline, setImagePrefixPipe, setBlurImagePrefixPipe, resetNullImagePipe)
+
+	// Next Available Slot
+	nextAvailableLookUp := bson.D{{Key: "$lookup", Value: bson.M{
+		"from":         "appointment_slot",
+		"localField":   "_id",
+		"foreignField": "doctor_id",
+		"as":           "next_available_slot",
+		"pipeline": bson.A{
+			bson.M{"$match": bson.M{"$and": bson.A{
+				bson.M{"is_available": true},
+				bson.M{"start": bson.M{"$gt": primitive.NewDateTimeFromTime(time.Now())}},
+			}}},
+			bson.M{"$limit": 1},
+		},
+	}}}
+
+	unwindNextAvailableSlot := bson.D{{Key: "$unwind", Value: bson.M{
+		"path":                       "$next_available_slot",
+		"preserveNullAndEmptyArrays": true,
+	}}}
+
+	pipeline = append(pipeline, nextAvailableLookUp, unwindNextAvailableSlot)
 
 	cur, err := r.colln.Aggregate(ctx, pipeline)
 
