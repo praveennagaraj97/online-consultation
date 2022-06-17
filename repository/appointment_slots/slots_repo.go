@@ -22,8 +22,6 @@ func (r *AppointmentSlotsRepository) Initialize(colln *mongo.Collection) {
 	utils.CreateIndex(colln,
 		bson.D{{Key: "doctor_id", Value: 1}, {Key: "date", Value: 1}, {Key: "start", Value: 1}}, "UniqueSlotIndex", true)
 
-	utils.CreateIndex(colln,
-		bson.D{{Key: "doctor_id", Value: 1}, {Key: "date", Value: 1}}, "DoctorAndDateIndex", false)
 }
 
 func (r *AppointmentSlotsRepository) CreateMany(docs []interface{}) error {
@@ -63,4 +61,23 @@ func (r *AppointmentSlotsRepository) FindById(docId, id *primitive.ObjectID) (*a
 
 	return &result, nil
 
+}
+
+func (r *AppointmentSlotsRepository) FindByDoctorIdAndDate(docId *primitive.ObjectID, date *primitive.DateTime) ([]appointmentslotmodel.AppointmentSlotEntity, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	cur, err := r.colln.Find(ctx, bson.M{"$and": bson.A{bson.M{"doctor_id": docId}, bson.M{"date": date}}})
+	if err != nil {
+		return nil, err
+	}
+	defer cur.Close(context.TODO())
+
+	var results []appointmentslotmodel.AppointmentSlotEntity
+
+	if err := cur.All(context.TODO(), &results); err != nil {
+		return nil, err
+	}
+
+	return results, nil
 }

@@ -11,10 +11,13 @@ func (r *Router) appointmentSlotsRoutes() {
 	api.Initialize(r.app, r.repos.GetAppointmentSlotsRepository(), r.repos.GetDoctorAppointmentSlotSetRepository())
 
 	doctorRoutes := r.engine.Group("/api/v1/doctor/appointment_slots")
+	routes := r.engine.Group("/api/v1/appointment_slots")
 
 	doctorRoutes.Use(r.middlewares.IsAuthorized(), r.middlewares.UserRole([]constants.UserType{constants.DOCTOR}))
 
 	doctorRoutes.POST("", api.AddNewSlots())
 	doctorRoutes.GET(":id", api.GetAppointmentSlotById())
+
+	routes.GET(":doctor_id", api.GetAppointmentSlotsByDocIdAndDate())
 
 }

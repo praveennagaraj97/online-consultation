@@ -2,6 +2,7 @@ package appointmentslotsapi
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/praveennagaraj97/online-consultation/api"
@@ -114,6 +115,49 @@ func (a *AppointmentSlotsAPI) GetAppointmentSlotById() gin.HandlerFunc {
 			Response: serialize.Response{
 				StatusCode: http.StatusOK,
 				Message:    "Appointment slot details retrieved successfully",
+			},
+		})
+
+	}
+}
+
+func (a *AppointmentSlotsAPI) GetAppointmentSlotsByDocIdAndDate() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		id := ctx.Param("doctor_id")
+
+		docId, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			api.SendErrorResponse(ctx, "Doctor Id should be valid primitive ObjectID", http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		dateQuery := ctx.Query("date")
+		if dateQuery == "" {
+			api.SendErrorResponse(ctx, "Date cannot be empty", http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		date, err := time.Parse("2006-01-02", dateQuery)
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		primitiveDate := primitive.NewDateTimeFromTime(date)
+
+		res, err := a.repo.FindByDoctorIdAndDate(&docId, &primitiveDate)
+		if err != nil {
+			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, &map[string]string{
+				"reason": err.Error(),
+			})
+			return
+		}
+
+		ctx.JSON(http.StatusOK, serialize.DataResponse[[]appointmentslotmodel.AppointmentSlotEntity]{
+			Data: res,
+			Response: serialize.Response{
+				StatusCode: http.StatusOK,
+				Message:    "Appointments slots retrieved successfully",
 			},
 		})
 
