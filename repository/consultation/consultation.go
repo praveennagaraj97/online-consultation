@@ -126,7 +126,7 @@ func (r *ConsultationRepository) GetDocumentsCount(filterOpts *map[string]primit
 
 }
 
-func (r *ConsultationRepository) FindByType(consType string) (*consultationmodel.ConsultationEntity, error) {
+func (r *ConsultationRepository) FindByType(consType consultationmodel.ConsultationType) (*consultationmodel.ConsultationEntity, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 

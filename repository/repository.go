@@ -4,6 +4,7 @@ import (
 	"github.com/praveennagaraj97/online-consultation/db"
 	logger "github.com/praveennagaraj97/online-consultation/pkg/log"
 	adminrepository "github.com/praveennagaraj97/online-consultation/repository/admin"
+	appointmentrepository "github.com/praveennagaraj97/online-consultation/repository/appointment"
 	appointmentslotsrepo "github.com/praveennagaraj97/online-consultation/repository/appointment_slots"
 	consultationrepository "github.com/praveennagaraj97/online-consultation/repository/consultation"
 	doctorrepo "github.com/praveennagaraj97/online-consultation/repository/doctor"
@@ -27,7 +28,8 @@ type Repository struct {
 	doctorAuthRepo          *doctorrepo.DoctorRepository
 	doctorAppSlotsRepo      *doctorrepo.DoctorAppointmentSlotSetRepository
 	hospitalRepo            *hospitalrepo.HospitalRepository
-	apptSlots               *appointmentslotsrepo.AppointmentSlotsRepository
+	apptSlotsRepo           *appointmentslotsrepo.AppointmentSlotsRepository
+	apptRepo                *appointmentrepository.AppointmentRepository
 }
 
 func (r *Repository) Initialize(mgoClient *mongo.Client, dbName string) {
@@ -77,8 +79,12 @@ func (r *Repository) Initialize(mgoClient *mongo.Client, dbName string) {
 	r.doctorAppSlotsRepo.Initialize(db.OpenCollection(mgoClient, dbName, "doctor_appointment_slot_set"))
 
 	// Appointment Slots
-	r.apptSlots = &appointmentslotsrepo.AppointmentSlotsRepository{}
-	r.apptSlots.Initialize(db.OpenCollection(mgoClient, dbName, "appointment_slot"))
+	r.apptSlotsRepo = &appointmentslotsrepo.AppointmentSlotsRepository{}
+	r.apptSlotsRepo.Initialize(db.OpenCollection(mgoClient, dbName, "appointment_slot"))
+
+	// Appointment
+	r.apptRepo = &appointmentrepository.AppointmentRepository{}
+	r.apptRepo.Initialize(db.OpenCollection(mgoClient, dbName, "appointment"))
 
 	logger.PrintLog("Repositories initialized 📜")
 }
@@ -128,5 +134,9 @@ func (r *Repository) GetHospitalRepository() *hospitalrepo.HospitalRepository {
 }
 
 func (r *Repository) GetAppointmentSlotsRepository() *appointmentslotsrepo.AppointmentSlotsRepository {
-	return r.apptSlots
+	return r.apptSlotsRepo
+}
+
+func (r *Repository) GetAppointmentRepository() *appointmentrepository.AppointmentRepository {
+	return r.apptRepo
 }

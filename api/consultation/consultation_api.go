@@ -151,7 +151,7 @@ func (a *ConsultationAPI) GetAll() gin.HandlerFunc {
 func (a *ConsultationAPI) FindByType(typ consultationmodel.ConsultationType) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
-		res, err := a.consultRepo.FindByType(string(typ))
+		res, err := a.consultRepo.FindByType(typ)
 		if err != nil {
 			api.SendErrorResponse(ctx, err.Error(), http.StatusNotFound, nil)
 			return
