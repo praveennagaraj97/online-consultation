@@ -11,7 +11,7 @@ type Task struct {
 type TasksTypes string
 
 const (
-	ReminderTask TasksTypes = "ReminderTask"
+	AppointmentReminderTask TasksTypes = "AppointmentReminderTask"
 )
 
 func (s *Scheduler) reminderTask(timer *time.Timer) {

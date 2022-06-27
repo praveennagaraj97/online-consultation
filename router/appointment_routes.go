@@ -13,6 +13,7 @@ func (r *Router) appointmentRoutes() {
 		r.repos.GetAppointmentRepository(),
 		r.repos.GetConsultationRepository(),
 		r.repos.GetUserRelativeRepository(),
+		r.repos.GetAppointmentScheduleReminderRepository(),
 	)
 
 	routes := r.engine.Group("/api/v1/appointment")

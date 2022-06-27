@@ -165,7 +165,7 @@ func (a *DoctorAPI) GetDoctorById(filterActiveAccounts bool) gin.HandlerFunc {
 		res, err := a.repo.FindOne(objectId, "", nil, filterActiveAccounts)
 
 		if err != nil {
-			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+			api.SendErrorResponse(ctx, err.Error(), http.StatusNotFound, nil)
 			return
 		}
 

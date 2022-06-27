@@ -10,15 +10,15 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type AppointmentRepository struct {
+type AppointmentScheduleReminderRepository struct {
 	colln *mongo.Collection
 }
 
-func (r *AppointmentRepository) Initialize(colln *mongo.Collection) {
+func (r *AppointmentScheduleReminderRepository) Initialize(colln *mongo.Collection) {
 	r.colln = colln
 }
 
-func (r *AppointmentRepository) Create(doc *appointmentmodel.AppointmentEntity) error {
+func (r *AppointmentScheduleReminderRepository) Create(doc *appointmentmodel.AppointmentScheduleTaskEntity) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
@@ -28,11 +28,11 @@ func (r *AppointmentRepository) Create(doc *appointmentmodel.AppointmentEntity) 
 
 }
 
-func (r *AppointmentRepository) DeleteById(userId, id *primitive.ObjectID) error {
+func (r *AppointmentScheduleReminderRepository) DeleteById(id *primitive.ObjectID) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
-	_, err := r.colln.DeleteOne(ctx, bson.M{"$and": bson.A{bson.M{"user_id": userId}, bson.M{"_id": id}}})
+	_, err := r.colln.DeleteOne(ctx, bson.M{"_id": id})
 
 	return err
 

@@ -31,7 +31,7 @@ func (s *Scheduler) NewSchedule(invokeTime time.Time, name TasksTypes) error {
 	}
 
 	switch name {
-	case ReminderTask:
+	case AppointmentReminderTask:
 		if s.reminderTasks[invokeTime] != nil {
 			timer.Stop()
 			return nil

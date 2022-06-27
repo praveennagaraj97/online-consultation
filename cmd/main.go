@@ -7,6 +7,7 @@ import (
 	mailer "github.com/praveennagaraj97/online-consultation/pkg/email"
 	"github.com/praveennagaraj97/online-consultation/pkg/env"
 	twiliopkg "github.com/praveennagaraj97/online-consultation/pkg/sms/twilio"
+	stripepayment "github.com/praveennagaraj97/online-consultation/pkg/stripe"
 	"github.com/praveennagaraj97/online-consultation/router"
 )
 
@@ -39,6 +40,9 @@ func main() {
 
 	// Initialize Twilio SMS Package
 	twiliopkg.Initialize()
+
+	// Stripe Package
+	stripepayment.Initialize()
 
 	// Start the server
 	r := router.Router{}

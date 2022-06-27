@@ -15,12 +15,12 @@ import (
 )
 
 type UserRepository struct {
-	collection *mongo.Collection
+	colln *mongo.Collection
 }
 
 // Method to initialize user repository
 func (r *UserRepository) InitializeRepository(colln *mongo.Collection) {
-	r.collection = colln
+	r.colln = colln
 
 	utils.CreateIndex(colln, bson.D{
 		{Key: "phone_number.number", Value: 1},
@@ -56,7 +56,7 @@ func (r *UserRepository) CreateUser(payload *userdto.RegisterDTO) (*usermodel.Us
 		Gender:      payload.Gender,
 	}
 
-	_, err := r.collection.InsertOne(ctx, document)
+	_, err := r.colln.InsertOne(ctx, document)
 
 	if err != nil {
 		return nil, err
@@ -70,7 +70,7 @@ func (r *UserRepository) UpdateById(id *primitive.ObjectID, payload *userdto.Upd
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
-	_, err := r.collection.UpdateByID(ctx, id, bson.D{{Key: "$set", Value: payload}})
+	_, err := r.colln.UpdateByID(ctx, id, bson.D{{Key: "$set", Value: payload}})
 	return err
 
 }
@@ -79,7 +79,7 @@ func (r *UserRepository) UpdateRefreshToken(id *primitive.ObjectID, token string
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
-	_, err := r.collection.UpdateByID(ctx, id, bson.D{{Key: "$set", Value: bson.M{"refresh_token": token}}})
+	_, err := r.colln.UpdateByID(ctx, id, bson.D{{Key: "$set", Value: bson.M{"refresh_token": token}}})
 	return err
 
 }
@@ -93,7 +93,7 @@ func (r *UserRepository) checkIfUserExistsWithEmailOrPhone(email, number, code s
 		bson.M{"$and": bson.A{bson.M{"phone_number.number": number, "phone_number.code": code}}},
 	}}
 
-	count, err := r.collection.CountDocuments(ctx, filter)
+	count, err := r.colln.CountDocuments(ctx, filter)
 
 	if err != nil {
 		return false
@@ -109,7 +109,7 @@ func (r *UserRepository) FindByPhoneNumber(number, code string) (*usermodel.User
 
 	filter := bson.M{"$and": bson.A{bson.M{"phone_number.number": number, "phone_number.code": code}}}
 
-	doc := r.collection.FindOne(ctx, filter)
+	doc := r.colln.FindOne(ctx, filter)
 
 	if doc.Err() != nil {
 		return nil, errors.New("Couldn't find any user")
@@ -131,7 +131,7 @@ func (r *UserRepository) FindByEmail(email string) (*usermodel.UserEntity, error
 
 	filter := bson.M{"email": email}
 
-	doc := r.collection.FindOne(ctx, filter)
+	doc := r.colln.FindOne(ctx, filter)
 
 	if doc.Err() != nil {
 		return nil, errors.New("Couldn't find any user")
@@ -151,7 +151,7 @@ func (r *UserRepository) FindById(id *primitive.ObjectID) (*usermodel.UserEntity
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
-	doc := r.collection.FindOne(ctx, bson.M{"_id": id})
+	doc := r.colln.FindOne(ctx, bson.M{"_id": id})
 
 	if doc.Err() != nil {
 		return nil, errors.New("Couldn't find any user")

@@ -30,6 +30,7 @@ type Repository struct {
 	hospitalRepo            *hospitalrepo.HospitalRepository
 	apptSlotsRepo           *appointmentslotsrepo.AppointmentSlotsRepository
 	apptRepo                *appointmentrepository.AppointmentRepository
+	apptReminderRepo        *appointmentrepository.AppointmentScheduleReminderRepository
 }
 
 func (r *Repository) Initialize(mgoClient *mongo.Client, dbName string) {
@@ -86,6 +87,10 @@ func (r *Repository) Initialize(mgoClient *mongo.Client, dbName string) {
 	r.apptRepo = &appointmentrepository.AppointmentRepository{}
 	r.apptRepo.Initialize(db.OpenCollection(mgoClient, dbName, "appointment"))
 
+	// Appointment Reminder Repo
+	r.apptReminderRepo = &appointmentrepository.AppointmentScheduleReminderRepository{}
+	r.apptReminderRepo.Initialize(db.OpenCollection(mgoClient, dbName, "appointment_schedule_reminder"))
+
 	logger.PrintLog("Repositories initialized 📜")
 }
 
@@ -139,4 +144,8 @@ func (r *Repository) GetAppointmentSlotsRepository() *appointmentslotsrepo.Appoi
 
 func (r *Repository) GetAppointmentRepository() *appointmentrepository.AppointmentRepository {
 	return r.apptRepo
+}
+
+func (r *Repository) GetAppointmentScheduleReminderRepository() *appointmentrepository.AppointmentScheduleReminderRepository {
+	return r.apptReminderRepo
 }
