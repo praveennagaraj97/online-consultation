@@ -145,10 +145,11 @@ type EditDoctorDTO struct {
 	SpecialityId       string   `json:"speciality_id,omitempty" form:"speciality_id,omitempty" bson:"-"`
 	SpokenLanguagesIds []string `json:"spoken_language_id,omitempty" form:"spoken_language_id,omitempty" bson:"-"`
 
-	Hospital         *primitive.ObjectID  `json:"-" form:"-" bson:"hospital_id,omitempty"`
-	ConsultationType *primitive.ObjectID  `json:"-" form:"-" bson:"consultation_type_id,omitempty"`
-	Speciality       *primitive.ObjectID  `json:"-" form:"-" bson:"speciality_id,omitempty"`
-	SpokenLanguages  []primitive.ObjectID `json:"-" form:"-" bson:"languages_ids,omitempty"`
+	Hospital         *primitive.ObjectID   `json:"-" form:"-" bson:"hospital_id,omitempty"`
+	ConsultationType *primitive.ObjectID   `json:"-" form:"-" bson:"consultation_type_id,omitempty"`
+	Speciality       *primitive.ObjectID   `json:"-" form:"-" bson:"speciality_id,omitempty"`
+	SpokenLanguages  []primitive.ObjectID  `json:"-" form:"-" bson:"languages_ids,omitempty"`
+	ProfilePic       *interfaces.ImageType `json:"profile_pic,omitempty" bson:"profile_pic,omitempty"`
 
 	Phone *interfaces.PhoneType `json:"-" form:"-" bson:"phone,omitempty"`
 }

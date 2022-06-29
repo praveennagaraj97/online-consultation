@@ -1,7 +1,6 @@
 package appointmentapi
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 
@@ -11,13 +10,12 @@ import (
 	appointmentdto "github.com/praveennagaraj97/online-consultation/dto/appointment"
 	appointmentmodel "github.com/praveennagaraj97/online-consultation/models/appointment"
 	consultationmodel "github.com/praveennagaraj97/online-consultation/models/consultation"
+	razorpaypayment "github.com/praveennagaraj97/online-consultation/pkg/razorpay"
 	"github.com/praveennagaraj97/online-consultation/pkg/scheduler"
-	stripepayment "github.com/praveennagaraj97/online-consultation/pkg/stripe"
 	appointmentrepository "github.com/praveennagaraj97/online-consultation/repository/appointment"
 	appointmentslotsrepo "github.com/praveennagaraj97/online-consultation/repository/appointment_slots"
 	consultationrepository "github.com/praveennagaraj97/online-consultation/repository/consultation"
 	userrepository "github.com/praveennagaraj97/online-consultation/repository/user"
-	"github.com/stripe/stripe-go/v72"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -27,6 +25,7 @@ type AppointmentAPI struct {
 	apptRepo         *appointmentrepository.AppointmentRepository
 	cnsltRepo        *consultationrepository.ConsultationRepository
 	rltvRepo         *userrepository.UserRelativesRepository
+	userRepo         *userrepository.UserRepository
 	apptReminderRepo *appointmentrepository.AppointmentScheduleReminderRepository
 	scheduler        *scheduler.Scheduler
 }
@@ -36,7 +35,8 @@ func (a *AppointmentAPI) Initialize(conf *app.ApplicationConfig,
 	apptRepo *appointmentrepository.AppointmentRepository,
 	cnsltRepo *consultationrepository.ConsultationRepository,
 	rltvRepo *userrepository.UserRelativesRepository,
-	apptReminderRepo *appointmentrepository.AppointmentScheduleReminderRepository) {
+	apptReminderRepo *appointmentrepository.AppointmentScheduleReminderRepository,
+	userRepo *userrepository.UserRepository) {
 
 	a.conf = conf
 	a.apptSlotRepo = apptSlotRepo
@@ -44,6 +44,7 @@ func (a *AppointmentAPI) Initialize(conf *app.ApplicationConfig,
 	a.cnsltRepo = cnsltRepo
 	a.rltvRepo = rltvRepo
 	a.apptReminderRepo = apptReminderRepo
+	a.userRepo = userRepo
 
 	// Task Scheduler
 	a.scheduler = &scheduler.Scheduler{}
@@ -74,14 +75,16 @@ func (a *AppointmentAPI) BookAnScheduledAppointment() gin.HandlerFunc {
 		}
 
 		// Get Slot Details
-		apptSlotRes, err := a.apptSlotRepo.FindById(payload.DoctorId, payload.AppointmentSlotId)
+		apptSlotRes, err := a.apptSlotRepo.FindById(payload.AppointmentSlotId)
 		if err != nil {
 			api.SendErrorResponse(ctx, err.Error(), http.StatusNotFound, nil)
 			return
 		}
 
 		if !apptSlotRes.IsAvailable {
-			api.SendErrorResponse(ctx, "We are sorry this slot has been booked", http.StatusConflict, nil)
+			api.SendErrorResponse(ctx, "We are sorry requested slot is not available", http.StatusNotFound, &map[string]string{
+				"reason": apptSlotRes.Reason,
+			})
 			return
 		}
 
@@ -101,7 +104,7 @@ func (a *AppointmentAPI) BookAnScheduledAppointment() gin.HandlerFunc {
 
 		doc := appointmentmodel.AppointmentEntity{
 			ID:              primitive.NewObjectID(),
-			DoctorId:        payload.DoctorId,
+			DoctorId:        apptSlotRes.DoctorId,
 			ConsultationId:  &consRes.ID,
 			UserId:          userId,
 			ConsultingFor:   payload.RelativeId,
@@ -110,16 +113,6 @@ func (a *AppointmentAPI) BookAnScheduledAppointment() gin.HandlerFunc {
 			Status:          appointmentmodel.Pending,
 		}
 
-		paymentDescription := fmt.Sprintf("Pay Rs.%v for your appointment booking", consRes.Price)
-		email := "praveen@mailsac.com"
-
-		// Pass Appointment Documnet ID to listen for webhook
-		paymentInfo, err := stripepayment.CreatePaymentIntent(consRes.Price,
-			string(stripe.CurrencyINR),
-			&paymentDescription, &email, &map[string]string{
-				"appointment_id": doc.ID.Hex(),
-			})
-
 		if err != nil {
 			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, &map[string]string{
 				"reason": err.Error(),
@@ -127,20 +120,66 @@ func (a *AppointmentAPI) BookAnScheduledAppointment() gin.HandlerFunc {
 			return
 		}
 
-		// if err := a.apptRepo.Create(&doc); err != nil {
+		// Get User Details
+		userRes, err := a.userRepo.FindById(userId)
+		if err != nil {
+			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, &map[string]string{
+				"reason": err.Error(),
+			})
+			return
+		}
+
+		if err := a.apptRepo.Create(&doc); err != nil {
+			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, &map[string]string{
+				"reason": err.Error(),
+			})
+			return
+		}
+
+		// Block the slot
+		// if err = a.apptSlotRepo.UpdateSlotAvailability(payload.AppointmentSlotId, false, "Blocked for booking"); err != nil {
+		// 	a.apptRepo.DeleteById(userId, &doc.ID)
 		// 	api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, &map[string]string{
 		// 		"reason": err.Error(),
 		// 	})
 		// 	return
 		// }
 
-		ctx.JSON(http.StatusCreated, map[string]interface{}{
-			"res":     doc,
-			"payment": paymentInfo,
+		// paymentDescription := fmt.Sprintf("Pay Rs.%v for your appointment booking", consRes.Price)
+		// email := userRes.Email
+
+		// Create Payment Channel
+		paymentRes, err := razorpaypayment.CreateOrder(consRes.Price, "INR", doc.ID.Hex())
+
+		if err != nil {
+			// Release blocked slot
+			a.apptSlotRepo.UpdateSlotAvailability(payload.AppointmentSlotId, true, "")
+
+			// Delete appointment if payment creation fails
+			a.apptRepo.DeleteById(userId, &doc.ID)
+			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, &map[string]string{
+				"reason": err.Error(),
+			})
+			return
+		}
+
+		ctx.JSON(200, map[string]interface{}{
+			"user":       userRes,
+			"paymentRes": paymentRes,
 		})
+
+		// ctx.JSON(http.StatusCreated, serialize.DataResponse[*paymentmodel.StripePaymentModel]{
+		// 	Data: paymentRes,
+		// 	Response: serialize.Response{
+		// 		StatusCode: http.StatusCreated,
+		// 		Message:    "Appointment slot has been blocked, pay to confirm the slot",
+		// 	},
+		// })
+
 	}
 }
 
+// Once the Payment is confirmed add to scheduled reminder list and mark slot as booked
 func (a *AppointmentAPI) ConfirmScheduledAppointment() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 

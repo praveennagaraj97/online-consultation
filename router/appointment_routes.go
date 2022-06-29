@@ -14,6 +14,7 @@ func (r *Router) appointmentRoutes() {
 		r.repos.GetConsultationRepository(),
 		r.repos.GetUserRelativeRepository(),
 		r.repos.GetAppointmentScheduleReminderRepository(),
+		r.repos.GetUserRepository(),
 	)
 
 	routes := r.engine.Group("/api/v1/appointment")

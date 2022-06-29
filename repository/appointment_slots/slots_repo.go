@@ -35,7 +35,7 @@ func (r *AppointmentSlotsRepository) CreateMany(docs []interface{}) error {
 	if errors.As(err, &e) {
 		for _, we := range e.WriteErrors {
 			if we.Code == 11000 {
-				return errors.New("Document with given slot already exist")
+				return errors.New("document with given slot already exist")
 			}
 		}
 	}
@@ -43,14 +43,34 @@ func (r *AppointmentSlotsRepository) CreateMany(docs []interface{}) error {
 	return err
 }
 
-func (r *AppointmentSlotsRepository) FindById(docId, id *primitive.ObjectID) (*appointmentslotmodel.AppointmentSlotEntity, error) {
+func (r *AppointmentSlotsRepository) FindByIdAndDoctorID(docId, id *primitive.ObjectID) (*appointmentslotmodel.AppointmentSlotEntity, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
 	cur := r.colln.FindOne(ctx, bson.M{"$and": bson.A{bson.M{"doctor_id": docId}, bson.M{"_id": id}}})
 
 	if cur.Err() != nil {
-		return nil, errors.New("Couldn't find appointment slot for given Id")
+		return nil, errors.New("couldn't find appointment slot for given Id")
+	}
+
+	var result appointmentslotmodel.AppointmentSlotEntity
+
+	if err := cur.Decode(&result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+
+}
+
+func (r *AppointmentSlotsRepository) FindById(id *primitive.ObjectID) (*appointmentslotmodel.AppointmentSlotEntity, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	cur := r.colln.FindOne(ctx, bson.M{"_id": id})
+
+	if cur.Err() != nil {
+		return nil, errors.New("couldn't find appointment slot for given Id")
 	}
 
 	var result appointmentslotmodel.AppointmentSlotEntity
@@ -80,4 +100,22 @@ func (r *AppointmentSlotsRepository) FindByDoctorIdAndDate(docId *primitive.Obje
 	}
 
 	return results, nil
+}
+
+func (r *AppointmentSlotsRepository) UpdateSlotAvailability(id *primitive.ObjectID, isAvailable bool, reason string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	if !isAvailable && len(reason) == 0 {
+		return errors.New("reason cannot be empty")
+	}
+
+	if isAvailable {
+		reason = ""
+	}
+
+	_, err := r.colln.UpdateByID(ctx, id, bson.M{"$set": bson.M{"is_available": isAvailable, "reason_of_unavailablity": reason}})
+
+	return err
+
 }

@@ -104,7 +104,7 @@ func (a *AppointmentSlotsAPI) GetAppointmentSlotById() gin.HandlerFunc {
 			return
 		}
 
-		res, err := a.repo.FindById(docId, &objectId)
+		res, err := a.repo.FindByIdAndDoctorID(docId, &objectId)
 		if err != nil {
 			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
 			return

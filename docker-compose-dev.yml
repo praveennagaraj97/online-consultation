@@ -40,6 +40,8 @@ services:
       - S3_ACCESS_BASEURL=${S3_ACCESS_BASEURL}
       - STRIPE_PUBLISHABLE_KEY=${STRIPE_PUBLISHABLE_KEY}
       - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - RAZOR_PAY_KEY_ID=${RAZOR_PAY_KEY_ID}
+      - RAZOR_PAY_KEY_SECRET=${RAZOR_PAY_KEY_SECRET}
     volumes:
       - .:/src/app
     restart: unless-stopped

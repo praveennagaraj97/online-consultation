@@ -14,7 +14,7 @@ type UserEntity struct {
 	Name          string               `json:"name" bson:"name"`
 	Email         string               `json:"email" bson:"email"`
 	PhoneNumber   interfaces.PhoneType `json:"phone_number" bson:"phone_number"`
-	DateOfBirth   string               `json:"date_of_birth" bson:"date_of_birth"`
+	DateOfBirth   primitive.DateTime   `json:"date_of_birth" bson:"date_of_birth"`
 	Gender        string               `json:"gender" bson:"gender"`
 	RefreshToken  string               `json:"-" bson:"refresh_token"`
 	EmailVerified bool                 `json:"email_verified" bson:"email_verified"`

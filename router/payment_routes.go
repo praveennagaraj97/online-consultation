@@ -7,7 +7,7 @@ func (r *Router) paymentRoutes() {
 	stripeAPi := stripepaymentapi.StripePaymentAPI{}
 	stripeAPi.Initialize(r.app)
 
-	stripeRoutes := r.engine.Group("/api/v1/stripe")
+	stripeRoutes := r.engine.Group("/api/v1")
 
 	// Stripe Payment
 	stripeRoutes.POST("/webhook/payment_intent", stripeAPi.PaymentIntentWebhook())

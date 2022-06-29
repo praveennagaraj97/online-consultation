@@ -411,7 +411,7 @@ func (a *DoctorAPI) UpdateById() gin.HandlerFunc {
 						api.SendErrorResponse(ctx, value.Err.Error(), http.StatusInternalServerError, nil)
 						return
 					} else {
-						doc.ProfilePic = value.Result
+						payload.ProfilePic = value.Result
 					}
 				}
 			default:

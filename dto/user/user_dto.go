@@ -3,6 +3,7 @@ package userdto
 import (
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/praveennagaraj97/online-consultation/interfaces"
 	usermodel "github.com/praveennagaraj97/online-consultation/models/user"
@@ -12,13 +13,14 @@ import (
 )
 
 type RegisterDTO struct {
-	Name           string `json:"name" form:"name"`
-	Email          string `json:"email" form:"email"`
-	PhoneCode      string `json:"phone_code" form:"phone_code"`
-	PhoneNumber    string `json:"phone_number" form:"phone_number"`
-	DOB            string `json:"date_of_birth" form:"date_of_birth"`
-	Gender         string `json:"gender" form:"gender"`
-	VerificationId string `json:"verification_id" form:"verification_id"`
+	Name           string             `json:"name" form:"name"`
+	Email          string             `json:"email" form:"email"`
+	PhoneCode      string             `json:"phone_code" form:"phone_code"`
+	PhoneNumber    string             `json:"phone_number" form:"phone_number"`
+	Gender         string             `json:"gender" form:"gender"`
+	VerificationId string             `json:"verification_id" form:"verification_id"`
+	DOB            primitive.DateTime `json:"-" form:"-""`
+	DOBRef         string             `json:"date_of_birth" form:"date_of_birth"`
 }
 
 type VerifyCodeDTO struct {
@@ -215,6 +217,15 @@ func (payload *RegisterDTO) ValidateRegisterDTO() *serialize.ErrorResponse {
 
 	if payload.VerificationId == "" {
 		errors["verification_id"] = "Verification ID cannot be empty"
+	}
+
+	if payload.DOBRef != "" {
+		t, err := time.Parse("2006-01-02", payload.DOBRef)
+		if err != nil {
+			errors["date_of_birth"] = err.Error()
+		} else {
+			payload.DOB = primitive.NewDateTimeFromTime(t)
+		}
 	}
 
 	if len(errors) != 0 {
