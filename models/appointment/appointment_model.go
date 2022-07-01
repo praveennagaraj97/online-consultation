@@ -8,9 +8,9 @@ type AppointmentStatus string
 
 const (
 	Cancelled AppointmentStatus = "cancelled"
-	Completed AppointmentStatus = "cancelled"
-	Upcoming  AppointmentStatus = "Upcoming"
-	Pending   AppointmentStatus = "Pending" // Payment pending.
+	Completed AppointmentStatus = "completed"
+	Upcoming  AppointmentStatus = "upcoming"
+	Pending   AppointmentStatus = "pending" // Payment pending.
 	OnGoing   AppointmentStatus = "ongoing"
 )
 

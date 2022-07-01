@@ -31,3 +31,9 @@ const JWT_AccessTokenExpiry = 30
 
 // Pagination options - PerPage default
 const DefaultPerPageResults = 10
+
+type PaymentFor string
+
+const (
+	ScheduledAppointment PaymentFor = "scheduled_appointment"
+)

@@ -22,6 +22,9 @@ func (r *AppointmentSlotsRepository) Initialize(colln *mongo.Collection) {
 	utils.CreateIndex(colln,
 		bson.D{{Key: "doctor_id", Value: 1}, {Key: "date", Value: 1}, {Key: "start", Value: 1}}, "UniqueSlotIndex", true)
 
+	utils.CreateIndex(colln,
+		bson.D{{Key: "is_available", Value: 1}}, "AvailabilityIndex", false)
+
 }
 
 func (r *AppointmentSlotsRepository) CreateMany(docs []interface{}) error {

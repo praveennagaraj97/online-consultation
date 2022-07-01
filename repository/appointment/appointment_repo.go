@@ -2,6 +2,7 @@ package appointmentrepository
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	appointmentmodel "github.com/praveennagaraj97/online-consultation/models/appointment"
@@ -36,4 +37,34 @@ func (r *AppointmentRepository) DeleteById(userId, id *primitive.ObjectID) error
 
 	return err
 
+}
+
+// For internal use only.
+func (r *AppointmentRepository) FindById(id *primitive.ObjectID) (*appointmentmodel.AppointmentEntity, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	res := r.colln.FindOne(ctx, bson.M{"_id": id})
+
+	if res.Err() != nil {
+		return nil, errors.New("couldn't find any appointment details")
+	}
+
+	var result appointmentmodel.AppointmentEntity
+
+	res.Decode(&result)
+
+	return &result, nil
+
+}
+
+func (r *AppointmentRepository) UpdateById(userId, id *primitive.ObjectID, status appointmentmodel.AppointmentStatus) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	_, err := r.colln.UpdateOne(ctx, bson.M{"$and": bson.A{bson.M{"_id": id}, bson.M{"user_id": userId}}}, bson.M{"$set": bson.M{
+		"status": status,
+	}})
+
+	return err
 }

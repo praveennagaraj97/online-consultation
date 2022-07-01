@@ -1,12 +1,14 @@
 package appointmentapi
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/praveennagaraj97/online-consultation/api"
 	"github.com/praveennagaraj97/online-consultation/app"
+	"github.com/praveennagaraj97/online-consultation/constants"
 	appointmentdto "github.com/praveennagaraj97/online-consultation/dto/appointment"
 	appointmentmodel "github.com/praveennagaraj97/online-consultation/models/appointment"
 	consultationmodel "github.com/praveennagaraj97/online-consultation/models/consultation"
@@ -16,6 +18,7 @@ import (
 	appointmentslotsrepo "github.com/praveennagaraj97/online-consultation/repository/appointment_slots"
 	consultationrepository "github.com/praveennagaraj97/online-consultation/repository/consultation"
 	userrepository "github.com/praveennagaraj97/online-consultation/repository/user"
+	"github.com/praveennagaraj97/online-consultation/serialize"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -137,20 +140,30 @@ func (a *AppointmentAPI) BookAnScheduledAppointment() gin.HandlerFunc {
 		}
 
 		// Block the slot
-		// if err = a.apptSlotRepo.UpdateSlotAvailability(payload.AppointmentSlotId, false, "Blocked for booking"); err != nil {
-		// 	a.apptRepo.DeleteById(userId, &doc.ID)
-		// 	api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, &map[string]string{
-		// 		"reason": err.Error(),
-		// 	})
-		// 	return
-		// }
+		if err = a.apptSlotRepo.UpdateSlotAvailability(payload.AppointmentSlotId, false, "Blocked for booking"); err != nil {
+			a.apptRepo.DeleteById(userId, &doc.ID)
+			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, &map[string]string{
+				"reason": err.Error(),
+			})
+			return
+		}
 
-		// paymentDescription := fmt.Sprintf("Pay Rs.%v for your appointment booking", consRes.Price)
-		// email := userRes.Email
+		orderData := razorpaypayment.CreateRazorPayOrder{
+			Amount:         uint64(consRes.Price),
+			Currency:       "INR",
+			Receipt:        doc.ID.Hex(),
+			PartialPayment: false,
+			Notes: struct {
+				PayingFor   constants.PaymentFor
+				ReferenceId string
+			}{
+				PayingFor:   constants.ScheduledAppointment,
+				ReferenceId: doc.ID.Hex(),
+			},
+		}
 
 		// Create Payment Channel
-		paymentRes, err := razorpaypayment.CreateOrder(consRes.Price, "INR", doc.ID.Hex())
-
+		orderId, err := razorpaypayment.CreateOrder(orderData)
 		if err != nil {
 			// Release blocked slot
 			a.apptSlotRepo.UpdateSlotAvailability(payload.AppointmentSlotId, true, "")
@@ -163,49 +176,24 @@ func (a *AppointmentAPI) BookAnScheduledAppointment() gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(200, map[string]interface{}{
-			"user":       userRes,
-			"paymentRes": paymentRes,
+		ctx.JSON(http.StatusCreated, serialize.DataResponse[*razorpaypayment.RazorPayPaymentOutput]{
+			Data: &razorpaypayment.RazorPayPaymentOutput{
+				Amount:   orderData.Amount,
+				Currency: orderData.Currency,
+				OrderId:  orderId,
+				Prefill: razorpaypayment.PrefillData{
+					Name:    userRes.Name,
+					Email:   userRes.Email,
+					Contact: fmt.Sprintf("%s %s", userRes.PhoneNumber.Code, userRes.PhoneNumber.Number),
+				},
+				Name:        "Online Consultation | Schedule Booking",
+				Description: fmt.Sprintf("Pay Rs. %.2f for your appointment booking", consRes.Price),
+			},
+			Response: serialize.Response{
+				StatusCode: http.StatusCreated,
+				Message:    "Appointment slot has been blocked, pay to confirm the slot",
+			},
 		})
 
-		// ctx.JSON(http.StatusCreated, serialize.DataResponse[*paymentmodel.StripePaymentModel]{
-		// 	Data: paymentRes,
-		// 	Response: serialize.Response{
-		// 		StatusCode: http.StatusCreated,
-		// 		Message:    "Appointment slot has been blocked, pay to confirm the slot",
-		// 	},
-		// })
-
-	}
-}
-
-// Once the Payment is confirmed add to scheduled reminder list and mark slot as booked
-func (a *AppointmentAPI) ConfirmScheduledAppointment() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-
-		// apptSheduleDoc := appointmentmodel.AppointmentScheduleTaskEntity{
-		// 	ID:            primitive.NewObjectID(),
-		// 	InvokeTime:    *apptSlotRes.Start,
-		// 	CreatedAt:     primitive.NewDateTimeFromTime(time.Now()),
-		// 	AppointmentId: &doc.ID,
-		// }
-
-		// 		if err := a.apptReminderRepo.Create(&apptSheduleDoc); err != nil {
-		// 	a.apptRepo.DeleteById(userId, &doc.ID)
-		// 	api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, &map[string]string{
-		// 		"reason": err.Error(),
-		// 	})
-		// 	return
-		// }
-
-		// // Schedule if appointment is in current date.
-		// if apptSheduleDoc.InvokeTime.Time().Format("2006-01-02") == time.Now().Format("2006-01-02") {
-		// 	if err := a.scheduler.NewSchedule(apptSheduleDoc.InvokeTime.Time(), scheduler.AppointmentReminderTask); err != nil {
-		// 		a.apptRepo.DeleteById(userId, &doc.ID)
-		// 		a.apptReminderRepo.DeleteById(&apptSheduleDoc.ID)
-		// 		api.SendErrorResponse(ctx, err.Error(), http.StatusInternalServerError, nil)
-		// 		return
-		// 	}
-		// }
 	}
 }

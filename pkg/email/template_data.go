@@ -27,6 +27,12 @@ type NewDoctorAddedTemplateData struct {
 	ActivateAccountLink string
 }
 
+type AppointmentBookingConfirmation struct {
+	MetaInfo    *EmailMetaInfoTemplateData
+	Title       string
+	Description string
+}
+
 func GetRegisterEmailTemplateData(name, verifyLink string) *ConfirmEmailTemplateData {
 
 	return &ConfirmEmailTemplateData{
@@ -113,5 +119,17 @@ func GetNewDoctorAddedTemplateData(name, role, activateLink string) *NewDoctorAd
 			Role: role,
 		},
 		ActivateAccountLink: activateLink,
+	}
+}
+
+func GetScheduledAppointmentBookingTemplateData() *AppointmentBookingConfirmation {
+	return &AppointmentBookingConfirmation{
+		MetaInfo: &EmailMetaInfoTemplateData{
+			MetaTitle: "Appointment has been booked successfully",
+		},
+		Title: "Your Appointment has been scheduled successfully",
+		Description: `Lorem ipsum dolor sit amet, consectetur adipisicing elit. Culpa vitae sequi
+  possimus! Porro, tenetur? Tempore quisquam animi tempora nulla! Eligendi neque
+  aspernatur sed officiis facilis. Id illum provident obcaecati quibusdam.`,
 	}
 }

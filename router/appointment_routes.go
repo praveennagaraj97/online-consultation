@@ -17,9 +17,14 @@ func (r *Router) appointmentRoutes() {
 		r.repos.GetUserRepository(),
 	)
 
+	razorpayRoutes := r.engine.Group("/api/v1/razorpay")
+
 	routes := r.engine.Group("/api/v1/appointment")
 
 	routes.Use(r.middlewares.IsAuthorized())
 
 	routes.POST("/schedule", r.middlewares.UserRole([]constants.UserType{constants.USER}), api.BookAnScheduledAppointment())
+
+	// Razor Pay Payment
+	razorpayRoutes.POST("/webhook/payment_intent", api.ConfirmScheduledAppointmentFromWebhook())
 }
