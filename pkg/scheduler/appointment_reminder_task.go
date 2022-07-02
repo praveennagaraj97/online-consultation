@@ -1,6 +1,7 @@
 package scheduler
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -14,9 +15,11 @@ const (
 	AppointmentReminderTask TasksTypes = "AppointmentReminderTask"
 )
 
-func (s *Scheduler) reminderTask(timer *time.Timer) {
+func (s *Scheduler) appointmenrReminderTask(timer *time.Timer) {
+	fmt.Println("lol")
 	<-timer.C
 	defer timer.Stop()
 
 	// get list of slots having invoke time
+
 }

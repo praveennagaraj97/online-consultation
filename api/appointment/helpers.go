@@ -20,8 +20,6 @@ func (a *AppointmentAPI) sendEmailAndSMSForBooking(ch chan bool, userId *primiti
 		return
 	}
 
-	fmt.Println("Spawned")
-
 	ISTTimeLoc := time.FixedZone("IST", 0)
 	message := fmt.Sprintf("Your appointment has been scheduled for %s", invokeTime.In(ISTTimeLoc).Format(time.RFC1123))
 

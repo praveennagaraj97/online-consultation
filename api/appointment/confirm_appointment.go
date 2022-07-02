@@ -1,6 +1,7 @@
 package appointmentapi
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -122,6 +123,8 @@ func (a *AppointmentAPI) confirmScheduledAppointment(ctx *gin.Context, details *
 		return
 	}
 
+	fmt.Println(apptSheduleDoc.InvokeTime.Time().Format("2006-01-02"), time.Now().Local().Format("2006-01-02"))
+
 	// Schedule if appointment is in current date.
 	if apptSheduleDoc.InvokeTime.Time().Format("2006-01-02") == time.Now().Format("2006-01-02") {
 		if err := a.scheduler.NewSchedule(apptSheduleDoc.InvokeTime.Time(), scheduler.AppointmentReminderTask); err != nil {
@@ -132,9 +135,8 @@ func (a *AppointmentAPI) confirmScheduledAppointment(ctx *gin.Context, details *
 		}
 	}
 
-	var ch chan bool = make(chan bool, 1)
-
-	go a.sendEmailAndSMSForBooking(ch, apptRes.UserId, apptSheduleDoc.InvokeTime.Time())
+	// var ch chan bool = make(chan bool, 1)
+	// go a.sendEmailAndSMSForBooking(ch, apptRes.UserId, apptSheduleDoc.InvokeTime.Time())
 
 	ctx.JSON(http.StatusOK, serialize.Response{
 		StatusCode: http.StatusOK,

@@ -2,46 +2,43 @@ package scheduler
 
 import (
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/praveennagaraj97/online-consultation/app"
 )
 
 type Scheduler struct {
-	conf          *app.ApplicationConfig
-	reminderTasks map[time.Time]*Task
+	conf                     *app.ApplicationConfig
+	appointmentReminderTasks map[time.Time]*Task
 }
 
 func (s *Scheduler) Initialize(conf *app.ApplicationConfig) {
 	s.conf = conf
 
-	s.reminderTasks = make(map[time.Time]*Task, 0)
+	s.appointmentReminderTasks = make(map[time.Time]*Task, 0)
 }
 
 // Used to schedule tasks manually.
 func (s *Scheduler) NewSchedule(invokeTime time.Time, name TasksTypes) error {
 
-	timer := time.NewTimer(time.Until(invokeTime))
-
-	fmt.Println(time.Until(invokeTime))
-
 	if invokeTime.Unix() < time.Now().Unix() {
-		return errors.New("Scheduling time is invalid")
+		return errors.New("scheduling time is invalid")
 	}
+
+	timer := time.NewTimer(time.Until(invokeTime))
 
 	switch name {
 	case AppointmentReminderTask:
-		if s.reminderTasks[invokeTime] != nil {
+		if s.appointmentReminderTasks[invokeTime] != nil {
 			timer.Stop()
 			return nil
 		}
 
-		s.reminderTasks[invokeTime] = &Task{
+		s.appointmentReminderTasks[invokeTime] = &Task{
 			timer: timer,
 		}
 
-		go s.reminderTask(timer)
+		go s.appointmenrReminderTask(timer)
 	default:
 		timer.Stop()
 	}
@@ -50,9 +47,7 @@ func (s *Scheduler) NewSchedule(invokeTime time.Time, name TasksTypes) error {
 }
 
 func (s *Scheduler) Shutdown() {
-
-	for _, value := range s.reminderTasks {
+	for _, value := range s.appointmentReminderTasks {
 		value.timer.Stop()
 	}
-
 }
