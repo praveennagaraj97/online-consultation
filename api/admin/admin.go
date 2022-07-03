@@ -213,6 +213,10 @@ func (a *AdminAPI) ForgotPassword() gin.HandlerFunc {
 		token, err := tokens.GenerateTokenWithExpiryTimeAndType(user.ID.Hex(),
 			time.Now().Local().Add(time.Hour*48).Unix(),
 			"reset-email", "user")
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+			return
+		}
 
 		emailLink := fmt.Sprintf("%s?verifyCode=%s",
 			env.GetEnvVariable("CLIENT_VERIFY_FORGOT_PASSWORD_LINK"), token)
@@ -338,6 +342,10 @@ func (a *AdminAPI) RefreshToken() gin.HandlerFunc {
 		}
 
 		access, refresh, accessTime, err := user.GetAccessAndRefreshToken(true, string(user.Role))
+		if err != nil {
+			api.SendErrorResponse(c, err.Error(), http.StatusUnprocessableEntity, nil)
+			return
+		}
 
 		if err = a.adminRepo.UpdateRefreshToken(&user.ID, refresh); err != nil {
 			api.SendErrorResponse(c, err.Error(), http.StatusBadGateway, nil)
