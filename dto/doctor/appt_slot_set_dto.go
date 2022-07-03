@@ -15,20 +15,19 @@ type AddNewAppointmentSlotSetDTO struct {
 
 	// Input Refs
 	SlotTimeRef []string `json:"slot_time" form:"slot_time"`
-	TimeZone    string   `json:"time_zone" form:"time_zone" bson:"-"`
 }
 
-func (a *AddNewAppointmentSlotSetDTO) Validate() *serialize.ErrorResponse {
+func (a *AddNewAppointmentSlotSetDTO) Validate(timeZone string) *serialize.ErrorResponse {
 
 	errors := map[string]string{}
-	if a.TimeZone == "" {
+	if timeZone == "" {
 		errors["time_zone"] = "Time zone cannot be empty"
 	}
 	if len(a.SlotTimeRef) == 0 {
 		errors["slot_time"] = "Slot time should have atleast one time slot"
 	}
 
-	timeLoc, err := time.LoadLocation(a.TimeZone)
+	timeLoc, err := time.LoadLocation(timeZone)
 	if err != nil {
 		errors["time_zone"] = "Invlaid time zone " + err.Error()
 	}
@@ -60,19 +59,18 @@ type UpdateAppointmentSlotSetDTO struct {
 
 	// Input Refs
 	SlotTimeRef []string `json:"slot_time,omitempty" form:"slot_time,omitempty" bson:"-"`
-	TimeZone    string   `json:"time_zone" form:"time_zone" bson:"-"`
 }
 
-func (a *UpdateAppointmentSlotSetDTO) Validate() *serialize.ErrorResponse {
+func (a *UpdateAppointmentSlotSetDTO) Validate(timeZone string) *serialize.ErrorResponse {
 	errors := map[string]string{}
-	if a.TimeZone == "" {
+	if timeZone == "" {
 		errors["time_zone"] = "Time zone cannot be empty"
 	}
 	if len(a.SlotTimeRef) == 0 {
 		errors["slot_time"] = "Slot time should have atleast one time slot"
 	}
 
-	timeLoc, err := time.LoadLocation(a.TimeZone)
+	timeLoc, err := time.LoadLocation(timeZone)
 	if err != nil {
 		errors["time_zone"] = "Invlaid time zone " + err.Error()
 	}

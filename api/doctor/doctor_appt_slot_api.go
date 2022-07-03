@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/praveennagaraj97/online-consultation/api"
+	"github.com/praveennagaraj97/online-consultation/constants"
 	doctordto "github.com/praveennagaraj97/online-consultation/dto/doctor"
 	doctormodel "github.com/praveennagaraj97/online-consultation/models/doctor"
 	"github.com/praveennagaraj97/online-consultation/serialize"
@@ -43,7 +44,9 @@ func (a *DoctorAPI) AddNewSlotSet() gin.HandlerFunc {
 		}
 		defer ctx.Request.Body.Close()
 
-		if errs := payload.Validate(); errs != nil {
+		timeZone := ctx.Request.Header.Get(constants.TimeZoneHeaderKey)
+
+		if errs := payload.Validate(timeZone); errs != nil {
 			api.SendErrorResponse(ctx, errs.Message, errs.StatusCode, errs.Errors)
 			return
 		}
@@ -177,7 +180,9 @@ func (a *DoctorAPI) UpdateSlotSetById() gin.HandlerFunc {
 		}
 		defer ctx.Request.Body.Close()
 
-		if errs := payload.Validate(); errs != nil {
+		timeZone := ctx.Request.Header.Get(constants.TimeZoneHeaderKey)
+
+		if errs := payload.Validate(timeZone); errs != nil {
 			api.SendErrorResponse(ctx, errs.Message, errs.StatusCode, errs.Errors)
 			return
 		}
