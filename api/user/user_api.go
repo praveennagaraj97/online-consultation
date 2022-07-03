@@ -7,10 +7,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/praveennagaraj97/online-consultation/api"
 	"github.com/praveennagaraj97/online-consultation/app"
-	"github.com/praveennagaraj97/online-consultation/constants"
 	userdto "github.com/praveennagaraj97/online-consultation/dto/user"
 	usermodel "github.com/praveennagaraj97/online-consultation/models/user"
 	"github.com/praveennagaraj97/online-consultation/serialize"
+	"github.com/praveennagaraj97/online-consultation/utils"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	onetimepasswordrepository "github.com/praveennagaraj97/online-consultation/repository/onetimepassword"
@@ -74,10 +74,8 @@ func (a *UserAPI) UpdateUserDetails() gin.HandlerFunc {
 			return
 		}
 
-		timeZone := ctx.Request.Header.Get(constants.TimeZoneHeaderKey)
-
 		if payload.DOBRef != "" {
-			timeLoc, err := time.LoadLocation(timeZone)
+			timeLoc, err := time.LoadLocation(utils.GetTimeZone(ctx))
 			if err != nil {
 				api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
 				return

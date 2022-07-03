@@ -10,6 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gin-gonic/gin"
+	"github.com/praveennagaraj97/online-consultation/constants"
 	"github.com/praveennagaraj97/online-consultation/interfaces"
 	logger "github.com/praveennagaraj97/online-consultation/pkg/log"
 	"go.mongodb.org/mongo-driver/bson"
@@ -89,4 +91,8 @@ func DecodeVerificationID(verification_query_str string) (*primitive.ObjectID, *
 	}
 
 	return &objectId, &phone, nil
+}
+
+func GetTimeZone(ctx *gin.Context) string {
+	return ctx.Request.Header.Get(constants.TimeZoneHeaderKey)
 }

@@ -6,11 +6,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/praveennagaraj97/online-consultation/api"
-	"github.com/praveennagaraj97/online-consultation/constants"
 	userdto "github.com/praveennagaraj97/online-consultation/dto/user"
 	"github.com/praveennagaraj97/online-consultation/interfaces"
 	usermodel "github.com/praveennagaraj97/online-consultation/models/user"
 	"github.com/praveennagaraj97/online-consultation/serialize"
+	"github.com/praveennagaraj97/online-consultation/utils"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -25,9 +25,7 @@ func (a *UserAPI) AddRelative() gin.HandlerFunc {
 
 		defer ctx.Request.Body.Close()
 
-		timeZone := ctx.Request.Header.Get(constants.TimeZoneHeaderKey)
-
-		if err := payload.ValidateRelativeDTO(timeZone); err != nil {
+		if err := payload.ValidateRelativeDTO(utils.GetTimeZone(ctx)); err != nil {
 			api.SendErrorResponse(ctx, err.Message, err.StatusCode, err.Errors)
 			return
 		}
@@ -208,10 +206,8 @@ func (a *UserAPI) UpdateRelativeProfileById() gin.HandlerFunc {
 			}
 		}
 
-		timeZone := ctx.Request.Header.Get(constants.TimeZoneHeaderKey)
-
 		if payload.DOBRef != "" {
-			timeLoc, err := time.LoadLocation(timeZone)
+			timeLoc, err := time.LoadLocation(utils.GetTimeZone(ctx))
 			if err != nil {
 				api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
 				return

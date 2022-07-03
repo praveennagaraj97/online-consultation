@@ -18,6 +18,7 @@ import (
 	"github.com/praveennagaraj97/online-consultation/pkg/tokens"
 	"github.com/praveennagaraj97/online-consultation/pkg/validator"
 	"github.com/praveennagaraj97/online-consultation/serialize"
+	"github.com/praveennagaraj97/online-consultation/utils"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -39,10 +40,8 @@ func (a *UserAPI) Register() gin.HandlerFunc {
 			return
 		}
 
-		timeZone := ctx.Request.Header.Get(constants.TimeZoneHeaderKey)
-
 		// Validate
-		if err := payload.ValidateRegisterDTO(timeZone); err != nil {
+		if err := payload.ValidateRegisterDTO(utils.GetTimeZone(ctx)); err != nil {
 			api.SendErrorResponse(ctx, err.Message, err.StatusCode, err.Errors)
 			return
 		}
