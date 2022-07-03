@@ -9,32 +9,32 @@ import (
 	"github.com/praveennagaraj97/online-consultation/utils"
 )
 
-func (a *DoctorAPI) validateVerifyCode(ctx *gin.Context, verificationId string, phoneNumber interfaces.PhoneType) (error, int) {
+func (a *DoctorAPI) validateVerifyCode(ctx *gin.Context, verificationId string, phoneNumber interfaces.PhoneType) (int, error) {
 	// Check if OTP is verified
 	objectId, phone, err := utils.DecodeVerificationID(verificationId)
 	if err != nil {
-		return err, http.StatusUnprocessableEntity
+		return http.StatusUnprocessableEntity, err
 	}
 
 	otpRef, err := a.otpRepo.FindById(objectId)
 
 	if err != nil {
-		return errors.New("couldn't find any reference to provided verification code"), http.StatusUnprocessableEntity
+		return http.StatusUnprocessableEntity, errors.New("couldn't find any reference to provided verification code")
 	}
 
 	_, refPhoneNumber, _ := utils.DecodeVerificationID(otpRef.VerificationID)
 
 	if !(refPhoneNumber.Code == phoneNumber.Code && phone.Number == phoneNumber.Number) {
-		return errors.New("provided verification ID is invalid"), http.StatusUnprocessableEntity
+		return http.StatusUnprocessableEntity, errors.New("provided verification ID is invalid")
 	}
 
 	if !otpRef.Verified {
-		return errors.New("provided verification ID is not verified"), http.StatusUnprocessableEntity
+		return http.StatusUnprocessableEntity, errors.New("provided verification ID is not verified")
 	}
 
 	if err := a.otpRepo.DeleteById(&otpRef.ID); err != nil {
-		return errors.New("something went wrong"), http.StatusInternalServerError
+		return http.StatusInternalServerError, errors.New("something went wrong")
 	}
 
-	return nil, 0
+	return 0, nil
 }
