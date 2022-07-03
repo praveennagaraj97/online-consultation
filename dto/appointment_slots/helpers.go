@@ -13,6 +13,8 @@ func validateAndGetDates(dates []string) ([]primitive.DateTime, *map[string]stri
 	errs := map[string]string{}
 	var dateList []primitive.DateTime = make([]primitive.DateTime, 0)
 
+	visited := make(map[primitive.DateTime]bool)
+
 	for i := 0; i < len(dates); i++ {
 		t, err := time.Parse("2006-01-02", dates[i])
 		if err != nil {
@@ -28,6 +30,13 @@ func validateAndGetDates(dates []string) ([]primitive.DateTime, *map[string]stri
 		}
 
 		date := primitive.NewDateTimeFromTime(t)
+
+		// Check Duplicates
+		if visited[date] {
+			errs[dates[i]] = "Date is found as duplicate"
+		} else {
+			visited[date] = true
+		}
 
 		dateList = append(dateList, date)
 	}

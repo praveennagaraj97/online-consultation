@@ -104,7 +104,8 @@ func validateSlots(SlotTimeRef []string, timeZone *time.Location) (*serialize.Er
 
 	for i := 0; i < len(SlotTimeRef); i++ {
 
-		t, err := time.ParseInLocation("15:04:05", SlotTimeRef[i], timeZone)
+		// Set Random Date to align time zones
+		t, err := time.ParseInLocation("2006-01-02 15:04:05", "1970-01-01 "+SlotTimeRef[i], timeZone)
 
 		if err != nil {
 			errs["slot_time"] = "Invalid Slot time, " + err.Error()
