@@ -37,3 +37,5 @@ type PaymentFor string
 const (
 	ScheduledAppointment PaymentFor = "scheduled_appointment"
 )
+
+const TimeZoneHeaderKey string = "Time-Zone"

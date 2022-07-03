@@ -19,7 +19,7 @@ type RegisterDTO struct {
 	PhoneNumber    string             `json:"phone_number" form:"phone_number"`
 	Gender         string             `json:"gender" form:"gender"`
 	VerificationId string             `json:"verification_id" form:"verification_id"`
-	DOB            primitive.DateTime `json:"-" form:"-""`
+	DOB            primitive.DateTime `json:"-" form:"-"`
 	DOBRef         string             `json:"date_of_birth" form:"date_of_birth"`
 }
 
@@ -28,13 +28,14 @@ type VerifyCodeDTO struct {
 }
 
 type UpdateUserDTO struct {
-	Name          string `json:"name,omitempty" form:"name,omitempty" bson:"name,omitempty"`
-	Email         string `json:"-" form:"-" bson:"email,omitempty"`
-	PhoneCode     string `json:"-" form:"-" bson:"phone_code,omitempty"`
-	PhoneNumber   string `json:"-" form:"-" bson:"phone_number,omitempty"`
-	DOB           string `json:"date_of_birth,omitempty" form:"date_of_birth,omitempty" bson:"date_of_birth,omitempty"`
-	Gender        string `json:"gender,omitempty" form:"gender,omitempty" bson:"gender,omitempty"`
-	EmailVerified bool   `json:"-" form:"-" bson:"email_verified,omitempty"`
+	Name          string              `json:"name,omitempty" form:"name,omitempty" bson:"name,omitempty"`
+	Email         string              `json:"-" form:"-" bson:"email,omitempty"`
+	PhoneCode     string              `json:"-" form:"-" bson:"phone_code,omitempty"`
+	PhoneNumber   string              `json:"-" form:"-" bson:"phone_number,omitempty"`
+	DOB           *primitive.DateTime `json:"-" form:"-" bson:"date_of_birth,omitempty"`
+	DOBRef        string              `json:"date_of_birth" form:"date_of_birth" bson:"-"`
+	Gender        string              `json:"gender,omitempty" form:"gender,omitempty" bson:"gender,omitempty"`
+	EmailVerified bool                `json:"-" form:"-" bson:"email_verified,omitempty"`
 }
 
 type SignInWithPhoneDTO struct {
@@ -58,11 +59,14 @@ type AddOrEditRelativeDTO struct {
 	Email       string                `json:"email,omitempty" form:"email,omitempty" bson:"email,omitempty"`
 	PhoneCode   string                `json:"phone_code,omitempty" form:"phone_code,omitempty" bson:"phone_code,omitempty"`
 	PhoneNumber string                `json:"phone_number,omitempty" form:"phone_number,omitempty" bson:"phone_number,omitempty"`
-	DateOfBirth string                `json:"date_of_birth,omitempty" form:"date_of_birth,omitempty" bson:"date_of_birth,omitempty"`
+	DateOfBirth *primitive.DateTime   `json:"-" form:"-" bson:"date_of_birth,omitempty"`
 	Gender      string                `json:"gender,omitempty" form:"gender,omitempty" bson:"gender,omitempty"`
 	Relation    string                `json:"relation,omitempty" form:"relation,omitempty" bson:"relation,omitempty"`
 	UserId      *primitive.ObjectID   `json:"-,omitempty" form:"-,omitempty"`
 	Phone       *interfaces.PhoneType `json:"-" form:"-" bson:"phone,omitempty"`
+
+	//
+	DOBRef string `json:"date_of_birth,omitempty" form:"date_of_birth,omitempty" bson:"-"`
 }
 
 type AddOrEditDeliveryAddressDTO struct {
@@ -78,7 +82,7 @@ type AddOrEditDeliveryAddressDTO struct {
 	Phone       *interfaces.PhoneType `form:"-" json:"-" bson:"phone,omitempty"`
 }
 
-func (payload *AddOrEditRelativeDTO) ValidateRelativeDTO() *serialize.ErrorResponse {
+func (payload *AddOrEditRelativeDTO) ValidateRelativeDTO(timeZone string) *serialize.ErrorResponse {
 
 	errors := map[string]string{}
 
@@ -104,6 +108,20 @@ func (payload *AddOrEditRelativeDTO) ValidateRelativeDTO() *serialize.ErrorRespo
 
 	if payload.Relation == "" {
 		errors["relation"] = "Relation cannot be empty"
+	}
+
+	if payload.DOBRef != "" {
+		timeLoc, err := time.LoadLocation(timeZone)
+		if err != nil {
+			errors["time_zone_header"] = "Provided time zone is invalid"
+		}
+		t, err := time.ParseInLocation("2006-01-02", payload.DOBRef, timeLoc)
+		if err != nil {
+			errors["date_of_birth"] = err.Error()
+		} else {
+			dob := primitive.NewDateTimeFromTime(t.UTC())
+			payload.DateOfBirth = &dob
+		}
 	}
 
 	if len(errors) != 0 {
@@ -191,7 +209,7 @@ func (payload *AddOrEditDeliveryAddressDTO) ValidateUserDeliveryAddressDTO() *se
 	return nil
 }
 
-func (payload *RegisterDTO) ValidateRegisterDTO() *serialize.ErrorResponse {
+func (payload *RegisterDTO) ValidateRegisterDTO(timeZone string) *serialize.ErrorResponse {
 
 	errors := map[string]string{}
 
@@ -220,11 +238,15 @@ func (payload *RegisterDTO) ValidateRegisterDTO() *serialize.ErrorResponse {
 	}
 
 	if payload.DOBRef != "" {
-		t, err := time.Parse("2006-01-02", payload.DOBRef)
+		timeLoc, err := time.LoadLocation(timeZone)
+		if err != nil {
+			errors["time_zone_header"] = "Provided time zone is invalid"
+		}
+		t, err := time.ParseInLocation("2006-01-02", payload.DOBRef, timeLoc)
 		if err != nil {
 			errors["date_of_birth"] = err.Error()
 		} else {
-			payload.DOB = primitive.NewDateTimeFromTime(t)
+			payload.DOB = primitive.NewDateTimeFromTime(t.UTC())
 		}
 	}
 

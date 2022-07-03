@@ -6,7 +6,6 @@ import (
 	"time"
 
 	userdto "github.com/praveennagaraj97/online-consultation/dto/user"
-	"github.com/praveennagaraj97/online-consultation/interfaces"
 	usermodel "github.com/praveennagaraj97/online-consultation/models/user"
 	"github.com/praveennagaraj97/online-consultation/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -32,37 +31,14 @@ func (r *UserRepository) InitializeRepository(colln *mongo.Collection) {
 		"EmailIndex", true)
 }
 
-func (r *UserRepository) CreateUser(payload *userdto.RegisterDTO) (*usermodel.UserEntity, error) {
+func (r *UserRepository) CreateUser(doc *usermodel.UserEntity) error {
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
-	// Check if already exists
-	exists := r.checkIfUserExistsWithEmailOrPhone(payload.Email, payload.PhoneNumber, payload.PhoneNumber)
+	_, err := r.colln.InsertOne(ctx, doc)
 
-	if exists {
-		return nil, errors.New("User with given credentials already exist")
-	}
-
-	document := &usermodel.UserEntity{
-		ID:    primitive.NewObjectID(),
-		Name:  payload.Name,
-		Email: payload.Email,
-		PhoneNumber: interfaces.PhoneType{
-			Code:   payload.PhoneCode,
-			Number: payload.PhoneNumber,
-		},
-		DateOfBirth: payload.DOB,
-		Gender:      payload.Gender,
-	}
-
-	_, err := r.colln.InsertOne(ctx, document)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return document, nil
+	return err
 
 }
 
@@ -84,7 +60,7 @@ func (r *UserRepository) UpdateRefreshToken(id *primitive.ObjectID, token string
 
 }
 
-func (r *UserRepository) checkIfUserExistsWithEmailOrPhone(email, number, code string) bool {
+func (r *UserRepository) CheckIfUserExistsWithEmailOrPhone(email, number, code string) bool {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 

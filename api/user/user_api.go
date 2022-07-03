@@ -2,13 +2,16 @@ package userapi
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/praveennagaraj97/online-consultation/api"
 	"github.com/praveennagaraj97/online-consultation/app"
+	"github.com/praveennagaraj97/online-consultation/constants"
 	userdto "github.com/praveennagaraj97/online-consultation/dto/user"
 	usermodel "github.com/praveennagaraj97/online-consultation/models/user"
 	"github.com/praveennagaraj97/online-consultation/serialize"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	onetimepasswordrepository "github.com/praveennagaraj97/online-consultation/repository/onetimepassword"
 	userrepository "github.com/praveennagaraj97/online-consultation/repository/user"
@@ -69,6 +72,24 @@ func (a *UserAPI) UpdateUserDetails() gin.HandlerFunc {
 		if err := ctx.ShouldBind(&payload); err != nil {
 			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
 			return
+		}
+
+		timeZone := ctx.Request.Header.Get(constants.TimeZoneHeaderKey)
+
+		if payload.DOBRef != "" {
+			timeLoc, err := time.LoadLocation(timeZone)
+			if err != nil {
+				api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+				return
+			}
+			t, err := time.ParseInLocation("2006-01-02", payload.DOBRef, timeLoc)
+			if err != nil {
+				api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+				return
+			} else {
+				dateOfBirth := primitive.NewDateTimeFromTime(t.UTC())
+				payload.DOB = &dateOfBirth
+			}
 		}
 
 		userId, err := api.GetUserIdFromContext(ctx)

@@ -2,9 +2,11 @@ package userapi
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/praveennagaraj97/online-consultation/api"
+	"github.com/praveennagaraj97/online-consultation/constants"
 	userdto "github.com/praveennagaraj97/online-consultation/dto/user"
 	"github.com/praveennagaraj97/online-consultation/interfaces"
 	usermodel "github.com/praveennagaraj97/online-consultation/models/user"
@@ -23,7 +25,9 @@ func (a *UserAPI) AddRelative() gin.HandlerFunc {
 
 		defer ctx.Request.Body.Close()
 
-		if err := payload.ValidateRelativeDTO(); err != nil {
+		timeZone := ctx.Request.Header.Get(constants.TimeZoneHeaderKey)
+
+		if err := payload.ValidateRelativeDTO(timeZone); err != nil {
 			api.SendErrorResponse(ctx, err.Message, err.StatusCode, err.Errors)
 			return
 		}
@@ -48,15 +52,33 @@ func (a *UserAPI) AddRelative() gin.HandlerFunc {
 
 		payload.UserId = userId
 
-		res, err := a.relativeRepo.CreateOne(&payload)
+		if exists := a.relativeRepo.CheckIfRelativeExist(payload.Email,
+			interfaces.PhoneType{Code: payload.PhoneCode, Number: payload.PhoneNumber}, payload.UserId); exists {
+			api.SendErrorResponse(ctx, "Relative account with given credentials already exist", http.StatusUnprocessableEntity, nil)
+			return
+		}
 
-		if err != nil {
-			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+		doc := &usermodel.RelativeEntity{
+			ID:    primitive.NewObjectID(),
+			Name:  payload.Name,
+			Email: payload.Email,
+			Phone: interfaces.PhoneType{
+				Code:   payload.PhoneCode,
+				Number: payload.PhoneNumber,
+			},
+			DateOfBirth: *payload.DateOfBirth,
+			Gender:      payload.Gender,
+			Relation:    payload.Relation,
+			UserId:      payload.UserId,
+		}
+
+		if err := a.relativeRepo.CreateOne(doc); err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusInternalServerError, nil)
 			return
 		}
 
 		ctx.JSON(http.StatusCreated, serialize.DataResponse[*usermodel.RelativeEntity]{
-			Data: res,
+			Data: doc,
 			Response: serialize.Response{
 				StatusCode: http.StatusCreated,
 				Message:    "Relative account added successfully",
@@ -183,6 +205,24 @@ func (a *UserAPI) UpdateRelativeProfileById() gin.HandlerFunc {
 			payload.Phone = &interfaces.PhoneType{
 				Code:   payload.PhoneCode,
 				Number: payload.PhoneNumber,
+			}
+		}
+
+		timeZone := ctx.Request.Header.Get(constants.TimeZoneHeaderKey)
+
+		if payload.DOBRef != "" {
+			timeLoc, err := time.LoadLocation(timeZone)
+			if err != nil {
+				api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+				return
+			}
+			t, err := time.ParseInLocation("2006-01-02", payload.DOBRef, timeLoc)
+			if err != nil {
+				api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+				return
+			} else {
+				dateOfBirth := primitive.NewDateTimeFromTime(t.UTC())
+				payload.DateOfBirth = &dateOfBirth
 			}
 		}
 

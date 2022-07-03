@@ -10,7 +10,7 @@ type RelativeEntity struct {
 	Name        string               `json:"name" bson:"name"`
 	Email       string               `json:"email" bson:"email"`
 	Phone       interfaces.PhoneType `json:"phone" bson:"phone"`
-	DateOfBirth string               `json:"date_of_birth" bson:"date_of_birth"`
+	DateOfBirth primitive.DateTime   `json:"date_of_birth" bson:"date_of_birth"`
 	Gender      string               `json:"gender" bson:"gender"`
 	Relation    string               `json:"relation" bson:"relation"`
 	UserId      *primitive.ObjectID  `json:"-" bson:"user_id"`

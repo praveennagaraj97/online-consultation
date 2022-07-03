@@ -31,8 +31,18 @@ func (a *UserAPI) Register() gin.HandlerFunc {
 		}
 		defer ctx.Request.Body.Close()
 
+		// Check if already exists
+		exists := a.userRepo.CheckIfUserExistsWithEmailOrPhone(payload.Email, payload.PhoneNumber, payload.PhoneNumber)
+
+		if exists {
+			api.SendErrorResponse(ctx, "User with given credentials already exist", http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		timeZone := ctx.Request.Header.Get(constants.TimeZoneHeaderKey)
+
 		// Validate
-		if err := payload.ValidateRegisterDTO(); err != nil {
+		if err := payload.ValidateRegisterDTO(timeZone); err != nil {
 			api.SendErrorResponse(ctx, err.Message, err.StatusCode, err.Errors)
 			return
 		}
@@ -45,8 +55,20 @@ func (a *UserAPI) Register() gin.HandlerFunc {
 			return
 		}
 
+		document := &usermodel.UserEntity{
+			ID:    primitive.NewObjectID(),
+			Name:  payload.Name,
+			Email: payload.Email,
+			PhoneNumber: interfaces.PhoneType{
+				Code:   payload.PhoneCode,
+				Number: payload.PhoneNumber,
+			},
+			DateOfBirth: payload.DOB,
+			Gender:      payload.Gender,
+		}
+
 		// Store to database
-		res, err := a.userRepo.CreateUser(&payload)
+		err := a.userRepo.CreateUser(document)
 		if err != nil {
 			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
 			return
@@ -58,9 +80,9 @@ func (a *UserAPI) Register() gin.HandlerFunc {
 			shouldExp = false
 		}
 
-		access, refresh, accessTime, err := res.GetAccessAndRefreshToken(!shouldExp)
+		access, refresh, accessTime, err := document.GetAccessAndRefreshToken(!shouldExp)
 
-		a.userRepo.UpdateRefreshToken(&res.ID, refresh)
+		a.userRepo.UpdateRefreshToken(&document.ID, refresh)
 
 		// Set Access Token
 		ctx.SetCookie(string(constants.AUTH_TOKEN),
@@ -77,15 +99,20 @@ func (a *UserAPI) Register() gin.HandlerFunc {
 			return
 		}
 
-		token, err := tokens.GenerateTokenWithExpiryTimeAndType(res.ID.Hex(),
+		token, err := tokens.GenerateTokenWithExpiryTimeAndType(document.ID.Hex(),
 			time.Now().Local().Add(time.Hour*48).Unix(),
 			"verify_email", "user")
+
+		if err != nil {
+			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, nil)
+			return
+		}
 
 		emailLink := fmt.Sprintf("%s?verifyCode=%s",
 			env.GetEnvVariable("CLIENT_VERIFY_EMAIL_LINK"), token)
 
-		td := mailer.GetRegisterEmailTemplateData(res.Name, emailLink)
-		if err = a.appConf.EmailClient.SendNoReplyMail([]string{res.Email},
+		td := mailer.GetRegisterEmailTemplateData(document.Name, emailLink)
+		if err = a.appConf.EmailClient.SendNoReplyMail([]string{document.Email},
 			"Welcome to Online Consultation", "verify-email",
 			"base", td); err != nil {
 			log.Println("Register email failed to send")
@@ -95,7 +122,7 @@ func (a *UserAPI) Register() gin.HandlerFunc {
 			AccessToken:  access,
 			RefreshToken: refresh,
 			DataResponse: serialize.DataResponse[*usermodel.UserEntity]{
-				Data: res,
+				Data: document,
 				Response: serialize.Response{
 					StatusCode: http.StatusCreated,
 					Message:    "Registered successfully",

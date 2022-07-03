@@ -44,39 +44,17 @@ func (r *UserRelativesRepository) InitializeRepository(colln *mongo.Collection) 
 		"UserIdandDocIdIndex", false)
 }
 
-func (r *UserRelativesRepository) CreateOne(payload *userdto.AddOrEditRelativeDTO) (*usermodel.RelativeEntity, error) {
-
-	if exists := r.checkIfRelativeExist(payload.Email,
-		interfaces.PhoneType{Code: payload.PhoneCode, Number: payload.PhoneNumber}, payload.UserId); exists {
-		return nil, errors.New("Relative account with given credentials already exist")
-	}
+func (r *UserRelativesRepository) CreateOne(doc *usermodel.RelativeEntity) error {
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
-	doc := &usermodel.RelativeEntity{
-		ID:    primitive.NewObjectID(),
-		Name:  payload.Name,
-		Email: payload.Email,
-		Phone: interfaces.PhoneType{
-			Code:   payload.PhoneCode,
-			Number: payload.PhoneNumber,
-		},
-		DateOfBirth: payload.DateOfBirth,
-		Gender:      payload.Gender,
-		Relation:    payload.Relation,
-		UserId:      payload.UserId,
-	}
-
-	if _, err := r.colln.InsertOne(ctx, doc); err != nil {
-		return nil, err
-	}
-
-	return doc, nil
+	_, err := r.colln.InsertOne(ctx, doc)
+	return err
 
 }
 
-func (r *UserRelativesRepository) checkIfRelativeExist(email string, phone interfaces.PhoneType, UserId *primitive.ObjectID) bool {
+func (r *UserRelativesRepository) CheckIfRelativeExist(email string, phone interfaces.PhoneType, UserId *primitive.ObjectID) bool {
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
