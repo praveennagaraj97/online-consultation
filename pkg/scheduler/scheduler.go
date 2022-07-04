@@ -2,20 +2,25 @@ package scheduler
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
-	"github.com/praveennagaraj97/online-consultation/app"
+	appointmentrepository "github.com/praveennagaraj97/online-consultation/repository/appointment"
 )
 
 type Scheduler struct {
-	conf                     *app.ApplicationConfig
 	appointmentReminderTasks map[time.Time]*Task
+
+	apptScheduledRepo *appointmentrepository.AppointmentScheduleReminderRepository
 }
 
-func (s *Scheduler) Initialize(conf *app.ApplicationConfig) {
-	s.conf = conf
+func (s *Scheduler) Initialize() {
 
 	s.appointmentReminderTasks = make(map[time.Time]*Task, 0)
+}
+
+func (s *Scheduler) InitializeAppointmentRemainderPersistRepo(apptScheduledRepo *appointmentrepository.AppointmentScheduleReminderRepository) {
+	s.apptScheduledRepo = apptScheduledRepo
 }
 
 // Used to schedule tasks manually.
@@ -38,7 +43,7 @@ func (s *Scheduler) NewSchedule(invokeTime time.Time, name TasksTypes) error {
 			timer: timer,
 		}
 
-		go s.appointmenrReminderTask(timer)
+		go s.appointmentReminderTask(timer, s.appointmentReminderTasks, invokeTime)
 	default:
 		timer.Stop()
 	}
@@ -49,5 +54,16 @@ func (s *Scheduler) NewSchedule(invokeTime time.Time, name TasksTypes) error {
 func (s *Scheduler) Shutdown() {
 	for _, value := range s.appointmentReminderTasks {
 		value.timer.Stop()
+	}
+}
+
+func (s *Scheduler) StartScheduler(loopEvery time.Duration) {
+	t := time.NewTicker(loopEvery)
+
+	select {
+	case <-t.C:
+		fmt.Println("Get Todays reminders and assign to cron job")
+	default:
+		t.Stop()
 	}
 }

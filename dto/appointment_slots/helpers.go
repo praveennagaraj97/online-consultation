@@ -108,7 +108,7 @@ func skipDatesMap(days []string) (map[time.Weekday]bool, error) {
 			skipMap[time.Friday] = true
 
 		default:
-			err = errors.New("Provided excluded day is invalid")
+			err = errors.New("provided excluded day is invalid")
 		}
 	}
 

@@ -2,7 +2,10 @@ package scheduler
 
 import (
 	"fmt"
+	"log"
 	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type Task struct {
@@ -15,11 +18,21 @@ const (
 	AppointmentReminderTask TasksTypes = "AppointmentReminderTask"
 )
 
-func (s *Scheduler) appointmenrReminderTask(timer *time.Timer) {
-	fmt.Println("lol")
-	<-timer.C
+// Get
+func (s *Scheduler) appointmentReminderTask(timer *time.Timer, appointmentReminderTasks map[time.Time]*Task, invokeTime time.Time) {
+	defer delete(appointmentReminderTasks, invokeTime)
 	defer timer.Stop()
+	<-timer.C
 
-	// get list of slots having invoke time
+	fmt.Println("Reminder sent")
+
+	invokeT := primitive.NewDateTimeFromTime(invokeTime)
+
+	results, err := s.apptScheduledRepo.FindAllByInvokeTime(&invokeT)
+	if err != nil {
+		log.Default().Println(err.Error())
+	}
+
+	fmt.Println(results)
 
 }

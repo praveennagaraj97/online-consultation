@@ -17,6 +17,7 @@ func (r *Router) appointmentSlotsRoutes() {
 
 	doctorRoutes.POST("", api.AddNewSlots())
 	doctorRoutes.GET(":id", api.GetAppointmentSlotById())
+	doctorRoutes.GET("", api.GetAppointmentSlotsByDocIdAndDate())
 
 	routes.GET(":doctor_id", api.GetAppointmentSlotsByDocIdAndDate())
 

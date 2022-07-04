@@ -15,11 +15,11 @@ import (
 
 type LanguageAPI struct {
 	lngRepo *languagerepo.LanguageRepository
-	appCong *app.ApplicationConfig
+	appConf *app.ApplicationConfig
 }
 
 func (a *LanguageAPI) Initialize(lngrepo *languagerepo.LanguageRepository, conf *app.ApplicationConfig) {
-	a.appCong = conf
+	a.appConf = conf
 	a.lngRepo = lngrepo
 
 }

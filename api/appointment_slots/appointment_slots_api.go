@@ -124,11 +124,22 @@ func (a *AppointmentSlotsAPI) GetAppointmentSlotById() gin.HandlerFunc {
 func (a *AppointmentSlotsAPI) GetAppointmentSlotsByDocIdAndDate() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		id := ctx.Param("doctor_id")
+		var docId *primitive.ObjectID
+		var err error
 
-		docId, err := primitive.ObjectIDFromHex(id)
-		if err != nil {
-			api.SendErrorResponse(ctx, "Doctor Id should be valid primitive ObjectID", http.StatusUnprocessableEntity, nil)
-			return
+		if id != "" {
+			docID, err := primitive.ObjectIDFromHex(id)
+			docId = &docID
+			if err != nil {
+				api.SendErrorResponse(ctx, "Doctor Id should be valid primitive ObjectID", http.StatusUnprocessableEntity, nil)
+				return
+			}
+		} else {
+			docId, err = api.GetUserIdFromContext(ctx)
+			if err != nil {
+				api.SendErrorResponse(ctx, err.Error(), http.StatusInternalServerError, nil)
+				return
+			}
 		}
 
 		dateQuery := ctx.Query("date")
@@ -145,7 +156,7 @@ func (a *AppointmentSlotsAPI) GetAppointmentSlotsByDocIdAndDate() gin.HandlerFun
 
 		primitiveDate := primitive.NewDateTimeFromTime(date)
 
-		res, err := a.repo.FindByDoctorIdAndDate(&docId, &primitiveDate)
+		res, err := a.repo.FindByDoctorIdAndDate(docId, &primitiveDate)
 		if err != nil {
 			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, &map[string]string{
 				"reason": err.Error(),

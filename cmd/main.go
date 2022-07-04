@@ -6,6 +6,7 @@ import (
 	awspkg "github.com/praveennagaraj97/online-consultation/pkg/aws"
 	mailer "github.com/praveennagaraj97/online-consultation/pkg/email"
 	"github.com/praveennagaraj97/online-consultation/pkg/env"
+	"github.com/praveennagaraj97/online-consultation/pkg/scheduler"
 	twiliopkg "github.com/praveennagaraj97/online-consultation/pkg/sms/twilio"
 	stripepayment "github.com/praveennagaraj97/online-consultation/pkg/stripe"
 	"github.com/praveennagaraj97/online-consultation/router"
@@ -27,24 +28,29 @@ func main() {
 		},
 	}
 
-	emailClient := mailer.Mailer{}
-	emailClient.Initialize()
+	// Email Client
+	app.EmailClient = &mailer.Mailer{}
+	app.EmailClient.Initialize()
 
-	app.EmailClient = &emailClient
 	// Initialize Database
 	app.MongoClient = db.InitializeMongoDatabase(&app.DB.MONGO_URI)
 
-	awsPkg := awspkg.AWSConfiguration{}
-	awsPkg.Initialize()
-	app.AwsUtils = &awsPkg
+	// AWS Utility Package
+	app.AwsUtils = &awspkg.AWSConfiguration{}
+	app.AwsUtils.Initialize()
 
-	// Initialize Twilio SMS Package
+	// Initialize Twilio SMS Package | Global instance is not available!
 	twiliopkg.Initialize()
 
 	// Stripe Package
 	stripepayment.Initialize()
 
+	// Scheduler Package
+	app.Scheduler = &scheduler.Scheduler{}
+	app.Scheduler.Initialize()
+
 	// Start the server
 	r := router.Router{}
 	r.ListenAndServe(app)
+
 }

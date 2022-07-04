@@ -13,7 +13,6 @@ import (
 	appointmentmodel "github.com/praveennagaraj97/online-consultation/models/appointment"
 	consultationmodel "github.com/praveennagaraj97/online-consultation/models/consultation"
 	razorpaypayment "github.com/praveennagaraj97/online-consultation/pkg/razorpay"
-	"github.com/praveennagaraj97/online-consultation/pkg/scheduler"
 	appointmentrepository "github.com/praveennagaraj97/online-consultation/repository/appointment"
 	appointmentslotsrepo "github.com/praveennagaraj97/online-consultation/repository/appointment_slots"
 	consultationrepository "github.com/praveennagaraj97/online-consultation/repository/consultation"
@@ -30,7 +29,6 @@ type AppointmentAPI struct {
 	rltvRepo         *userrepository.UserRelativesRepository
 	userRepo         *userrepository.UserRepository
 	apptReminderRepo *appointmentrepository.AppointmentScheduleReminderRepository
-	scheduler        *scheduler.Scheduler
 }
 
 func (a *AppointmentAPI) Initialize(conf *app.ApplicationConfig,
@@ -50,9 +48,7 @@ func (a *AppointmentAPI) Initialize(conf *app.ApplicationConfig,
 	a.userRepo = userRepo
 
 	// Task Scheduler
-	a.scheduler = &scheduler.Scheduler{}
-	a.scheduler.Initialize(a.conf)
-
+	a.conf.Scheduler.InitializeAppointmentRemainderPersistRepo(apptReminderRepo)
 }
 
 // Takes input and create payment intent
