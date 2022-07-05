@@ -12,19 +12,29 @@ type Task struct {
 	timer *time.Timer
 }
 
-type TasksTypes string
-
 const (
 	AppointmentReminderTask TasksTypes = "AppointmentReminderTask"
 )
 
+func (s *Scheduler) scheduleUpcomingAppointmentReminders(apptReminderChan chan bool) {
+
+	t := time.NewTicker(time.Until(getNextDateWithZeroTime()))
+	s.jobs["appointment_reminder_job"] = t
+
+	for range t.C {
+		nextDate := getNextDateWithZeroTime()
+		t.Reset(time.Until(nextDate))
+
+	}
+
+	apptReminderChan <- true
+
+}
+
 // Get
 func (s *Scheduler) appointmentReminderTask(timer *time.Timer, appointmentReminderTasks map[time.Time]*Task, invokeTime time.Time) {
-	defer delete(appointmentReminderTasks, invokeTime)
-	defer timer.Stop()
-	<-timer.C
 
-	fmt.Println("Reminder sent")
+	<-timer.C
 
 	invokeT := primitive.NewDateTimeFromTime(invokeTime)
 
@@ -34,5 +44,11 @@ func (s *Scheduler) appointmentReminderTask(timer *time.Timer, appointmentRemind
 	}
 
 	fmt.Println(results)
+	if timer.Stop() {
+		delete(appointmentReminderTasks, invokeTime)
+	} else {
+		<-timer.C
+		timer.Stop()
+	}
 
 }

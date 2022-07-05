@@ -1,6 +1,8 @@
 .env
 .env.prod
 
+.scratch
+
 /tmp
 
 

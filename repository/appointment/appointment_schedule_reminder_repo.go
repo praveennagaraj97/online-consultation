@@ -38,12 +38,31 @@ func (r *AppointmentScheduleReminderRepository) DeleteById(id *primitive.ObjectI
 
 }
 
-// For Internal Use
+// For Internal Use | Find AllReminders By Invoke Time
 func (r *AppointmentScheduleReminderRepository) FindAllByInvokeTime(invoke_time *primitive.DateTime) ([]appointmentmodel.AppointmentScheduleTaskEntity, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
 	cur, err := r.colln.Find(ctx, bson.M{"invoke_time": invoke_time})
+	if err != nil {
+		return nil, err
+	}
+
+	var results []appointmentmodel.AppointmentScheduleTaskEntity
+
+	if err := cur.All(context.TODO(), &results); err != nil {
+		return nil, err
+	}
+
+	return results, nil
+}
+
+// For Internal Use | Get All By date
+func (r *AppointmentScheduleReminderRepository) FindAllByDate(date *primitive.DateTime) ([]appointmentmodel.AppointmentScheduleTaskEntity, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	cur, err := r.colln.Find(ctx, bson.M{"date": date})
 	if err != nil {
 		return nil, err
 	}

@@ -49,6 +49,7 @@ func (a *AppointmentAPI) Initialize(conf *app.ApplicationConfig,
 
 	// Task Scheduler
 	a.conf.Scheduler.InitializeAppointmentRemainderPersistRepo(apptReminderRepo)
+
 }
 
 // Takes input and create payment intent

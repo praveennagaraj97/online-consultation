@@ -111,7 +111,8 @@ func (a *AppointmentAPI) confirmScheduledAppointment(ctx *gin.Context, details *
 	// Create schedule reminder Docs
 	apptSheduleDoc := appointmentmodel.AppointmentScheduleTaskEntity{
 		ID:            primitive.NewObjectID(),
-		InvokeTime:    invokeTime,
+		InvokeTime:    &invokeTime,
+		Date:          appSlotRes.Date,
 		CreatedAt:     primitive.NewDateTimeFromTime(time.Now()),
 		AppointmentId: &apptRes.ID,
 	}

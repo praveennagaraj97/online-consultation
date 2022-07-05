@@ -3,20 +3,36 @@ package scheduler
 import (
 	"errors"
 	"fmt"
+	"runtime"
 	"time"
 
 	appointmentrepository "github.com/praveennagaraj97/online-consultation/repository/appointment"
 )
 
+type TasksTypes string
+
 type Scheduler struct {
 	appointmentReminderTasks map[time.Time]*Task
+	apptScheduledRepo        *appointmentrepository.AppointmentScheduleReminderRepository
 
-	apptScheduledRepo *appointmentrepository.AppointmentScheduleReminderRepository
+	jobs map[string]*time.Ticker
 }
 
 func (s *Scheduler) Initialize() {
 
 	s.appointmentReminderTasks = make(map[time.Time]*Task, 0)
+	s.jobs = make(map[string]*time.Ticker, 0)
+
+	apptReminderChan := make(chan bool, 1)
+	go s.scheduleUpcomingAppointmentReminders(apptReminderChan)
+
+	select {
+	case <-apptReminderChan:
+		close(apptReminderChan)
+	default:
+		close(apptReminderChan)
+	}
+
 }
 
 func (s *Scheduler) InitializeAppointmentRemainderPersistRepo(apptScheduledRepo *appointmentrepository.AppointmentScheduleReminderRepository) {
@@ -29,6 +45,8 @@ func (s *Scheduler) NewSchedule(invokeTime time.Time, name TasksTypes) error {
 	if invokeTime.Unix() < time.Now().Unix() {
 		return errors.New("scheduling time is invalid")
 	}
+
+	fmt.Printf("Number of open channels %v\n", runtime.NumGoroutine())
 
 	timer := time.NewTimer(time.Until(invokeTime))
 
@@ -53,17 +71,10 @@ func (s *Scheduler) NewSchedule(invokeTime time.Time, name TasksTypes) error {
 
 func (s *Scheduler) Shutdown() {
 	for _, value := range s.appointmentReminderTasks {
-		value.timer.Stop()
-	}
-}
-
-func (s *Scheduler) StartScheduler(loopEvery time.Duration) {
-	t := time.NewTicker(loopEvery)
-
-	select {
-	case <-t.C:
-		fmt.Println("Get Todays reminders and assign to cron job")
-	default:
-		t.Stop()
+		if !value.timer.Stop() {
+			// Drain and stop
+			<-value.timer.C
+			value.timer.Stop()
+		}
 	}
 }

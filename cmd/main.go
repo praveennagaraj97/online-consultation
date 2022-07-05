@@ -48,6 +48,7 @@ func main() {
 	// Scheduler Package
 	app.Scheduler = &scheduler.Scheduler{}
 	app.Scheduler.Initialize()
+	defer app.Scheduler.Shutdown()
 
 	// Start the server
 	r := router.Router{}
