@@ -3,6 +3,7 @@ package doctorapi
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/praveennagaraj97/online-consultation/api"
@@ -246,15 +247,28 @@ func (a *DoctorAPI) FindAllDoctors(showInActive bool) gin.HandlerFunc {
 
 		// Search Options
 		var searchOpts *bson.M = nil
-		var countSearch *bson.M = nil
 		name := ctx.Query("name")
+
+		// Doctor Appointments Availability on particular Date
+		var slotsExistsOn *primitive.DateTime = nil
+		availableOn := ctx.Query("available_on")
 
 		if name != "" {
 			searchOpts = &bson.M{"$text": bson.M{"$search": name}}
-			countSearch = &bson.M{"$search": name}
 		}
 
-		res, err := a.repo.FindAll(pgOpts, fltrOpts, &sortOpts, ketSortBy, searchOpts, showInActive)
+		if availableOn != "" {
+			t, err := time.Parse("2006-01-02", availableOn)
+			if err != nil {
+				api.SendErrorResponse(ctx, err.Error(), http.StatusBadGateway, nil)
+				return
+			}
+
+			slotDate := primitive.NewDateTimeFromTime(t)
+			slotsExistsOn = &slotDate
+		}
+
+		res, err := a.repo.FindAll(pgOpts, fltrOpts, &sortOpts, ketSortBy, searchOpts, showInActive, slotsExistsOn)
 		if err != nil {
 			api.SendErrorResponse(ctx, "Something went wrong", http.StatusBadRequest, &map[string]string{
 				"reason": err.Error(),
@@ -269,7 +283,7 @@ func (a *DoctorAPI) FindAllDoctors(showInActive bool) gin.HandlerFunc {
 		var lastId *primitive.ObjectID
 
 		if pgOpts.PaginateId == nil {
-			docCount, err = a.repo.GetDocumentsCount(fltrOpts, countSearch, showInActive)
+			docCount, err = a.repo.GetDocumentsCount(fltrOpts, searchOpts, showInActive, slotsExistsOn)
 			if err != nil {
 				api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, &map[string]string{
 					"reason": err.Error(),

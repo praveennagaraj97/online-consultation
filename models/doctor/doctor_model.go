@@ -29,7 +29,7 @@ type DoctorEntity struct {
 	ConsultationType  string                                      `json:"consultation_type,omitempty" bson:"consultation_type,omitempty"`
 	Hospital          *hospitalmodel.HospitalEntity               `json:"hospital,omitempty" bson:"hospital,omitempty"`
 	SpokenLanguages   []languagesmodel.LanguageEntity             `json:"spoken_languages,omitempty" bson:"spoken_languages,omitempty"`
-	NextAvailableSlot *appointmentslotmodel.AppointmentSlotEntity `json:"next_available_slot" bson:"next_available_slot"`
+	NextAvailableSlot *appointmentslotmodel.AppointmentSlotEntity `json:"next_available_slot" bson:"next_available_slot,omitempty"`
 
 	// reference fields
 	ConsultationTypeId *primitive.ObjectID  `json:"-" bson:"consultation_type_id"`

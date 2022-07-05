@@ -39,7 +39,7 @@ func (r *DoctorRepository) Initialize(colln *mongo.Collection) {
 	utils.CreateIndex(colln, bson.D{{Key: "hospital_id", Value: 1}}, "HospitalIndex", false)
 	utils.CreateIndex(colln, bson.D{{Key: "experience", Value: 1}}, "ExperienceIndex", false)
 	utils.CreateIndex(colln, bson.D{{Key: "is_active", Value: 1}}, "AccountActiveStatusIndex", false)
-
+	utils.CreateIndex(colln, bson.D{{Key: "languages_ids", Value: 1}}, "SpokenLanguagesIndex", false)
 }
 
 func (r *DoctorRepository) CreateOne(doc *doctormodel.DoctorEntity) error {
@@ -234,7 +234,7 @@ func (r *DoctorRepository) FindOne(id *primitive.ObjectID,
 		return &result[0], nil
 	}
 
-	return nil, errors.New("Couldn't find any doctor")
+	return nil, errors.New("couldn't find any doctor")
 
 }
 
@@ -253,15 +253,49 @@ func (r *DoctorRepository) FindAll(pgOpts *api.PaginationOptions,
 	srtOpts *map[string]int8,
 	keySortBy string,
 	searchOpts *bson.M,
-	showInActive bool) ([]doctormodel.DoctorEntity, error) {
+	showInActive bool,
+	slotsExistsOn *primitive.DateTime,
+) ([]doctormodel.DoctorEntity, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
 	pipeline := mongo.Pipeline{}
 
-	// Search Match
+	// Filter Doctor By Appointment Slot Availability
+	if slotsExistsOn != nil {
+		apptAvailLookup := bson.D{{Key: "$lookup", Value: bson.M{
+			"from":         "appointment_slot",
+			"localField":   "_id",
+			"foreignField": "doctor_id",
+			"as":           "slot",
+			"pipeline": bson.A{
+				bson.M{"$match": bson.M{
+					"$and": bson.A{
+						bson.M{"is_available": true},
+						bson.M{"date": slotsExistsOn},
+					},
+				}},
+				bson.M{"$limit": 1},
+			},
+		}}}
 
+		// Filter doctors having slots
+		apptAvailMatch := bson.D{{Key: "$match", Value: bson.M{
+			"$expr": bson.M{
+				"$gt": bson.A{bson.M{"$size": "$slot"}, 0},
+			},
+		}}}
+
+		// Map the available slot to next available field
+		apptAvailAdddFields := bson.D{{Key: "$addFields", Value: bson.M{
+			"next_available_slot": "$slot",
+		}}}
+
+		pipeline = append(pipeline, apptAvailLookup, apptAvailMatch, apptAvailAdddFields)
+	}
+
+	// Search Match
 	if searchOpts != nil {
 		pipeline = append(pipeline, bson.D{{Key: "$match", Value: *searchOpts}})
 	}
@@ -336,27 +370,31 @@ func (r *DoctorRepository) FindAll(pgOpts *api.PaginationOptions,
 	}}}
 	pipeline = append(pipeline, setImagePrefixPipe, setBlurImagePrefixPipe, resetNullImagePipe)
 
-	// Next Available Slot
-	nextAvailableLookUp := bson.D{{Key: "$lookup", Value: bson.M{
-		"from":         "appointment_slot",
-		"localField":   "_id",
-		"foreignField": "doctor_id",
-		"as":           "next_available_slot",
-		"pipeline": bson.A{
-			bson.M{"$match": bson.M{"$and": bson.A{
-				bson.M{"is_available": true},
-				bson.M{"start": bson.M{"$gt": primitive.NewDateTimeFromTime(time.Now())}},
-			}}},
-			bson.M{"$limit": 1},
-		},
-	}}}
+	if slotsExistsOn == nil {
+		// Next Available Slot
+		nextAvailableLookUp := bson.D{{Key: "$lookup", Value: bson.M{
+			"from":         "appointment_slot",
+			"localField":   "_id",
+			"foreignField": "doctor_id",
+			"as":           "next_available_slot",
+			"pipeline": bson.A{
+				bson.M{"$match": bson.M{"$and": bson.A{
+					bson.M{"is_available": true},
+					bson.M{"start": bson.M{"$gt": primitive.NewDateTimeFromTime(time.Now())}},
+				}}},
+				bson.M{"$limit": 1},
+			},
+		}}}
+
+		pipeline = append(pipeline, nextAvailableLookUp)
+	}
 
 	unwindNextAvailableSlot := bson.D{{Key: "$unwind", Value: bson.M{
 		"path":                       "$next_available_slot",
 		"preserveNullAndEmptyArrays": true,
 	}}}
 
-	pipeline = append(pipeline, nextAvailableLookUp, unwindNextAvailableSlot)
+	pipeline = append(pipeline, unwindNextAvailableSlot)
 
 	cur, err := r.colln.Aggregate(ctx, pipeline)
 
@@ -376,25 +414,86 @@ func (r *DoctorRepository) FindAll(pgOpts *api.PaginationOptions,
 
 }
 
-func (r *DoctorRepository) GetDocumentsCount(filters *map[string]primitive.M, searchOpts *bson.M, showInActive bool) (int64, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+// Is Called only first first page.
+func (r *DoctorRepository) GetDocumentsCount(
+	fltrOpts *map[string]primitive.M,
+	searchOpts *bson.M,
+	showInActive bool,
+	slotsExistsOn *primitive.DateTime,
+) (int64, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
-	var fltrs map[string]primitive.M = make(map[string]primitive.M, 0)
+	pipeline := mongo.Pipeline{}
 
-	if searchOpts != nil {
-		fltrs["$text"] = *searchOpts
+	// Filter Doctor By Appointment Slot Availability
+	if slotsExistsOn != nil {
+		apptAvailLookup := bson.D{{Key: "$lookup", Value: bson.M{
+			"from":         "appointment_slot",
+			"localField":   "_id",
+			"foreignField": "doctor_id",
+			"as":           "slot",
+			"pipeline": bson.A{
+				bson.M{"$match": bson.M{
+					"$and": bson.A{
+						bson.M{"is_available": true},
+						bson.M{"date": slotsExistsOn},
+					},
+				}},
+				bson.M{"$limit": 1},
+			},
+		}}}
+
+		// Filter doctors having slots
+		apptAvailMatch := bson.D{{Key: "$match", Value: bson.M{
+			"$expr": bson.M{
+				"$gt": bson.A{bson.M{"$size": "$slot"}, 0},
+			},
+		}}}
+
+		// Map the available slot to next available field
+		apptAvailAdddFields := bson.D{{Key: "$addFields", Value: bson.M{
+			"next_available_slot": "$slot",
+		}}}
+
+		pipeline = append(pipeline, apptAvailLookup, apptAvailMatch, apptAvailAdddFields)
 	}
 
-	for key, value := range *filters {
-		fltrs[key] = value
+	// Search Match
+	if searchOpts != nil {
+		pipeline = append(pipeline, bson.D{{Key: "$match", Value: *searchOpts}})
+	}
+
+	// Filter Options
+	if len(*fltrOpts) != 0 {
+		fltr := bson.D{{Key: "$match", Value: *fltrOpts}}
+		pipeline = append(pipeline, fltr)
 	}
 
 	if !showInActive {
-		fltrs["is_active"] = bson.M{"$eq": true}
+		pipeline = append(pipeline, bson.D{{Key: "$match", Value: bson.M{"is_active": true}}})
 	}
 
-	return r.colln.CountDocuments(ctx, fltrs)
+	countPipe := bson.D{{Key: "$count", Value: "total"}}
+	pipeline = append(pipeline, countPipe)
+
+	cur, err := r.colln.Aggregate(ctx, pipeline)
+	if err != nil {
+		return 0, err
+	}
+
+	var results []struct {
+		Total int64 `bson:"total"`
+	}
+
+	cur.All(context.TODO(), &results)
+	defer cur.Close(context.TODO())
+	if len(results) > 0 {
+		return results[0].Total, nil
+	}
+
+	return 0, nil
+
 }
 
 func (r *DoctorRepository) UpdateRefreshToken(id *primitive.ObjectID, token string) error {
