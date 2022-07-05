@@ -45,10 +45,12 @@ func ParseFilterByOptions(c *gin.Context) *map[string]bson.M {
 	filterKeys := c.Request.URL.Query()
 
 	for key := range filterKeys {
+
 		// ignore sort and pagination keys.
 		if key == "sort" || key == "per_page" || key == "page_num" || key == "paginate_id" {
 			continue
 		}
+
 		filterBy := filterParamsBinder(key)
 		if len(filterBy) > 0 && contains(filterBy[1]) {
 			var filterValue interface{} = filterKeys.Get(key)
@@ -58,6 +60,8 @@ func ParseFilterByOptions(c *gin.Context) *map[string]bson.M {
 			if err == nil {
 				filterValue = objectId
 			} else {
+				// Array In Operator Parse
+
 				// Number Parse
 				val, err := strconv.Atoi(filterKeys.Get(key))
 				if err == nil {
@@ -71,7 +75,13 @@ func ParseFilterByOptions(c *gin.Context) *map[string]bson.M {
 				}
 			}
 
-			opts[filterBy[0]] = bson.M{fmt.Sprintf("$%s", filterBy[1]): filterValue}
+			operator := filterBy[1]
+
+			if operator == "in" {
+				filterValue = []interface{}{filterValue}
+			}
+
+			opts[filterBy[0]] = bson.M{fmt.Sprintf("$%s", operator): filterValue}
 		}
 	}
 
