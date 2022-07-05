@@ -2,12 +2,12 @@ package constants
 
 const VerifyCodeAcceptedAttempts uint8 = 3
 
-type Constants string
+type CookieNames string
 
 const (
-	AUTH_TOKEN              Constants = "AUTH_TOKEN"
-	REFRESH_TOKEN           Constants = "REFRESH_TOKEN"
-	CUSTOME_HEADER_LANG_KEY Constants = "LOCALE"
+	AUTH_TOKEN              CookieNames = "AUTH_TOKEN"
+	REFRESH_TOKEN           CookieNames = "REFRESH_TOKEN"
+	CUSTOME_HEADER_LANG_KEY CookieNames = "LOCALE"
 )
 
 type UserType string

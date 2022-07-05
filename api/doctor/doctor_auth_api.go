@@ -71,6 +71,7 @@ func (a *DoctorAPI) SignInWithPhoneNumber() gin.HandlerFunc {
 			return
 		}
 
+		ctx.SetSameSite(http.SameSiteLaxMode)
 		// Set Access Token
 		ctx.SetCookie(string(constants.AUTH_TOKEN),
 			access,
@@ -290,6 +291,7 @@ func (a *DoctorAPI) SendLoginCredentialsForEmailLink() gin.HandlerFunc {
 
 		a.repo.UpdateRefreshToken(&res.ID, refresh)
 
+		ctx.SetSameSite(http.SameSiteLaxMode)
 		// Set Access Token
 		ctx.SetCookie(string(constants.AUTH_TOKEN),
 			access,
