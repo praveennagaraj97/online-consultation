@@ -46,7 +46,7 @@ func (a *UserAPI) Register() gin.HandlerFunc {
 			return
 		}
 
-		if err, statusCode := a.validateVerifyCode(ctx, payload.VerificationId, interfaces.PhoneType{
+		if statusCode, err := a.validateVerifyCode(ctx, payload.VerificationId, interfaces.PhoneType{
 			Code:   payload.PhoneCode,
 			Number: payload.PhoneNumber,
 		}); err != nil {
@@ -151,7 +151,7 @@ func (a *UserAPI) SignInWithPhoneNumber() gin.HandlerFunc {
 		}
 
 		// Validate veriy code
-		if err, statusCode := a.validateVerifyCode(ctx, payload.VerificationId, interfaces.PhoneType{
+		if statusCode, err := a.validateVerifyCode(ctx, payload.VerificationId, interfaces.PhoneType{
 			Code:   payload.PhoneCode,
 			Number: payload.PhoneNumber,
 		}); err != nil {
