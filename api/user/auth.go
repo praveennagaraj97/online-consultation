@@ -83,7 +83,7 @@ func (a *UserAPI) Register() gin.HandlerFunc {
 
 		a.userRepo.UpdateRefreshToken(&document.ID, refresh)
 
-		ctx.SetSameSite(http.SameSiteLaxMode)
+		ctx.SetSameSite(http.SameSiteNoneMode)
 		// Set Access Token
 		ctx.SetCookie(string(constants.AUTH_TOKEN),
 			access,
@@ -182,7 +182,7 @@ func (a *UserAPI) SignInWithPhoneNumber() gin.HandlerFunc {
 			return
 		}
 
-		ctx.SetSameSite(http.SameSiteLaxMode)
+		ctx.SetSameSite(http.SameSiteNoneMode)
 		// Set Access Token
 		ctx.SetCookie(string(constants.AUTH_TOKEN),
 			access,
@@ -327,7 +327,7 @@ func (a *UserAPI) SendLoginCredentialsForEmailLink() gin.HandlerFunc {
 
 		a.userRepo.UpdateRefreshToken(&res.ID, refresh)
 
-		ctx.SetSameSite(http.SameSiteLaxMode)
+		ctx.SetSameSite(http.SameSiteNoneMode)
 		// Set Access Token
 		ctx.SetCookie(string(constants.AUTH_TOKEN),
 			access,

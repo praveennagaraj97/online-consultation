@@ -13,7 +13,7 @@ import {
   templateUrl: 'theme-provider.component.html',
   animations: [
     trigger('backInRight', [
-      transition('void => *', [
+      transition('void <=> *', [
         style({ opacity: 0, transform: `translateX(100%)` }),
         animate('0.5s', style({ opacity: 1, transform: `translateX(0)` })),
       ]),

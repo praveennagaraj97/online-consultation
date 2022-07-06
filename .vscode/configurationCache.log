@@ -1,1 +1,1 @@
-{"buildTargets":["make","serve_ngrok","start_dev","stop_dev"],"launchTargets":[],"customConfigurationProvider":{"workspaceBrowse":{"browsePath":[],"compilerArgs":[]},"fileIndex":[]}}
+{"buildTargets":["serve_ngrok","start_dev","stop_dev"],"launchTargets":[],"customConfigurationProvider":{"workspaceBrowse":{"browsePath":[],"compilerArgs":[]},"fileIndex":[]}}

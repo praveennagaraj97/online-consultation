@@ -111,7 +111,7 @@ func (a *AdminAPI) Login() gin.HandlerFunc {
 
 		a.adminRepo.UpdateRefreshToken(&user.ID, refresh)
 
-		ctx.SetSameSite(http.SameSiteLaxMode)
+		ctx.SetSameSite(http.SameSiteNoneMode)
 		// Set Access Token
 		ctx.SetCookie(string(constants.AUTH_TOKEN),
 			access,
@@ -428,7 +428,7 @@ func (a *AdminAPI) Logout() gin.HandlerFunc {
 			api.SendErrorResponse(ctx, err.Error(), http.StatusUnauthorized, nil)
 			return
 		}
-		ctx.SetSameSite(http.SameSiteLaxMode)
+		ctx.SetSameSite(http.SameSiteNoneMode)
 		ctx.SetCookie(string(constants.AUTH_TOKEN), "", 0, "/", a.appConf.Domain, false, true)
 		ctx.SetCookie(string(constants.REFRESH_TOKEN), "", 0, "/", a.appConf.Domain, false, true)
 

@@ -1,28 +1,32 @@
 <ng-template #themePortal>
   <div
-    class="fixed bottom-2 right-2 bg-white px-4 py-2 rounded-md shadow-2xl"
+    class="fixed bottom-2 right-2 bg-white dark:bg-gray-800 px-4 py-2 rounded-md shadow-2xl"
     @backInRight
   >
-    <p>Choose a style</p>
-    <span class="text-xs block text-gray-500">
+    <p class="text-gray-900 dark:text-gray-200">Choose a style</p>
+    <span class="text-xs block text-gray-500 dark:text-gray-400">
       Pop or subtle. day or night.
     </span>
-    <span class="text-xs block text-gray-500"> Customise your interface </span>
+    <span class="text-xs block text-gray-500 dark:text-gray-400">
+      Customise your interface
+    </span>
 
     <div
-      class="flex text-xs mt-2 items-center justify-center border rounded-full bg-gray-200"
+      class="flex text-xs mt-2 items-center justify-center border rounded-full bg-gray-300"
     >
       <button
         (click)="setTheme('light')"
-        class="p-1.5 rounded-full w-full transform transition-colors will-change-transform duration-500"
+        class="p-1.5 rounded-full w-full transform transition-colors will-change-transform duration-700"
         [ngClass]="{ 'bg-white shadow-t-3xl': selectedTheme == 'light' }"
       >
         Light
       </button>
       <button
         (click)="setTheme('dark')"
-        class="p-1.5 rounded-full w-full transform transition-colors will-change-transform duration-500"
-        [ngClass]="{ 'bg-white shadow-t-3xl': selectedTheme == 'dark' }"
+        class="p-1.5 rounded-full w-full transform transition-colors will-change-transform duration-700"
+        [ngClass]="{
+          'bg-gray-800 text-gray-50 shadow-t-3xl': selectedTheme == 'dark'
+        }"
       >
         Dark
       </button>
