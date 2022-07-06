@@ -50,7 +50,7 @@ func (r *DoctorAppointmentSlotSetRepository) FindById(doctorId, id *primitive.Ob
 	cur := r.colln.FindOne(ctx, bson.M{"$and": bson.A{bson.M{"_id": id}, bson.M{"doctor_id": doctorId}}})
 
 	if cur.Err() != nil {
-		return nil, errors.New("Couldn't find any slot set.")
+		return nil, errors.New("couldn't find any slot set.")
 	}
 
 	var result doctormodel.AppointmentSlotSetEntity
@@ -69,7 +69,7 @@ func (r *DoctorAppointmentSlotSetRepository) FindDefault(doctorId *primitive.Obj
 	cur := r.colln.FindOne(ctx, bson.M{"$and": bson.A{bson.M{"is_default": true}, bson.M{"doctor_id": doctorId}}})
 
 	if cur.Err() != nil {
-		return nil, errors.New("Couldn't find any slot set.")
+		return nil, errors.New("couldn't find any slot set.")
 	}
 
 	var result doctormodel.AppointmentSlotSetEntity
