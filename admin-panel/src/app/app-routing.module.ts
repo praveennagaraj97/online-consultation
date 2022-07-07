@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { ForgotPasswordViewComponent } from './views/auth/forgot-password/forgot-password.component';
 import { LoginViewComponent } from './views/auth/login/login-view.component';
+import { PageNotFoundViewComponent } from './views/not-found/not-found-view.component';
 
 const publicRoues: Routes = [
   {
@@ -27,7 +28,13 @@ const publicRoues: Routes = [
 const protectedRoues: Routes = [];
 
 @NgModule({
-  imports: [RouterModule.forRoot([...publicRoues, ...protectedRoues])],
+  imports: [
+    RouterModule.forRoot([
+      ...publicRoues,
+      ...protectedRoues,
+      { path: '**', component: PageNotFoundViewComponent },
+    ]),
+  ],
   exports: [RouterModule],
 })
 export class AppRoutingModule {}

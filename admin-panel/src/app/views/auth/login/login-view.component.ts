@@ -1,6 +1,7 @@
 import { transition, trigger, useAnimation } from '@angular/animations';
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { fadeInTransformAnimation } from 'src/app/animations';
 import { authRoutes } from 'src/app/api-routes/routes';
 import type {
@@ -8,6 +9,7 @@ import type {
   LoginErrors,
 } from 'src/app/types/api.response.types';
 import { LoginResponse } from 'src/app/types/auth.response.types';
+import { clearSubscriptions } from 'src/app/utils/helpers';
 import { validateEmail } from 'src/app/utils/validators';
 
 @Component({
@@ -23,6 +25,10 @@ import { validateEmail } from 'src/app/utils/validators';
   ],
 })
 export class LoginViewComponent {
+  // Subscriptions
+  private subs: Subscription[] = [];
+
+  // Form Data
   email: string = '';
   password: string = '';
   rememberMe: boolean = true;
@@ -39,35 +45,45 @@ export class LoginViewComponent {
   constructor(private http: HttpClient) {}
 
   handleLogin() {
-    const formData = new FormData();
+    this.isLoading = true;
 
+    const formData = new FormData();
     formData.append(
       validateEmail(this.email) ? 'email' : 'user_name',
       this.email
     );
     formData.append('password', this.password);
 
-    this.isLoading = true;
-    this.http
-      .post<LoginResponse>(authRoutes.Login, formData, {
-        params: { remember_me: this.rememberMe },
-      })
-      .subscribe({
-        next: (res) => {
-          this.rspMsg = { message: res.message, type: 'success' };
-          this.isLoading = false;
-        },
-        error: (err: ErrorResponse<LoginErrors>) => {
-          this.errors = { ...err.error.errors };
-          this.rspMsg = { message: err.error.message, type: 'error' };
-          this.isLoading = false;
-          setTimeout(() => {
-            this.errors = null;
-            this.rspMsg = null;
-          }, 3000);
-        },
-      });
+    this.subs.push(
+      this.http
+        .post<LoginResponse>(authRoutes.Login, formData, {
+          params: { remember_me: this.rememberMe },
+        })
+        .subscribe({
+          next: (res) => {
+            this.isLoading = false;
+            this.setMessage({ message: res.message, type: 'success' });
+          },
+          error: (err: ErrorResponse<LoginErrors>) => {
+            this.isLoading = false;
+            this.errors = { ...err.error.errors };
+            this.setMessage({ message: err.error.message, type: 'error' });
+          },
+        })
+    );
+  }
 
-    console.log(this.email, this.password);
+  private setMessage(
+    msg: { type: 'error' | 'success'; message: string } | null
+  ) {
+    this.rspMsg = msg;
+    setTimeout(() => {
+      this.errors = null;
+      this.rspMsg = null;
+    }, 3000);
+  }
+
+  ngOnDestry() {
+    clearSubscriptions(this.subs);
   }
 }

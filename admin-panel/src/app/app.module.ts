@@ -11,9 +11,15 @@ import { IconsModule } from './components/icons/icons.module';
 import { APiInterceptor } from './interceptors/api.interceptor';
 import { ForgotPasswordViewComponent } from './views/auth/forgot-password/forgot-password.component';
 import { LoginViewComponent } from './views/auth/login/login-view.component';
+import { PageNotFoundViewComponent } from './views/not-found/not-found-view.component';
 
 @NgModule({
-  declarations: [AppComponent, LoginViewComponent, ForgotPasswordViewComponent],
+  declarations: [
+    AppComponent,
+    PageNotFoundViewComponent,
+    LoginViewComponent,
+    ForgotPasswordViewComponent,
+  ],
   imports: [
     BrowserModule,
     AppRoutingModule,

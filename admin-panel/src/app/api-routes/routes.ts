@@ -1,4 +1,4 @@
 export const authRoutes = {
-  Login: '/api/v1/admin/login',
+  Login: '/admin/login',
   ForgotPassword: '/admin/forgot_password',
 };
