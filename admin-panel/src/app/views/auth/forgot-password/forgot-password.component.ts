@@ -31,6 +31,14 @@ export class ForgotPasswordViewComponent {
   isLoading = false;
   rspMsg: { type: 'error' | 'success'; message: string } | null = null;
 
+  // Properties
+  showSentView = false;
+  resetSuccessMsgs = {
+    title: 'Reset Link is on the way',
+    message:
+      'We have sent reset to your mail,\nPlease check your email to change your password.',
+  };
+
   constructor(private http: HttpClient) {}
 
   handleRequestResetLink() {
@@ -42,12 +50,9 @@ export class ForgotPasswordViewComponent {
       this.http
         .post<BaseAPiResponse<null>>(authRoutes.ForgotPassword, formData)
         .subscribe({
-          next: (res) => {
+          next: () => {
             this.isLoading = false;
-            this.setMessage({
-              message: res.message,
-              type: 'error',
-            });
+            this.showSentView = true;
           },
           error: (err: ErrorResponse<null>) => {
             this.isLoading = false;

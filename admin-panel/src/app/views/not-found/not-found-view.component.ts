@@ -21,8 +21,8 @@ import { Component } from '@angular/core';
           </p>
           <a
             rel="noopener noreferrer"
-            href="#"
-            class="px-8 font-semibold action-btn  flex items-center justify-center shadow-md text-sm rounded-md py-2 mt-1 w-fit mx-auto block"
+            routerLink="/"
+            class="px-8 font-semibold action-btn  items-center justify-center shadow-md text-sm rounded-md py-2 mt-1 w-fit mx-auto block"
             >Back to homepage</a
           >
         </div>
