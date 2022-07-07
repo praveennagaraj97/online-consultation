@@ -220,7 +220,7 @@ func (a *AdminAPI) ForgotPassword() gin.HandlerFunc {
 		}
 
 		emailLink := fmt.Sprintf("%s?verifyCode=%s",
-			env.GetEnvVariable("CLIENT_VERIFY_FORGOT_PASSWORD_LINK"), token)
+			env.GetEnvVariable("CLIENT_ADMIN_VERIFY_FORGOT_PASSWORD_LINK"), token)
 
 		td := mailer.GetForgotEmailLinkTemplateData(user.Name, emailLink)
 		if err = a.appConf.EmailClient.SendNoReplyMail([]string{user.Email},
