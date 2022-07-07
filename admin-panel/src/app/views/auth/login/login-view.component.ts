@@ -7,6 +7,7 @@ import type {
   ErrorResponse,
   LoginErrors,
 } from 'src/app/types/api.response.types';
+import { LoginResponse } from 'src/app/types/auth.response.types';
 import { validateEmail } from 'src/app/utils/validators';
 
 @Component({
@@ -33,7 +34,7 @@ export class LoginViewComponent {
     password: string;
     user_name: string;
   } | null = null;
-  errorMessage = '';
+  rspMsg: { type: 'error' | 'success'; message: string } | null = null;
 
   constructor(private http: HttpClient) {}
 
@@ -47,20 +48,25 @@ export class LoginViewComponent {
     formData.append('password', this.password);
 
     this.isLoading = true;
-    this.http.post(authRoutes.Login, formData).subscribe({
-      next: (res) => {
-        console.log(res);
-      },
-      error: (err: ErrorResponse<LoginErrors>) => {
-        this.errors = { ...err.error.errors };
-        this.errorMessage = err.error.message;
-        this.isLoading = false;
-        setTimeout(() => {
-          this.errors = null;
-          this.errorMessage = '';
-        }, 3000);
-      },
-    });
+    this.http
+      .post<LoginResponse>(authRoutes.Login, formData, {
+        params: { remember_me: this.rememberMe },
+      })
+      .subscribe({
+        next: (res) => {
+          this.rspMsg = { message: res.message, type: 'success' };
+          this.isLoading = false;
+        },
+        error: (err: ErrorResponse<LoginErrors>) => {
+          this.errors = { ...err.error.errors };
+          this.rspMsg = { message: err.error.message, type: 'error' };
+          this.isLoading = false;
+          setTimeout(() => {
+            this.errors = null;
+            this.rspMsg = null;
+          }, 3000);
+        },
+      });
 
     console.log(this.email, this.password);
   }

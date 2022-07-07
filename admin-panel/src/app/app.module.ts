@@ -9,10 +9,11 @@ import { AppComponent } from './app.component';
 import { ComponentsModule } from './components/component.module';
 import { IconsModule } from './components/icons/icons.module';
 import { APiInterceptor } from './interceptors/api.interceptor';
+import { ForgotPasswordViewComponent } from './views/auth/forgot-password/forgot-password.component';
 import { LoginViewComponent } from './views/auth/login/login-view.component';
 
 @NgModule({
-  declarations: [AppComponent, LoginViewComponent],
+  declarations: [AppComponent, LoginViewComponent, ForgotPasswordViewComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,

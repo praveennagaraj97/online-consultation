@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { ForgotPasswordViewComponent } from './views/auth/forgot-password/forgot-password.component';
 import { LoginViewComponent } from './views/auth/login/login-view.component';
 
 const publicRoues: Routes = [
@@ -14,6 +15,10 @@ const publicRoues: Routes = [
       {
         path: 'login',
         component: LoginViewComponent,
+      },
+      {
+        path: 'forgot-password',
+        component: ForgotPasswordViewComponent,
       },
     ],
   },

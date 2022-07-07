@@ -13,3 +13,9 @@ export interface LoginErrors {
   password: string;
   user_name: string;
 }
+
+export interface BaseAPiResponse<T> {
+  result: T;
+  status_code: number;
+  message: string;
+}
