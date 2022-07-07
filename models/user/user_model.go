@@ -29,7 +29,7 @@ func (u *UserEntity) GetAccessAndRefreshToken(acessExpires bool) (string, string
 	if acessExpires {
 		accessTime = constants.CookieAccessExpiryTime
 		access, err = tokens.GenerateTokenWithExpiryTimeAndType(u.ID.Hex(),
-			time.Now().Local().Add(time.Minute*constants.JWT_AccessTokenExpiry).Unix(), "access", "user")
+			time.Now().Add(time.Minute*constants.JWT_AccessTokenExpiry).Unix(), "access", "user")
 	} else {
 		access, err = tokens.GenerateNoExpiryTokenWithCustomType(u.ID.Hex(), "access", "user")
 

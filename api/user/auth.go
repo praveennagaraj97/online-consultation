@@ -100,7 +100,7 @@ func (a *UserAPI) Register() gin.HandlerFunc {
 		}
 
 		token, err := tokens.GenerateTokenWithExpiryTimeAndType(document.ID.Hex(),
-			time.Now().Local().Add(time.Hour*48).Unix(),
+			time.Now().Add(time.Hour*48).Unix(),
 			"verify_email", "user")
 
 		if err != nil {
@@ -255,7 +255,7 @@ func (a *UserAPI) SignInWithEmailLink() gin.HandlerFunc {
 		}
 
 		token, err := tokens.GenerateTokenWithExpiryTimeAndType(res.ID.Hex(),
-			time.Now().Local().Add(time.Minute*5).Unix(),
+			time.Now().Add(time.Minute*5).Unix(),
 			"sign-in-email", "user")
 
 		if err != nil {
@@ -392,7 +392,7 @@ func (a *UserAPI) RequestEmailVerifyLink() gin.HandlerFunc {
 		}
 
 		token, err := tokens.GenerateTokenWithExpiryTimeAndType(res.ID.Hex(),
-			time.Now().Local().Add(time.Hour*48).Unix(),
+			time.Now().Add(time.Hour*48).Unix(),
 			"verify_email", "user")
 
 		if err != nil {

@@ -43,7 +43,7 @@ func (a *AdminEntity) GetAccessAndRefreshToken(acessExpires bool, userType strin
 	if acessExpires {
 		accessTime = constants.CookieAccessExpiryTime
 		access, err = tokens.GenerateTokenWithExpiryTimeAndType(a.ID.Hex(),
-			time.Now().Local().Add(time.Minute*constants.JWT_AccessTokenExpiry).Unix(), "access", userType)
+			time.Now().Add(time.Minute*constants.JWT_AccessTokenExpiry).Unix(), "access", userType)
 	} else {
 		access, err = tokens.GenerateNoExpiryTokenWithCustomType(a.ID.Hex(), "access", userType)
 

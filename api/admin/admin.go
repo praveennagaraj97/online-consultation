@@ -212,7 +212,7 @@ func (a *AdminAPI) ForgotPassword() gin.HandlerFunc {
 		}
 
 		token, err := tokens.GenerateTokenWithExpiryTimeAndType(user.ID.Hex(),
-			time.Now().Local().Add(time.Hour*48).Unix(),
+			time.Now().Add(time.Minute*5).Unix(),
 			"reset-email", "user")
 		if err != nil {
 			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)

@@ -47,7 +47,7 @@ func (a *DoctorEntity) GetAccessAndRefreshToken(acessExpires bool) (string, stri
 	if acessExpires {
 		accessTime = constants.CookieAccessExpiryTime
 		access, err = tokens.GenerateTokenWithExpiryTimeAndType(a.ID.Hex(),
-			time.Now().Local().Add(time.Minute*constants.JWT_AccessTokenExpiry).Unix(), "access", "doctor")
+			time.Now().Add(time.Minute*constants.JWT_AccessTokenExpiry).Unix(), "access", "doctor")
 	} else {
 		access, err = tokens.GenerateNoExpiryTokenWithCustomType(a.ID.Hex(), "access", "doctor")
 

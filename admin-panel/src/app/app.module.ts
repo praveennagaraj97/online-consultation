@@ -11,6 +11,7 @@ import { IconsModule } from './components/icons/icons.module';
 import { APiInterceptor } from './interceptors/api.interceptor';
 import { ForgotPasswordViewComponent } from './views/auth/forgot-password/forgot-password.component';
 import { LoginViewComponent } from './views/auth/login/login-view.component';
+import { ResetPasswordViewComponent } from './views/auth/reset-password/reset-password-view.component';
 import { PageNotFoundViewComponent } from './views/not-found/not-found-view.component';
 
 @NgModule({
@@ -19,6 +20,7 @@ import { PageNotFoundViewComponent } from './views/not-found/not-found-view.comp
     PageNotFoundViewComponent,
     LoginViewComponent,
     ForgotPasswordViewComponent,
+    ResetPasswordViewComponent,
   ],
   imports: [
     BrowserModule,

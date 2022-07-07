@@ -219,7 +219,7 @@ func (a *DoctorAPI) SignInWithEmailLink() gin.HandlerFunc {
 		}
 
 		token, err := tokens.GenerateTokenWithExpiryTimeAndType(res.ID.Hex(),
-			time.Now().Local().Add(time.Minute*5).Unix(),
+			time.Now().Add(time.Minute*5).Unix(),
 			"sign-in-email", "doctor")
 
 		if err != nil {

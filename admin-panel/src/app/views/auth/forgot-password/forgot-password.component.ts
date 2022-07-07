@@ -28,15 +28,16 @@ export class ForgotPasswordViewComponent {
 
   // Template Form Data
   email: string = '';
+
+  // State
   isLoading = false;
   rspMsg: { type: 'error' | 'success'; message: string } | null = null;
 
   // Properties
   showSentView = false;
   resetSuccessMsgs = {
-    title: 'Reset Link is on the way',
-    message:
-      'We have sent reset to your mail,\nPlease check your email to change your password.',
+    title: 'Check your email',
+    message: 'We have sent a password recover link to your email address',
   };
 
   constructor(private http: HttpClient) {}
