@@ -87,12 +87,12 @@ func (a *UserAPI) Register() gin.HandlerFunc {
 		// Set Access Token
 		ctx.SetCookie(string(constants.AUTH_TOKEN),
 			access,
-			accessTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
+			accessTime, "/", a.appConf.Domain, true, true)
 
 		// Set Refresh Token
 		ctx.SetCookie(string(constants.REFRESH_TOKEN),
 			refresh,
-			constants.CookieRefreshExpiryTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
+			constants.CookieRefreshExpiryTime, "/", a.appConf.Domain, true, true)
 
 		if err != nil {
 			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, nil)
@@ -186,12 +186,12 @@ func (a *UserAPI) SignInWithPhoneNumber() gin.HandlerFunc {
 		// Set Access Token
 		ctx.SetCookie(string(constants.AUTH_TOKEN),
 			access,
-			accessTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
+			accessTime, "/", a.appConf.Domain, true, true)
 
 		// Set Refresh Token
 		ctx.SetCookie(string(constants.REFRESH_TOKEN),
 			refresh,
-			constants.CookieRefreshExpiryTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
+			constants.CookieRefreshExpiryTime, "/", a.appConf.Domain, true, true)
 
 		if err != nil {
 			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, nil)
@@ -331,12 +331,12 @@ func (a *UserAPI) SendLoginCredentialsForEmailLink() gin.HandlerFunc {
 		// Set Access Token
 		ctx.SetCookie(string(constants.AUTH_TOKEN),
 			access,
-			accessTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
+			accessTime, "/", a.appConf.Domain, true, true)
 
 		// Set Refresh Token
 		ctx.SetCookie(string(constants.REFRESH_TOKEN),
 			refresh,
-			constants.CookieRefreshExpiryTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
+			constants.CookieRefreshExpiryTime, "/", a.appConf.Domain, true, true)
 
 		if err != nil {
 			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, nil)
@@ -553,12 +553,12 @@ func (a *UserAPI) RefreshToken() gin.HandlerFunc {
 		// Set Access Token
 		c.SetCookie(string(constants.AUTH_TOKEN),
 			access,
-			accessTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
+			accessTime, "/", a.appConf.Domain, true, true)
 
 		// Set Refresh Token
 		c.SetCookie(string(constants.REFRESH_TOKEN),
 			refresh,
-			constants.CookieRefreshExpiryTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
+			constants.CookieRefreshExpiryTime, "/", a.appConf.Domain, true, true)
 
 		if err != nil {
 			api.SendErrorResponse(c, "Something went wrong", http.StatusInternalServerError, nil)

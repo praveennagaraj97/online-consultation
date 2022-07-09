@@ -11,8 +11,8 @@ import {
 import { clearSubscriptions } from 'src/app/utils/helpers';
 
 @Component({
-  selector: 'app-forgot-password-view-component',
-  templateUrl: 'forgot-password.component.html',
+  selector: 'app-forgot-password-view',
+  templateUrl: 'forgot-password-view.component.html',
   animations: [
     trigger('fadeInOut', [
       transition('void<=>*', [useAnimation(fadeInTransformAnimation())]),

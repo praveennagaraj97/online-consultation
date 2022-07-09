@@ -61,11 +61,13 @@ export class ThemeProviderComponent {
 
   private toggleTheme(theme: 'dark' | 'light') {
     const dom = window.document.querySelector('body');
+    dom?.removeAttribute('class');
+
     this.selectedTheme = theme;
     if (theme === 'dark') {
-      dom?.classList.add('dark', 'theme-switch');
+      dom?.classList.add('dark', 'theme-switch', 'dark-bg');
     } else {
-      dom?.classList.remove('dark', 'theme-switch');
+      dom?.classList.add('theme-switch', 'light-bg');
     }
   }
 

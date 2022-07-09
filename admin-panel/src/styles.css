@@ -15,6 +15,14 @@
     @apply transition-colors duration-300;
   }
 
+  .dark-bg {
+    @apply bg-gray-900;
+  }
+
+  .light-bg {
+    @apply bg-indigo-100;
+  }
+
   .section-container {
     @apply xl:container mx-auto xl:px-2 lg:px-10  px-6;
   }

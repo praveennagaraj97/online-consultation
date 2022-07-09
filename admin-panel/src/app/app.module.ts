@@ -8,8 +8,11 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ComponentsModule } from './components/component.module';
 import { IconsModule } from './components/icons/icons.module';
+import { AuthorizedGuard } from './guards/is-authorized.guard';
 import { APiInterceptor } from './interceptors/api.interceptor';
-import { ForgotPasswordViewComponent } from './views/auth/forgot-password/forgot-password.component';
+import { AppStoreModule } from './store/store.module';
+import { ForgotPasswordViewComponent } from './views/auth/forgot-password/forgot-password-view.component';
+
 import { LoginViewComponent } from './views/auth/login/login-view.component';
 import { ResetPasswordViewComponent } from './views/auth/reset-password/reset-password-view.component';
 import { PageNotFoundViewComponent } from './views/not-found/not-found-view.component';
@@ -30,6 +33,7 @@ import { PageNotFoundViewComponent } from './views/not-found/not-found-view.comp
     ComponentsModule,
     IconsModule,
     FormsModule,
+    AppStoreModule,
   ],
   bootstrap: [AppComponent],
   providers: [
@@ -38,6 +42,7 @@ import { PageNotFoundViewComponent } from './views/not-found/not-found-view.comp
       useClass: APiInterceptor,
       multi: true,
     },
+    AuthorizedGuard,
   ],
 })
 export class AppModule {}

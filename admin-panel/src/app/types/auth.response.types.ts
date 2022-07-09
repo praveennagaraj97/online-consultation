@@ -12,3 +12,8 @@ export interface UserEntity {
   email: string;
   joined_on: string;
 }
+
+export type JWTTokenStatus = {
+  expires: string | null;
+  is_valid: boolean;
+};

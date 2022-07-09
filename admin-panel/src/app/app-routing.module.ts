@@ -1,8 +1,10 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { ForgotPasswordViewComponent } from './views/auth/forgot-password/forgot-password.component';
+import { AuthorizedGuard } from './guards/is-authorized.guard';
+import { ForgotPasswordViewComponent } from './views/auth/forgot-password/forgot-password-view.component';
 import { LoginViewComponent } from './views/auth/login/login-view.component';
 import { ResetPasswordViewComponent } from './views/auth/reset-password/reset-password-view.component';
+import { DashboardViewComponent } from './views/dashboard/dashboard-view.component';
 import { PageNotFoundViewComponent } from './views/not-found/not-found-view.component';
 
 const publicRoues: Routes = [
@@ -30,7 +32,17 @@ const publicRoues: Routes = [
   },
 ];
 
-const protectedRoues: Routes = [];
+const protectedRoues: Routes = [
+  {
+    path: '',
+    canActivate: [AuthorizedGuard],
+    children: [
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: 'dashboard', component: DashboardViewComponent },
+      { path: 'settings', component: DashboardViewComponent },
+    ],
+  },
+];
 
 @NgModule({
   imports: [

@@ -1,19 +1,15 @@
 import { transition, trigger, useAnimation } from '@angular/animations';
-import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { fadeInTransformAnimation } from 'src/app/animations';
-import { authRoutes } from 'src/app/api-routes/routes';
-import type {
-  ErrorResponse,
-  LoginErrors,
-} from 'src/app/types/api.response.types';
-import { LoginResponse } from 'src/app/types/auth.response.types';
+import { ErrorResponse, LoginErrors } from 'src/app/types/api.response.types';
 import { clearSubscriptions } from 'src/app/utils/helpers';
 import { validateEmail } from 'src/app/utils/validators';
+import { LoginService } from './login-view.service';
 
 @Component({
-  selector: 'app-login-view-component',
+  selector: 'app-login-view',
   templateUrl: 'login-view.component.html',
   animations: [
     trigger('fadeInOut', [
@@ -42,7 +38,7 @@ export class LoginViewComponent {
   } | null = null;
   rspMsg: { type: 'error' | 'success'; message: string } | null = null;
 
-  constructor(private http: HttpClient) {}
+  constructor(private loginService: LoginService, private router: Router) {}
 
   handleLogin() {
     this.isLoading = true;
@@ -55,14 +51,19 @@ export class LoginViewComponent {
     formData.append('password', this.password);
 
     this.subs.push(
-      this.http
-        .post<LoginResponse>(authRoutes.Login, formData, {
-          params: { remember_me: this.rememberMe },
-        })
+      this.loginService
+        .login(this.email, this.password, this.rememberMe)
+
         .subscribe({
           next: (res) => {
-            this.isLoading = false;
-            this.setMessage({ message: res.message, type: 'success' });
+            this.setMessage({ message: res.message, type: 'success' }, () => {
+              this.isLoading = false;
+
+              const parsedURL = this.router.parseUrl(this.router.url);
+              this.router.navigate([
+                parsedURL.queryParams?.['redirectTo'] || '/',
+              ]);
+            });
           },
           error: (err: ErrorResponse<LoginErrors>) => {
             this.isLoading = false;
@@ -74,12 +75,16 @@ export class LoginViewComponent {
   }
 
   private setMessage(
-    msg: { type: 'error' | 'success'; message: string } | null
+    msg: { type: 'error' | 'success'; message: string } | null,
+    callback?: () => void
   ) {
     this.rspMsg = msg;
     setTimeout(() => {
       this.errors = null;
       this.rspMsg = null;
+      if (callback) {
+        callback();
+      }
     }, 3000);
   }
 
