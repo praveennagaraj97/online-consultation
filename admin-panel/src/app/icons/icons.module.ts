@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { AdminIconComponent } from './admin/admin-icon.component';
 import { AppointmentIconComponent } from './appointment/appointment-icon.component';
+import { ArrowUpIconComponent } from './arrow/arrow-up-icon.component';
 import { ConsultatationIconComponent } from './consultation/consultation-icon.component';
 import { DoctorIconComponent } from './doctor/doctor-icon.component';
 import { DotsIconComponent } from './dots/dots-icon.component';
@@ -34,6 +35,7 @@ import { UserIconComponent } from './user/user-icon.component';
     SpecialityIconComponent,
     DotsIconComponent,
     UserRoundedIconComponent,
+    ArrowUpIconComponent,
   ],
   exports: [
     MailIconComponent,
@@ -51,6 +53,7 @@ import { UserIconComponent } from './user/user-icon.component';
     SpecialityIconComponent,
     DotsIconComponent,
     UserRoundedIconComponent,
+    ArrowUpIconComponent,
   ],
 })
 export class IconsModule {}

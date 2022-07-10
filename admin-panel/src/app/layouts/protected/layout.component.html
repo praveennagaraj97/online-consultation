@@ -2,7 +2,7 @@
   <app-nav-bar (onExpand)="onMenuExpand($event)" class="fixed z-20">
   </app-nav-bar>
   <main
-    class="p-3 w-full relative smooth-animate"
+    class="p-3 w-full relative transform duration-200 will-change-transform"
     [ngClass]="menuExpanded ? 'ml-64' : 'ml-24'"
   >
     <app-header class="sticky top-0 left-0 right-0"></app-header>

@@ -1,3 +1,4 @@
+import { OverlayModule } from '@angular/cdk/overlay';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -39,6 +40,7 @@ import { PageNotFoundViewComponent } from './views/not-found/not-found-view.comp
     FormsModule,
     AppStoreModule,
     LayoutModule,
+    OverlayModule,
   ],
   bootstrap: [AppComponent],
   providers: [

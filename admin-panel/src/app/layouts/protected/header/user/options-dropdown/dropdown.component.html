@@ -1,0 +1,17 @@
+<ng-template #dropdownRef>
+  <div
+    class="w-96 h-96 dark:bg-gray-700 bg-gray-50 rounded-lg fixed z-10 shadow-2xl"
+    [style]="domPosition"
+    @fadeInOut
+  >
+    <div
+      class="relative w-full h-full"
+      clickOutside
+      (callback)="onCloseCallback(!$event)"
+    >
+      <app-arrow-up-icon
+        className="w-10 h-10 -top-5 right-2 absolute z-0 fill-gray-50 stroke-gray-50 dark:fill-gray-700 dark:stroke-gray-700"
+      ></app-arrow-up-icon>
+    </div>
+  </div>
+</ng-template>
