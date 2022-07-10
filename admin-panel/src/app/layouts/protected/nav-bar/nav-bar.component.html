@@ -1,39 +1,50 @@
 <div
   class="h-screen dark:bg-gray-700 bg-gray-50 shadow-t-xl flex flex-col items-center pt-3 px-4"
+  (mouseover)="toggleMenu(true)"
+  (mouseleave)="toggleMenu(false)"
+  [@expand]="expandState"
 >
   <a routerLink="/dashboard" class="flex items-center space-x-2">
     <img src="/assets/brand.png" width="48" height="48" />
-    <p class="font-semibold">Online Consultation</p>
+    <p class="font-semibold cut-text-1" *ngIf="expandMenu">
+      Online Consultation
+    </p>
   </a>
   <nav class="mt-6 flex flex-col space-y-4 w-full">
-    <app-nav-item title="Dashboard">
+    <app-nav-item [showTitle]="expandMenu" title="Dashboard">
       <app-home-icon
         className="w-7 h-7 dark:fill-gray-50 dark:stroke-gray-50"
       ></app-home-icon>
     </app-nav-item>
 
     <div class="mt-2">
-      <small class="block mb-2"> Apps & Pages </small>
+      <small class="block mb-2 cut-text-1" *ngIf="expandMenu">
+        Apps & Pages
+      </small>
+      <app-dots-icon
+        className="h-4 mx-auto my-1 dark:fill-gray-500 dark:stroke-gray-500 stroke-gray-600 fill-gray-600"
+        *ngIf="!expandMenu"
+      ></app-dots-icon>
       <div class="flex flex-col space-y-2">
-        <app-nav-item title="Users / Patients">
+        <app-nav-item [showTitle]="expandMenu" title="Users / Patients">
           <app-user-icon
             className="w-6 h-6 dark:fill-gray-50 dark:stroke-gray-50"
           ></app-user-icon>
         </app-nav-item>
 
-        <app-nav-item title="Doctors">
+        <app-nav-item [showTitle]="expandMenu" title="Doctors">
           <app-doctor-icon
             className="w-6 h-6 dark:fill-gray-50 dark:stroke-gray-50"
           ></app-doctor-icon>
         </app-nav-item>
 
-        <app-nav-item title="Emails">
+        <app-nav-item [showTitle]="expandMenu" title="Emails">
           <app-mail-icon
             className="w-6 h-6 dark:fill-gray-50 dark:stroke-gray-50"
           ></app-mail-icon>
         </app-nav-item>
 
-        <app-nav-item title="Appointments">
+        <app-nav-item [showTitle]="expandMenu" title="Appointments">
           <app-appointment-icon
             className="w-6 h-6 dark:fill-gray-50 dark:stroke-gray-50"
           ></app-appointment-icon>
@@ -41,14 +52,20 @@
       </div>
 
       <div class="mt-4">
-        <small class="block mb-2">Administrative </small>
+        <small class="block mb-2 cut-text-1" *ngIf="expandMenu"
+          >Administrative
+        </small>
+        <app-dots-icon
+          className="h-4 mx-auto my-1 dark:fill-gray-500 dark:stroke-gray-500 stroke-gray-600 fill-gray-600"
+          *ngIf="!expandMenu"
+        ></app-dots-icon>
         <div class="flex flex-col space-y-2">
-          <app-nav-item title="Admins">
+          <app-nav-item [showTitle]="expandMenu" title="Admins">
             <app-admin-icon
               className="w-6 h-6 dark:fill-gray-50 dark:stroke-gray-50"
             ></app-admin-icon>
           </app-nav-item>
-          <app-nav-item title="Editors">
+          <app-nav-item [showTitle]="expandMenu" title="Editors">
             <app-editor-icon
               className="w-6 h-6 dark:fill-gray-50 dark:stroke-gray-50"
             ></app-editor-icon>
@@ -57,26 +74,30 @@
       </div>
 
       <div class="mt-4">
-        <small class="block mb-2">CMS </small>
+        <small class="block mb-2 cut-text-1" *ngIf="expandMenu">CMS </small>
+        <app-dots-icon
+          className="h-4 mx-auto my-1 dark:fill-gray-500 dark:stroke-gray-500 stroke-gray-600 fill-gray-600"
+          *ngIf="!expandMenu"
+        ></app-dots-icon>
         <div class="flex flex-col space-y-2">
-          <app-nav-item title="Hospitals">
+          <app-nav-item [showTitle]="expandMenu" title="Hospitals">
             <app-hospital-icon
               className="w-6 h-6 dark:fill-gray-50 dark:stroke-gray-50"
             ></app-hospital-icon>
           </app-nav-item>
-          <app-nav-item title="Consultation">
+          <app-nav-item [showTitle]="expandMenu" title="Consultation">
             <app-consultation-icon
               className="w-6 h-6 dark:fill-gray-50 dark:stroke-gray-50"
             ></app-consultation-icon>
           </app-nav-item>
 
-          <app-nav-item title="Languages">
+          <app-nav-item [showTitle]="expandMenu" title="Languages">
             <app-language-icon
               className="w-6 h-6 dark:fill-gray-50 dark:stroke-gray-50"
             ></app-language-icon>
           </app-nav-item>
 
-          <app-nav-item title="Specialities">
+          <app-nav-item [showTitle]="expandMenu" title="Specialities">
             <app-speciality-icon
               className="w-6 h-6 dark:fill-gray-50 dark:stroke-gray-50"
             ></app-speciality-icon>

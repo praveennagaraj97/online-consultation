@@ -4,6 +4,7 @@ import { AdminIconComponent } from './admin/admin-icon.component';
 import { AppointmentIconComponent } from './appointment/appointment-icon.component';
 import { ConsultatationIconComponent } from './consultation/consultation-icon.component';
 import { DoctorIconComponent } from './doctor/doctor-icon.component';
+import { DotsIconComponent } from './dots/dots-icon.component';
 import { EditorIconComponent } from './editor/editor-icon.component';
 import { HomeIconComponent } from './home/home-icon.component';
 import { HospitalIconComponent } from './hospital/hospital-icon.component';
@@ -30,6 +31,7 @@ import { UserIconComponent } from './user/user-icon.component';
     ConsultatationIconComponent,
     LanguageIconComponent,
     SpecialityIconComponent,
+    DotsIconComponent,
   ],
   exports: [
     MailIconComponent,
@@ -45,6 +47,7 @@ import { UserIconComponent } from './user/user-icon.component';
     ConsultatationIconComponent,
     LanguageIconComponent,
     SpecialityIconComponent,
+    DotsIconComponent,
   ],
 })
 export class IconsModule {}
