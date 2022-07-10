@@ -9,12 +9,15 @@ import { AppComponent } from './app.component';
 import { ComponentsModule } from './components/component.module';
 import { IconsModule } from './components/icons/icons.module';
 import { AuthorizedGuard } from './guards/is-authorized.guard';
+import { NotAuthorizedGuard } from './guards/not-authorized.guard';
 import { APiInterceptor } from './interceptors/api.interceptor';
+import { LayoutModule } from './layouts/layout.module';
 import { AppStoreModule } from './store/store.module';
 import { ForgotPasswordViewComponent } from './views/auth/forgot-password/forgot-password-view.component';
 
 import { LoginViewComponent } from './views/auth/login/login-view.component';
 import { ResetPasswordViewComponent } from './views/auth/reset-password/reset-password-view.component';
+import { DashboardViewComponent } from './views/dashboard/dashboard-view.component';
 import { PageNotFoundViewComponent } from './views/not-found/not-found-view.component';
 
 @NgModule({
@@ -24,6 +27,7 @@ import { PageNotFoundViewComponent } from './views/not-found/not-found-view.comp
     LoginViewComponent,
     ForgotPasswordViewComponent,
     ResetPasswordViewComponent,
+    DashboardViewComponent,
   ],
   imports: [
     BrowserModule,
@@ -34,6 +38,7 @@ import { PageNotFoundViewComponent } from './views/not-found/not-found-view.comp
     IconsModule,
     FormsModule,
     AppStoreModule,
+    LayoutModule,
   ],
   bootstrap: [AppComponent],
   providers: [
@@ -43,6 +48,7 @@ import { PageNotFoundViewComponent } from './views/not-found/not-found-view.comp
       multi: true,
     },
     AuthorizedGuard,
+    NotAuthorizedGuard,
   ],
 })
 export class AppModule {}

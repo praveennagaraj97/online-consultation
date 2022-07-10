@@ -1,15 +1,16 @@
 import { Component } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 import { Store } from '@ngrx/store';
-import { AuthState } from 'src/app/store/auth/auth.types';
+import { StoreState } from 'src/app/store/store.module';
 
 @Component({
   selector: 'app-dashboard-view',
-  template: ` <h1>{{ isLogged }}</h1>`,
+  templateUrl: 'dashboard-view.component.html',
 })
 export class DashboardViewComponent {
   isLogged = false;
 
-  constructor(private store: Store<{ auth: AuthState }>) {}
+  constructor(private store: Store<StoreState>, private titleService: Title) {}
 
   ngOnInit() {
     this.store.select('auth').subscribe({

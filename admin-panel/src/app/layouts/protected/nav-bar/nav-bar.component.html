@@ -1,0 +1,88 @@
+<div
+  class="h-screen dark:bg-gray-700 bg-gray-50 shadow-t-xl flex flex-col items-center pt-3 px-4"
+>
+  <a routerLink="/dashboard" class="flex items-center space-x-2">
+    <img src="/assets/brand.png" width="48" height="48" />
+    <p class="font-semibold">Online Consultation</p>
+  </a>
+  <nav class="mt-6 flex flex-col space-y-4 w-full">
+    <app-nav-item title="Dashboard">
+      <app-home-icon
+        className="w-7 h-7 dark:fill-gray-50 dark:stroke-gray-50"
+      ></app-home-icon>
+    </app-nav-item>
+
+    <div class="mt-2">
+      <small class="block mb-2"> Apps & Pages </small>
+      <div class="flex flex-col space-y-2">
+        <app-nav-item title="Users / Patients">
+          <app-user-icon
+            className="w-6 h-6 dark:fill-gray-50 dark:stroke-gray-50"
+          ></app-user-icon>
+        </app-nav-item>
+
+        <app-nav-item title="Doctors">
+          <app-doctor-icon
+            className="w-6 h-6 dark:fill-gray-50 dark:stroke-gray-50"
+          ></app-doctor-icon>
+        </app-nav-item>
+
+        <app-nav-item title="Emails">
+          <app-mail-icon
+            className="w-6 h-6 dark:fill-gray-50 dark:stroke-gray-50"
+          ></app-mail-icon>
+        </app-nav-item>
+
+        <app-nav-item title="Appointments">
+          <app-appointment-icon
+            className="w-6 h-6 dark:fill-gray-50 dark:stroke-gray-50"
+          ></app-appointment-icon>
+        </app-nav-item>
+      </div>
+
+      <div class="mt-4">
+        <small class="block mb-2">Administrative </small>
+        <div class="flex flex-col space-y-2">
+          <app-nav-item title="Admins">
+            <app-admin-icon
+              className="w-6 h-6 dark:fill-gray-50 dark:stroke-gray-50"
+            ></app-admin-icon>
+          </app-nav-item>
+          <app-nav-item title="Editors">
+            <app-editor-icon
+              className="w-6 h-6 dark:fill-gray-50 dark:stroke-gray-50"
+            ></app-editor-icon>
+          </app-nav-item>
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <small class="block mb-2">CMS </small>
+        <div class="flex flex-col space-y-2">
+          <app-nav-item title="Hospitals">
+            <app-hospital-icon
+              className="w-6 h-6 dark:fill-gray-50 dark:stroke-gray-50"
+            ></app-hospital-icon>
+          </app-nav-item>
+          <app-nav-item title="Consultation">
+            <app-consultation-icon
+              className="w-6 h-6 dark:fill-gray-50 dark:stroke-gray-50"
+            ></app-consultation-icon>
+          </app-nav-item>
+
+          <app-nav-item title="Languages">
+            <app-language-icon
+              className="w-6 h-6 dark:fill-gray-50 dark:stroke-gray-50"
+            ></app-language-icon>
+          </app-nav-item>
+
+          <app-nav-item title="Specialities">
+            <app-speciality-icon
+              className="w-6 h-6 dark:fill-gray-50 dark:stroke-gray-50"
+            ></app-speciality-icon>
+          </app-nav-item>
+        </div>
+      </div>
+    </div>
+  </nav>
+</div>

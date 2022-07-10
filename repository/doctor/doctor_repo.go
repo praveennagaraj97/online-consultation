@@ -14,7 +14,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/x/bsonx"
 )
 
 type DoctorRepository struct {
@@ -33,7 +32,6 @@ func (r *DoctorRepository) Initialize(colln *mongo.Collection) {
 
 	utils.CreateIndex(colln, bson.D{{Key: "email", Value: 1}}, "EmailIndex", true)
 
-	utils.CreateIndex(colln, bson.D{{Key: "name", Value: bsonx.String("text")}}, "TextSearchByNameIndex", false)
 	utils.CreateIndex(colln, bson.D{{Key: "consultation_type_id", Value: 1}}, "ConsultationTypeIndex", false)
 	utils.CreateIndex(colln, bson.D{{Key: "speciality_id", Value: 1}}, "SpecialityIndex", false)
 	utils.CreateIndex(colln, bson.D{{Key: "hospital_id", Value: 1}}, "HospitalIndex", false)

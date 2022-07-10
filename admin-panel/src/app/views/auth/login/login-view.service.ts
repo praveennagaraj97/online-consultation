@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { tap } from 'rxjs';
 import { authRoutes } from 'src/app/api-routes/routes';
+import { APP_STORAGE_NAMES } from 'src/app/constants';
 import { loginAction } from 'src/app/store/auth/auth.actions';
 import { AuthState } from 'src/app/store/auth/auth.types';
 import { LoginResponse } from 'src/app/types/auth.response.types';
@@ -28,17 +29,28 @@ export class LoginService {
       .pipe(
         tap((res) => {
           if (res) {
-            this.store.dispatch(
-              loginAction({
-                expiresAt: rememberMe
-                  ? addDaysToDate(30).toISOString()
-                  : addMinutesToDate(30).toISOString(),
-                isLogged: true,
-                rememberMe: rememberMe,
-              })
-            );
+            const authState = {
+              expiresAt: rememberMe
+                ? addDaysToDate(30).toISOString()
+                : addMinutesToDate(30).toISOString(),
+              isLogged: true,
+              rememberMe: rememberMe,
+            };
+            this.persistState(authState);
+            this.store.dispatch(loginAction(authState));
           }
         })
       );
+  }
+
+  private persistState(state: AuthState) {
+    if (state.rememberMe) {
+      localStorage.setItem(APP_STORAGE_NAMES.AUTH_STATE, JSON.stringify(state));
+    } else {
+      sessionStorage.setItem(
+        APP_STORAGE_NAMES.AUTH_STATE,
+        JSON.stringify(state)
+      );
+    }
   }
 }

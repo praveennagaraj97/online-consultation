@@ -15,12 +15,12 @@
     @apply transition-colors duration-300;
   }
 
-  .dark-bg {
-    @apply bg-gray-900;
+  .dark-mode {
+    @apply bg-gray-900 text-gray-50;
   }
 
-  .light-bg {
-    @apply bg-indigo-100;
+  .light-mode {
+    @apply bg-indigo-100 text-gray-900;
   }
 
   .section-container {

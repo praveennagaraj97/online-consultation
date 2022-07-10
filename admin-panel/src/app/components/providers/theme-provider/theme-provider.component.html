@@ -12,12 +12,14 @@
     </span>
 
     <div
-      class="flex text-xs mt-2 items-center justify-center border rounded-full bg-gray-300"
+      class="flex text-xs mt-2 items-center justify-center border rounded-full bg-gray-300 text-gray-900"
     >
       <button
         (click)="setTheme('light')"
         class="p-1.5 rounded-full w-full transform transition-colors will-change-transform duration-700"
-        [ngClass]="{ 'bg-white shadow-t-3xl': selectedTheme == 'light' }"
+        [ngClass]="{
+          'bg-white shadow-t-3xl ': selectedTheme == 'light'
+        }"
       >
         Light
       </button>

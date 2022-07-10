@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Store } from '@ngrx/store';
+import { rehydrateAuthState } from './store/auth/auth.actions';
 import { StoreState } from './store/store.module';
 
 @Component({
@@ -11,8 +12,6 @@ import { StoreState } from './store/store.module';
 })
 export class AppComponent {
   constructor(private store: Store<StoreState>) {
-    this.store.select('auth').subscribe({
-      next: (val) => {},
-    });
+    this.store.dispatch(rehydrateAuthState());
   }
 }

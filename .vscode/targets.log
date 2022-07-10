@@ -10,20 +10,18 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 make: *** No rule to make target `all'.  Stop.
 
 
-# Make data base, printed on Thu Jul  7 00:56:34 2022
+# Make data base, printed on Sun Jul 10 15:52:05 2022
 
 # Variables
 
 # automatic
 <D = $(patsubst %/,%,$(dir $<))
+ 
 # automatic
 ?F = $(notdir $?)
-# environment
-VSCODE_LOG_NATIVE = false
 # automatic
 ?D = $(patsubst %/,%,$(dir $?))
 # automatic
- 
 @D = $(patsubst %/,%,$(dir $@))
 # automatic
 @F = $(notdir $@)
@@ -38,27 +36,21 @@ _ = /usr/bin/make
 # makefile (from `Makefile', line 1)
 MAKEFILE_LIST :=  Makefile
 # environment
-VSCODE_VERBOSE_LOGGING = true
-# environment
 __CFBundleIdentifier = com.microsoft.VSCode
-# environment
-VSCODE_IPC_HOOK_EXTHOST = /var/folders/0r/09_b436s653b4t6fbp0twspc0000gn/T/vscode-ipc-b6797dbc-d723-4695-8923-d6cea578d9dd.sock
 # environment
 VSCODE_CWD = /
 # environment
 PATH = /usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin
 # environment
-VSCODE_LOG_STACK = false
+LaunchInstanceID = 65F86F2E-C138-4190-9564-D429F8DF32B0
 # environment
 ELECTRON_RUN_AS_NODE = 1
 # default
 .FEATURES := target-specific order-only second-expansion else-if archives jobserver check-symlink
 # environment
-SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.UciD96IEot/Listeners
+SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.8jY5noVEEn/Listeners
 # automatic
 %F = $(notdir $%)
-# environment
-VSCODE_PIPE_LOGGING = true
 # environment
 PWD = /Volumes/Workspace/online-consultation-api
 # environment
@@ -70,7 +62,7 @@ HOME = /Users/praveennagaraj
 # default
 MAKEFILEPATH = $(shell /usr/bin/xcode-select -print-path 2>/dev/null || echo /Developer)/Makefiles
 # environment
-VSCODE_CODE_CACHE_PATH = /Users/praveennagaraj/Library/Application Support/Code/CachedData/30d9c6cd9483b2cc586687151bcbcd635f373630
+VSCODE_CODE_CACHE_PATH = /Users/praveennagaraj/Library/Application Support/Code/CachedData/92d25e35d9bf1a6b16f7d0758f25d48ace11e5b9
 # environment
 LOGNAME = praveennagaraj
 # environment
@@ -106,7 +98,9 @@ TMPDIR = /var/folders/0r/09_b436s653b4t6fbp0twspc0000gn/T/
 # automatic
 *F = $(notdir $*)
 # environment
-VSCODE_IPC_HOOK = /Users/praveennagaraj/Library/Application Support/Code/1.68.1-main.sock
+VSCODE_IPC_HOOK = /Users/praveennagaraj/Library/Application Support/Code/1.69.0-main.sock
+# environment
+MallocNanoZone = 0
 # makefile
 MAKEFLAGS = Rrqp
 # environment
@@ -114,7 +108,7 @@ MFLAGS = -Rrqp
 # automatic
 *D = $(patsubst %/,%,$(dir $*))
 # environment
-XPC_SERVICE_NAME = application.com.microsoft.VSCode.96417.96423
+XPC_SERVICE_NAME = application.com.microsoft.VSCode.1959316.1959322
 # automatic
 +D = $(patsubst %/,%,$(dir $+))
 # automatic
@@ -129,6 +123,8 @@ MAKEFILES :=
 <F = $(notdir $<)
 # environment
 LC_ALL = C
+# environment
+SECURITYSESSIONID = 186b2
 # automatic
 ^F = $(notdir $^)
 # default
@@ -140,9 +136,9 @@ MAKELEVEL := 0
 # environment
 LANG = C
 # environment
-VSCODE_PID = 1359
+VSCODE_PID = 575
 # variable set hash-table stats:
-# Load=63/1024=6%, Rehash=0, Collisions=1/87=1%
+# Load=61/1024=6%, Rehash=0, Collisions=1/85=1%
 
 # Pattern-specific Variable Values
 
@@ -150,9 +146,9 @@ VSCODE_PID = 1359
 
 # Directories
 
-# . (device 16777250, inode 15038850): 34 files, no impossibilities.
+# . (device 16777250, inode 15038850): 35 files, no impossibilities.
 
-# 34 files, no impossibilities in 1 directories.
+# 35 files, no impossibilities in 1 directories.
 
 # Implicit Rules
 
@@ -167,7 +163,6 @@ serve_ngrok:
 #  commands to execute (from `Makefile', line 12):
 	@echo "starting ngrok reverse proxy"
 	@./ngrok http 4000
- 
 	@echo "ngrok reverse proxy server started"
 	
 
@@ -234,6 +229,6 @@ stop_dev:
 # strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
-# Finished Make data base on Thu Jul  7 00:56:34 2022
+# Finished Make data base on Sun Jul 10 15:52:05 2022
 
  

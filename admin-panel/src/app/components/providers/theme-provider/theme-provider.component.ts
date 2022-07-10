@@ -65,9 +65,9 @@ export class ThemeProviderComponent {
 
     this.selectedTheme = theme;
     if (theme === 'dark') {
-      dom?.classList.add('dark', 'theme-switch', 'dark-bg');
+      dom?.classList.add('dark', 'theme-switch', 'dark-mode');
     } else {
-      dom?.classList.add('theme-switch', 'light-bg');
+      dom?.classList.add('theme-switch', 'light-mode');
     }
   }
 
