@@ -3,7 +3,7 @@ FROM golang:latest as base
 RUN useradd -m praveen
 
 
-FROM base as dev
+FROM base as prod
 
 RUN apt-get update -y
 
@@ -15,7 +15,6 @@ RUN chown praveen /src/app
 
 USER praveen
 
-EXPOSE 4200
 
 EXPOSE 25 465 587 2525
 

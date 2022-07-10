@@ -1,0 +1,12 @@
+# Env
+.env
+.env.prod
+
+
+# Git
+.git
+.gitignore
+
+ngrok
+
+/admin-panel
