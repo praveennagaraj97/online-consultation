@@ -4,3 +4,5 @@ export const authRoutes = {
   ResetPassword: '/admin/reset_password/',
   CheckTokenStatus: '/additional/jwt/status',
 };
+
+export const adminRoutes = { ProfileDetails: '/admin/me' };

@@ -1,0 +1,9 @@
+<div class="flex items-center">
+  <div class="mr-2" *ngIf="!loading">
+    <p class="text-sm leading-tight font-semibold">{{ user?.name }}</p>
+    <small class="text-right text-xs block">
+      {{ user?.role }}
+    </small>
+  </div>
+  <app-user-rounded-icon className="w-12 h-12"></app-user-rounded-icon>
+</div>
