@@ -75,12 +75,12 @@ func (a *DoctorAPI) SignInWithPhoneNumber() gin.HandlerFunc {
 		// Set Access Token
 		ctx.SetCookie(string(constants.AUTH_TOKEN),
 			access,
-			accessTime, "/", a.appConf.Domain, true, true)
+			accessTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
 
 		// Set Refresh Token
 		ctx.SetCookie(string(constants.REFRESH_TOKEN),
 			refresh,
-			constants.CookieRefreshExpiryTime, "/", a.appConf.Domain, true, true)
+			constants.CookieRefreshExpiryTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
 
 		if err != nil {
 			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, nil)
@@ -154,12 +154,12 @@ func (a *DoctorAPI) RefreshToken() gin.HandlerFunc {
 		// Set Access Token
 		c.SetCookie(string(constants.AUTH_TOKEN),
 			access,
-			accessTime, "/", a.appConf.Domain, true, true)
+			accessTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
 
 		// Set Refresh Token
 		c.SetCookie(string(constants.REFRESH_TOKEN),
 			refresh,
-			constants.CookieRefreshExpiryTime, "/", a.appConf.Domain, true, true)
+			constants.CookieRefreshExpiryTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
 
 		if err != nil {
 			api.SendErrorResponse(c, "Something went wrong", http.StatusInternalServerError, nil)
@@ -295,12 +295,12 @@ func (a *DoctorAPI) SendLoginCredentialsForEmailLink() gin.HandlerFunc {
 		// Set Access Token
 		ctx.SetCookie(string(constants.AUTH_TOKEN),
 			access,
-			accessTime, "/", a.appConf.Domain, true, true)
+			accessTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
 
 		// Set Refresh Token
 		ctx.SetCookie(string(constants.REFRESH_TOKEN),
 			refresh,
-			constants.CookieRefreshExpiryTime, "/", a.appConf.Domain, true, true)
+			constants.CookieRefreshExpiryTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
 
 		if err != nil {
 			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, nil)
@@ -337,8 +337,8 @@ func (a *DoctorAPI) Logout() gin.HandlerFunc {
 			return
 		}
 
-		c.SetCookie(string(constants.AUTH_TOKEN), "", 0, "/", a.appConf.Domain, false, true)
-		c.SetCookie(string(constants.REFRESH_TOKEN), "", 0, "/", a.appConf.Domain, false, true)
+		c.SetCookie(string(constants.AUTH_TOKEN), "", 0, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
+		c.SetCookie(string(constants.REFRESH_TOKEN), "", 0, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
 
 		c.JSON(http.StatusOK, serialize.Response{
 			StatusCode: http.StatusOK,

@@ -32,6 +32,7 @@ func (r *Router) adminRoutes() {
 	routes.DELETE("/delete_editor", r.middlewares.UserRole([]constants.UserType{constants.ADMIN}), api.DeleteUser())
 
 	routes.Use(r.middlewares.UserRole([]constants.UserType{constants.ADMIN, constants.EDITOR, constants.SUPER_ADMIN}))
+	routes.GET("/me", api.GetMe())
 	routes.GET("/refresh_token", api.RefreshToken())
 	routes.PATCH("/update_password", api.UpdatePassword())
 	routes.GET("/logout", api.Logout())

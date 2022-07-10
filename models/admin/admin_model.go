@@ -13,7 +13,7 @@ type AdminEntity struct {
 	ID           primitive.ObjectID `json:"id" bson:"_id"`
 	Name         string             `json:"name" bson:"name"`
 	UserName     string             `json:"user_name" bson:"user_name"`
-	Role         constants.UserType `json:"-" bson:"role"`
+	Role         constants.UserType `json:"role" bson:"role"`
 	Email        string             `json:"email" bson:"email"`
 	Password     string             `json:"-" bson:"password"`
 	CreatedAt    primitive.DateTime `json:"joined_on" bson:"created_at"`

@@ -115,12 +115,12 @@ func (a *AdminAPI) Login() gin.HandlerFunc {
 		// Set Access Token
 		ctx.SetCookie(string(constants.AUTH_TOKEN),
 			access,
-			accessTime, "/", a.appConf.Domain, true, true)
+			accessTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
 
 		// Set Refresh Token
 		ctx.SetCookie(string(constants.REFRESH_TOKEN),
 			refresh,
-			constants.CookieRefreshExpiryTime, "/", a.appConf.Domain, true, true)
+			constants.CookieRefreshExpiryTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
 
 		if err != nil {
 			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, nil)
@@ -356,12 +356,12 @@ func (a *AdminAPI) RefreshToken() gin.HandlerFunc {
 		// Set Access Token
 		c.SetCookie(string(constants.AUTH_TOKEN),
 			access,
-			accessTime, "/", a.appConf.Domain, true, true)
+			accessTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
 
 		// Set Refresh Token
 		c.SetCookie(string(constants.REFRESH_TOKEN),
 			refresh,
-			constants.CookieRefreshExpiryTime, "/", a.appConf.Domain, true, true)
+			constants.CookieRefreshExpiryTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
 
 		if err != nil {
 			api.SendErrorResponse(c, "Something went wrong", http.StatusInternalServerError, nil)
@@ -429,12 +429,39 @@ func (a *AdminAPI) Logout() gin.HandlerFunc {
 			return
 		}
 		ctx.SetSameSite(http.SameSiteNoneMode)
-		ctx.SetCookie(string(constants.AUTH_TOKEN), "", 0, "/", a.appConf.Domain, false, true)
-		ctx.SetCookie(string(constants.REFRESH_TOKEN), "", 0, "/", a.appConf.Domain, false, true)
+		ctx.SetCookie(string(constants.AUTH_TOKEN), "", 0, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
+		ctx.SetCookie(string(constants.REFRESH_TOKEN), "", 0, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
 
 		ctx.JSON(http.StatusOK, serialize.Response{
 			StatusCode: http.StatusOK,
 			Message:    "Logged out successfully",
 		})
+	}
+}
+
+func (a *AdminAPI) GetMe() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+
+		userId, err := api.GetUserIdFromContext(ctx)
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusInternalServerError, nil)
+			return
+		}
+
+		res, err := a.adminRepo.FindById(userId)
+
+		if err != nil {
+			api.SendErrorResponse(ctx, "Not Found", http.StatusNotFound, nil)
+			return
+		}
+
+		ctx.JSON(http.StatusOK, serialize.DataResponse[*adminmodel.AdminEntity]{
+			Data: res,
+			Response: serialize.Response{
+				StatusCode: http.StatusOK,
+				Message:    "Profile details retrieved successfully",
+			},
+		})
+
 	}
 }

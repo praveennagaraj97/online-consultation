@@ -7,7 +7,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var trustedDomains map[string]bool = map[string]bool{}
+var trustedDomains map[string]bool = map[string]bool{
+	"https://online-consultation.vercel.app": true,
+}
 
 var allowedHeaders = []string{
 	"User-Agent",
