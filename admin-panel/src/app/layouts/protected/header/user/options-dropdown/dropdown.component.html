@@ -1,6 +1,6 @@
 <ng-template #dropdownRef>
   <div
-    class="w-96 h-96 dark:bg-gray-700 bg-gray-50 rounded-lg fixed z-10 shadow-2xl"
+    class="dark:bg-gray-700 bg-gray-50 rounded-lg fixed z-10 shadow-2xl"
     [style]="domPosition"
     @fadeInOut
   >
@@ -12,6 +12,25 @@
       <app-arrow-up-icon
         className="w-10 h-10 -top-5 right-2 absolute z-0 fill-gray-50 stroke-gray-50 dark:fill-gray-700 dark:stroke-gray-700"
       ></app-arrow-up-icon>
+      <div class="w-40 flex flex-col">
+        <button
+          class="hover:bg-sky-700 smooth-animate hover:text-gray-50 flex items-center px-4 py-2 z-10 space-x-2 text-sm rounded-t-lg"
+        >
+          <app-user-icon
+            className="w-4 h-4 dark:fill-gray-50 dark:stroke-gray-50"
+          ></app-user-icon>
+          <span> Profile </span>
+        </button>
+
+        <button
+          class="hover:bg-sky-700 smooth-animate hover:text-gray-50 flex items-center px-4 py-2 z-10 space-x-2 text-sm rounded-b-lg"
+        >
+          <app-logout-icon
+            className="w-4 h-4 dark:fill-gray-50 dark:stroke-gray-50"
+          ></app-logout-icon>
+          <span> Logout </span>
+        </button>
+      </div>
     </div>
   </div>
 </ng-template>

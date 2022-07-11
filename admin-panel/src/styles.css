@@ -114,4 +114,27 @@
   .action-btn {
     @apply bg-amber-600 smooth-animate hover:bg-amber-800 text-gray-50;
   }
+
+  .inner-scrollbar::-webkit-scrollbar {
+    @apply w-1.5;
+  }
+
+  .inner-scrollbar::-webkit-scrollbar-track {
+  }
+  .inner-scrollbar::-webkit-scrollbar-track:hover {
+    @apply dark:bg-gray-300/10 bg-gray-400/20 rounded-2xl;
+  }
+
+  /* scrollbar itself */
+  .inner-scrollbar::-webkit-scrollbar-thumb {
+    @apply dark:bg-gray-300/30 bg-gray-400/40 rounded-2xl border;
+  }
+
+  .inner-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply dark:bg-gray-300/50 bg-gray-400/60;
+  }
+
+  .inner-scrollbar::-webkit-scrollbar-button {
+    @apply hidden;
+  }
 }

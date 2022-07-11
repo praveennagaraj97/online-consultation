@@ -11,6 +11,7 @@ import { HomeIconComponent } from './home/home-icon.component';
 import { HospitalIconComponent } from './hospital/hospital-icon.component';
 import { LanguageIconComponent } from './language/language-icon.component';
 import { LockIconComponent } from './lock/lock-icon.component';
+import { LogoutIconComponent } from './logout/logout-icon.component';
 import { MailIconComponent } from './mail/mail-icon.component';
 import { SpecialityIconComponent } from './speciality/speciality-icon.component';
 import { SpinnerIconComponent } from './spinner/spinner-icon.component';
@@ -36,6 +37,7 @@ import { UserIconComponent } from './user/user-icon.component';
     DotsIconComponent,
     UserRoundedIconComponent,
     ArrowUpIconComponent,
+    LogoutIconComponent,
   ],
   exports: [
     MailIconComponent,
@@ -54,6 +56,7 @@ import { UserIconComponent } from './user/user-icon.component';
     DotsIconComponent,
     UserRoundedIconComponent,
     ArrowUpIconComponent,
+    LogoutIconComponent,
   ],
 })
 export class IconsModule {}

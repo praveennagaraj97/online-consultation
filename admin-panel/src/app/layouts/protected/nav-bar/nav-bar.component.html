@@ -1,16 +1,20 @@
 <div
-  class="h-screen dark:bg-gray-700 bg-gray-50 shadow-t-xl flex flex-col items-center pt-3 px-4"
+  class="h-screen dark:bg-gray-700 bg-gray-50 shadow-t-xl flex flex-col items-center pt-3 px-4 inner-scrollbar"
   (mouseover)="toggleMenu(true)"
   (mouseleave)="toggleMenu(false)"
   [@expand]="expandState"
+  [ngClass]="{ 'overflow-auto overflow-x-hidden': expandMenu }"
 >
-  <a routerLink="/dashboard" class="flex items-center space-x-2">
+  <a
+    routerLink="/dashboard"
+    class="flex items-center space-x-2 fixed z-20 dark:bg-gray-700 bg-gray-50"
+  >
     <img src="/assets/brand.png" width="48" height="48" />
     <p class="font-semibold cut-text-1" *ngIf="expandMenu">
       Online Consultation
     </p>
   </a>
-  <nav class="mt-6 flex flex-col space-y-4 w-full">
+  <nav class="mt-20 flex flex-col space-y-4 w-full mb-10">
     <app-nav-item [showTitle]="expandMenu" title="Dashboard">
       <app-home-icon
         className="w-7 h-7 dark:fill-gray-50 dark:stroke-gray-50"

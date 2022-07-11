@@ -58,7 +58,7 @@ export class UserOptionsDropdownComponent {
       });
 
       this.domPosition = {
-        left: `${(this.position?.left || 0) - 210}px`,
+        left: `${(this.position?.left || 0) + 15}px`,
         top: `${(this.position?.top || 0) + 55}px`,
       };
 
