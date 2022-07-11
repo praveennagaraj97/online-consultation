@@ -239,9 +239,7 @@ func (a *DoctorAPI) FindAllDoctors(showInActive bool) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
 		pgOpts := api.ParsePaginationOptions(ctx, "doctors")
-		sortOpts := map[string]int8{
-			"_id": -1,
-		}
+		sortOpts := map[string]int8{}
 		fltrOpts := api.ParseFilterByOptions(ctx)
 		ketSortBy := "$lt"
 
@@ -252,6 +250,13 @@ func (a *DoctorAPI) FindAllDoctors(showInActive bool) gin.HandlerFunc {
 		// Doctor Appointments Availability on particular Date
 		var slotsExistsOn *primitive.DateTime = nil
 		availableOn := ctx.Query("available_on")
+
+		// Sort By Availability
+		sortByAvailability := ctx.Query("next_available_slot")
+		if sortByAvailability != "" {
+			sortOpts["next_available_slot"] = -1
+		}
+		sortOpts["_id"] = -1
 
 		if name != "" {
 			searchOpts = &bson.M{"$text": bson.M{"$search": name}}

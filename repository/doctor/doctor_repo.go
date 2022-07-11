@@ -3,6 +3,7 @@ package doctorrepo
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/praveennagaraj97/online-consultation/api"
@@ -308,9 +309,37 @@ func (r *DoctorRepository) FindAll(pgOpts *api.PaginationOptions,
 		pipeline = append(pipeline, bson.D{{Key: "$match", Value: bson.M{"is_active": true}}})
 	}
 
+	if slotsExistsOn == nil {
+		// Next Available Slot
+		nextAvailableLookUp := bson.D{{Key: "$lookup", Value: bson.M{
+			"from":         "appointment_slot",
+			"localField":   "_id",
+			"foreignField": "doctor_id",
+			"as":           "next_available_slot",
+			"pipeline": bson.A{
+				bson.M{"$match": bson.M{"$and": bson.A{
+					bson.M{"is_available": true},
+					bson.M{"start": bson.M{"$gt": primitive.NewDateTimeFromTime(time.Now())}},
+				}}},
+				bson.M{"$limit": 1},
+			},
+		}}}
+
+		pipeline = append(pipeline, nextAvailableLookUp)
+	}
+
+	unwindNextAvailableSlot := bson.D{{Key: "$unwind", Value: bson.M{
+		"path":                       "$next_available_slot",
+		"preserveNullAndEmptyArrays": true,
+	}}}
+
+	pipeline = append(pipeline, unwindNextAvailableSlot)
+
 	// Sort Options
 	sortBy := bson.D{{Key: "$sort", Value: *srtOpts}}
 	pipeline = append(pipeline, sortBy)
+
+	fmt.Println(sortBy)
 
 	// Pagination Options
 	if pgOpts.PaginateId != nil {
@@ -320,6 +349,7 @@ func (r *DoctorRepository) FindAll(pgOpts *api.PaginationOptions,
 		skip := bson.D{{Key: "$skip", Value: (pgOpts.PerPage * (pgOpts.PageNum - 1))}}
 		pipeline = append(pipeline, skip)
 	}
+
 	// Limit
 	limit := bson.D{{Key: "$limit", Value: pgOpts.PerPage}}
 	pipeline = append(pipeline, limit)
@@ -367,32 +397,6 @@ func (r *DoctorRepository) FindAll(pgOpts *api.PaginationOptions,
 		}},
 	}}}
 	pipeline = append(pipeline, setImagePrefixPipe, setBlurImagePrefixPipe, resetNullImagePipe)
-
-	if slotsExistsOn == nil {
-		// Next Available Slot
-		nextAvailableLookUp := bson.D{{Key: "$lookup", Value: bson.M{
-			"from":         "appointment_slot",
-			"localField":   "_id",
-			"foreignField": "doctor_id",
-			"as":           "next_available_slot",
-			"pipeline": bson.A{
-				bson.M{"$match": bson.M{"$and": bson.A{
-					bson.M{"is_available": true},
-					bson.M{"start": bson.M{"$gt": primitive.NewDateTimeFromTime(time.Now())}},
-				}}},
-				bson.M{"$limit": 1},
-			},
-		}}}
-
-		pipeline = append(pipeline, nextAvailableLookUp)
-	}
-
-	unwindNextAvailableSlot := bson.D{{Key: "$unwind", Value: bson.M{
-		"path":                       "$next_available_slot",
-		"preserveNullAndEmptyArrays": true,
-	}}}
-
-	pipeline = append(pipeline, unwindNextAvailableSlot)
 
 	cur, err := r.colln.Aggregate(ctx, pipeline)
 

@@ -8,6 +8,8 @@ export class DoctorsListViewService {
   constructor(private http: HttpClient) {}
 
   getDoctorsList() {
-    return this.http.get<DoctorListResponse>(doctorRoutes.DoctorsList);
+    return this.http.get<DoctorListResponse>(doctorRoutes.DoctorsList, {
+      params: { next_available_slot: true },
+    });
   }
 }
