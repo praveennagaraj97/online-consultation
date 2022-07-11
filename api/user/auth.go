@@ -489,7 +489,7 @@ func (a *UserAPI) Logout() gin.HandlerFunc {
 			api.SendErrorResponse(c, err.Error(), http.StatusUnauthorized, nil)
 			return
 		}
-
+		c.SetSameSite(http.SameSiteNoneMode)
 		c.SetCookie(string(constants.AUTH_TOKEN), "", 0, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
 		c.SetCookie(string(constants.REFRESH_TOKEN), "", 0, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
 
@@ -550,6 +550,7 @@ func (a *UserAPI) RefreshToken() gin.HandlerFunc {
 
 		a.userRepo.UpdateRefreshToken(&user.ID, refresh)
 
+		c.SetSameSite(http.SameSiteNoneMode)
 		// Set Access Token
 		c.SetCookie(string(constants.AUTH_TOKEN),
 			access,

@@ -111,7 +111,7 @@ func (a *AdminAPI) Login() gin.HandlerFunc {
 
 		a.adminRepo.UpdateRefreshToken(&user.ID, refresh)
 
-		ctx.SetSameSite(http.SameSiteLaxMode)
+		ctx.SetSameSite(http.SameSiteNoneMode)
 		// Set Access Token
 		ctx.SetCookie(string(constants.AUTH_TOKEN),
 			access,

@@ -151,6 +151,7 @@ func (a *DoctorAPI) RefreshToken() gin.HandlerFunc {
 
 		a.repo.UpdateRefreshToken(&user.ID, refresh)
 
+		c.SetSameSite(http.SameSiteNoneMode)
 		// Set Access Token
 		c.SetCookie(string(constants.AUTH_TOKEN),
 			access,
@@ -337,6 +338,7 @@ func (a *DoctorAPI) Logout() gin.HandlerFunc {
 			return
 		}
 
+		c.SetSameSite(http.SameSiteNoneMode)
 		c.SetCookie(string(constants.AUTH_TOKEN), "", 0, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
 		c.SetCookie(string(constants.REFRESH_TOKEN), "", 0, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
 
