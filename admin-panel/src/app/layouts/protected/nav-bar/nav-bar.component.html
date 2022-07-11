@@ -5,10 +5,7 @@
   [@expand]="expandState"
   [ngClass]="{ 'overflow-auto overflow-x-hidden': expandMenu }"
 >
-  <a
-    routerLink="/dashboard"
-    class="flex items-center space-x-2 fixed z-20 dark:bg-gray-700 bg-gray-50"
-  >
+  <a routerLink="/dashboard" class="flex items-center space-x-2 fixed z-20">
     <img src="/assets/brand.png" width="48" height="48" />
     <p class="font-semibold cut-text-1" *ngIf="expandMenu">
       Online Consultation

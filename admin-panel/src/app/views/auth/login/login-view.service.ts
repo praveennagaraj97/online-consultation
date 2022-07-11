@@ -36,6 +36,11 @@ export class LoginService {
               isLogged: true,
               rememberMe: rememberMe,
             };
+            this.setAuthTokenIfCookieDisabled(
+              res.access_token,
+              res.refresh_token,
+              rememberMe
+            );
             this.persistState(authState);
             this.store.dispatch(loginAction(authState));
           }
@@ -51,6 +56,20 @@ export class LoginService {
         APP_STORAGE_NAMES.AUTH_STATE,
         JSON.stringify(state)
       );
+    }
+  }
+
+  private setAuthTokenIfCookieDisabled(
+    access: string,
+    refresh: string,
+    rememberMe: boolean
+  ) {
+    if (!navigator.cookieEnabled) {
+      if (rememberMe) {
+        localStorage.setItem(APP_STORAGE_NAMES.AUTH_ACCESS_TOKEN, access);
+      } else {
+        sessionStorage.setItem(APP_STORAGE_NAMES.AUTH_REFRESH_TOKEN, refresh);
+      }
     }
   }
 }

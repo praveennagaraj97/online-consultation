@@ -119,8 +119,6 @@
     @apply w-1.5;
   }
 
-  .inner-scrollbar::-webkit-scrollbar-track {
-  }
   .inner-scrollbar::-webkit-scrollbar-track:hover {
     @apply dark:bg-gray-300/10 bg-gray-400/20 rounded-2xl;
   }
