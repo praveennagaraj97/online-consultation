@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { AuthorizedGuard } from './guards/is-authorized.guard';
 import { NotAuthorizedGuard } from './guards/not-authorized.guard';
 import { ProtectedLayoutComponent } from './layouts/protected/layout.component';
@@ -56,17 +56,27 @@ const protectedRoues: Routes = [
         component: DashboardViewComponent,
         title: 'Online Consultation | Settings',
       },
+      {
+        path: 'doctors',
+        loadChildren: () =>
+          import('./views/doctors/doctors.module').then(
+            (m) => m.DoctorsViewModule
+          ),
+      },
     ],
   },
 ];
 
 @NgModule({
   imports: [
-    RouterModule.forRoot([
-      ...publicRoues,
-      ...protectedRoues,
-      { path: '**', component: PageNotFoundViewComponent },
-    ]),
+    RouterModule.forRoot(
+      [
+        ...publicRoues,
+        ...protectedRoues,
+        { path: '**', component: PageNotFoundViewComponent },
+      ],
+      { preloadingStrategy: PreloadAllModules }
+    ),
   ],
   exports: [RouterModule],
 })

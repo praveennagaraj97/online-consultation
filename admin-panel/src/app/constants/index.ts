@@ -3,3 +3,7 @@ export enum APP_STORAGE_NAMES {
   AUTH_ACCESS_TOKEN = 'auth_access_token',
   AUTH_REFRESH_TOKEN = 'auth_refresh_token',
 }
+
+export enum ImagePlaceholders {
+  NOTFOUND = '/assets/img-placeholder.png',
+}

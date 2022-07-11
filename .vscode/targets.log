@@ -10,7 +10,7 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 make: *** No rule to make target `all'.  Stop.
 
 
-# Make data base, printed on Sun Jul 10 21:08:25 2022
+# Make data base, printed on Mon Jul 11 23:23:24 2022
 
 # Variables
 
@@ -35,20 +35,24 @@ _ = /usr/bin/make
 # makefile (from `Makefile', line 1)
 MAKEFILE_LIST :=  Makefile
 # environment
+VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
+# environment
 __CFBundleIdentifier = com.microsoft.VSCode
 # environment
 VSCODE_CWD = /
+ 
 # environment
-PATH = /usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin
+GOPROXY = https://proxy.golang.org,direct
 # environment
-LaunchInstanceID = 65F86F2E-C138-4190-9564-D429F8DF32B0
+PATH = /usr/local/go/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+# environment
+GOPATH = /Users/praveennagaraj/go
 # environment
 ELECTRON_RUN_AS_NODE = 1
 # default
- 
 .FEATURES := target-specific order-only second-expansion else-if archives jobserver check-symlink
 # environment
-SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.8jY5noVEEn/Listeners
+SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.Vjw3EJgKg3/Listeners
 # automatic
 %F = $(notdir $%)
 # environment
@@ -56,7 +60,7 @@ PWD = /Volumes/Workspace/online-consultation-api
 # environment
 ORIGINAL_XDG_CURRENT_DESKTOP = undefined
 # environment
-VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
+GOMODCACHE = /Users/praveennagaraj/go/pkg/mod
 # environment
 HOME = /Users/praveennagaraj
 # default
@@ -123,8 +127,6 @@ MAKEFILES :=
 <F = $(notdir $<)
 # environment
 LC_ALL = C
-# environment
-SECURITYSESSIONID = 186b2
 # automatic
 ^F = $(notdir $^)
 # default
@@ -136,9 +138,9 @@ MAKELEVEL := 0
 # environment
 LANG = C
 # environment
-VSCODE_PID = 575
+VSCODE_PID = 905
 # variable set hash-table stats:
-# Load=61/1024=6%, Rehash=0, Collisions=1/85=1%
+# Load=62/1024=6%, Rehash=0, Collisions=2/86=2%
 
 # Pattern-specific Variable Values
 
@@ -146,9 +148,9 @@ VSCODE_PID = 575
 
 # Directories
 
-# . (device 16777250, inode 15038850): 36 files, no impossibilities.
+# . (device 16777249, inode 15038850): 37 files, no impossibilities.
 
-# 36 files, no impossibilities in 1 directories.
+# 37 files, no impossibilities in 1 directories.
 
 # Implicit Rules
 
@@ -249,6 +251,6 @@ stop_dev:
 # strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
-# Finished Make data base on Sun Jul 10 21:08:25 2022
+# Finished Make data base on Mon Jul 11 23:23:24 2022
 
  

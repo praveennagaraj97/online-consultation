@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { AdminIconComponent } from './admin/admin-icon.component';
 import { AppointmentIconComponent } from './appointment/appointment-icon.component';
 import { ArrowUpIconComponent } from './arrow/arrow-up-icon.component';
+import { ChevronIconComponent } from './chevron/chevron-icon.component';
 import { ConsultatationIconComponent } from './consultation/consultation-icon.component';
 import { DoctorIconComponent } from './doctor/doctor-icon.component';
 import { DotsIconComponent } from './dots/dots-icon.component';
@@ -38,6 +39,7 @@ import { UserIconComponent } from './user/user-icon.component';
     UserRoundedIconComponent,
     ArrowUpIconComponent,
     LogoutIconComponent,
+    ChevronIconComponent,
   ],
   exports: [
     MailIconComponent,
@@ -57,6 +59,7 @@ import { UserIconComponent } from './user/user-icon.component';
     UserRoundedIconComponent,
     ArrowUpIconComponent,
     LogoutIconComponent,
+    ChevronIconComponent,
   ],
 })
 export class IconsModule {}
