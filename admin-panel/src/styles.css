@@ -116,7 +116,7 @@
   }
 
   .inner-scrollbar::-webkit-scrollbar {
-    @apply w-1.5;
+    @apply w-1.5 h-2;
   }
 
   .inner-scrollbar::-webkit-scrollbar-track:hover {

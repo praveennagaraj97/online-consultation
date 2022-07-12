@@ -4,15 +4,26 @@
 
   <!-- Search Filters -->
   <div
-    class="dark:bg-gray-700 bg-gray-50 rounded-lg shadow-lg mt-2 overflow-hidden"
+    class="dark:bg-gray-700 bg-gray-50 rounded-lg shadow-lg my-4 overflow-hidden p-3"
   >
-    <!--  -->
+    <h2 class="font-semibold mb-3">Search Filter</h2>
+    <div class="grid grid-cols-3 gap-4">
+      <app-select-dropdown
+        placeHolder="Select Speciality"
+        [options]="specialities"
+        (onChange)="onSpecialityFilter($event)"
+      ></app-select-dropdown>
+      <app-select-dropdown
+        placeHolder="Select Consultation Type"
+      ></app-select-dropdown>
+      <app-select-dropdown placeHolder="Select Status"></app-select-dropdown>
+    </div>
   </div>
 
   <div
     class="dark:bg-gray-700 bg-gray-50 rounded-lg shadow-lg mt-2 overflow-hidden"
   >
-    <!-- <header class="p-3 flex justify-between items-center">
+    <header class="p-3 flex justify-between items-center">
       <app-per-page-component
         [options]="limitOptions"
         [defaultSelected]="perPage"
@@ -33,7 +44,7 @@
           Add new doctor
         </button>
       </div>
-    </header> -->
+    </header>
 
     <app-doctor-list-data-component
       [doctors]="doctors"

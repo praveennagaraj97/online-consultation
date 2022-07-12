@@ -10,3 +10,7 @@ export const adminRoutes = { ProfileDetails: '/admin/me' };
 export const doctorRoutes = {
   DoctorsList: `/admin/doctor`,
 };
+
+export const sharedRoutes = {
+  Specialities: `/speciality`,
+};

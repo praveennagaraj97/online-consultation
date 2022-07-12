@@ -5,3 +5,5 @@ export enum UserRoles {
   Admin = 'admin',
   Editor = 'editor',
 }
+
+export type SelectOption = { title: string; value: string };

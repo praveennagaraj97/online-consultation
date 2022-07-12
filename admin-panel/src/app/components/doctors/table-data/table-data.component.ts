@@ -4,7 +4,7 @@ import { DoctorsEntity } from 'src/app/types/doctor.response.types';
 @Component({
   selector: 'app-doctor-list-data-component',
   template: `
-    <div class="overflow-x-auto">
+    <div class="overflow-x-auto inner-scrollbar">
       <table class="w-full min-w-[1000px]">
         <thead class="w-full bg-gray-400/50">
           <th class="text-sm font-medium p-2 whitespace-nowrap text-left">
@@ -80,6 +80,7 @@ import { DoctorsEntity } from 'src/app/types/doctor.response.types';
             </td>
             <td class="text-xs p-2 whitespace-nowrap">
               <select
+                aria-readonly="true"
                 name="languages"
                 class="common-input input-focus input-colors rounded-md p-1"
               >
