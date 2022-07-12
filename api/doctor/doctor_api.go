@@ -260,7 +260,7 @@ func (a *DoctorAPI) FindAllDoctors(showInActive bool) gin.HandlerFunc {
 		sortOpts["_id"] = -1
 
 		if name != "" {
-			searchOpts = &bson.M{"name": bson.M{"$regex": primitive.Regex{Pattern: fmt.Sprintf("%s", name), Options: "i"}}}
+			searchOpts = &bson.M{"name": bson.M{"$regex": primitive.Regex{Pattern: name, Options: "i"}}}
 		}
 
 		if availableOn != "" {

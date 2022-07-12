@@ -31,7 +31,7 @@ func (r *DoctorRepository) Initialize(colln *mongo.Collection) {
 		{Key: "phone.code", Value: 1}}, "PhoneIndex", true)
 
 	utils.CreateIndex(colln, bson.D{{Key: "email", Value: 1}}, "EmailIndex", true)
-
+	utils.CreateIndex(colln, bson.D{{Key: "name", Value: 1}}, "DoctorNameIndex", false)
 	utils.CreateIndex(colln, bson.D{{Key: "consultation_type_id", Value: 1}}, "ConsultationTypeIndex", false)
 	utils.CreateIndex(colln, bson.D{{Key: "speciality_id", Value: 1}}, "SpecialityIndex", false)
 	utils.CreateIndex(colln, bson.D{{Key: "hospital_id", Value: 1}}, "HospitalIndex", false)
