@@ -35,7 +35,7 @@ import { DoctorsEntity } from 'src/app/types/doctor.response.types';
             Actions
           </th>
         </thead>
-        <tbody>
+        <tbody *ngIf="doctors.length; else notfound">
           <tr
             *ngFor="let doctor of doctors"
             class="smooth-animate hover:bg-gray-400/30"
@@ -95,6 +95,18 @@ import { DoctorsEntity } from 'src/app/types/doctor.response.types';
             <td class="text-xs p-2 whitespace-nowrap">...</td>
           </tr>
         </tbody>
+
+        <ng-template #notfound>
+          <tbody>
+            <tr>
+              <td colspan="9">
+                <div class="flex items-center justify-center">
+                  <app-no-doctors-component></app-no-doctors-component>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </ng-template>
       </table>
     </div>
   `,

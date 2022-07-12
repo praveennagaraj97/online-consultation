@@ -11,12 +11,18 @@
       <app-select-dropdown
         placeHolder="Select Speciality"
         [options]="specialities"
-        (onChange)="onSpecialityFilter($event)"
+        (onChange)="onSpecialityChanegFilter($event)"
       ></app-select-dropdown>
       <app-select-dropdown
         placeHolder="Select Consultation Type"
+        [options]="consultationTypes"
+        (onChange)="onConsultationChangeFilter($event)"
       ></app-select-dropdown>
-      <app-select-dropdown placeHolder="Select Status"></app-select-dropdown>
+      <app-select-dropdown
+        [options]="activeStatus"
+        placeHolder="Select Status"
+        (onChange)="onActiveStatusChangeFilter($event)"
+      ></app-select-dropdown>
     </div>
   </div>
 
@@ -25,7 +31,6 @@
   >
     <header class="p-3 flex justify-between items-center">
       <app-per-page-component
-        [options]="limitOptions"
         [defaultSelected]="perPage"
         (onChange)="updatePerPageLimit($event)"
       ></app-per-page-component>
@@ -46,7 +51,12 @@
       </div>
     </header>
 
+    <app-doctors-list-skeleton-component
+      *ngIf="isLoading"
+    ></app-doctors-list-skeleton-component>
+
     <app-doctor-list-data-component
+      *ngIf="!isLoading"
       [doctors]="doctors"
     ></app-doctor-list-data-component>
   </div>

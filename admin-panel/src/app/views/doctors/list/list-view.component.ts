@@ -22,21 +22,49 @@ export class DoctorsListViewComponent {
 
   // State
   breadcrumbPaths = [{ path: '/doctors', title: 'Doctors' }];
+  isLoading = false;
   doctors: DoctorsEntity[] = [];
   perPage = 10;
-  limitOptions: { value: number; title: string }[] = [
-    { title: '10', value: 10 },
-    { title: '20', value: 20 },
-    { title: '50', value: 50 },
-  ];
   specialities: SelectOption[] = [];
+  consultationTypes: SelectOption[] = [];
+  activeStatus: SelectOption[] = [
+    { title: 'All', value: '' },
+    { title: 'Active', value: 'true' },
+    { title: 'In Active', value: 'false' },
+  ];
   selectedSpeciality = '';
+  selectedConsultationType = '';
+  selectedActiveType = '';
 
   constructor(private doctorsListService: DoctorsListViewService) {}
 
   ngOnInit() {
     this.getDoctorsList();
     this.getSpecialities();
+    this.getConsultationTypes();
+  }
+
+  private getDoctorsList() {
+    this.isLoading = true;
+    this.subs$.push(
+      this.doctorsListService
+        .getDoctorsList(
+          this.perPage,
+          this.selectedSpeciality,
+          this.selectedConsultationType,
+          this.selectedActiveType
+        )
+        .subscribe({
+          next: (res) => {
+            this.isLoading = false;
+            this.doctors = res.result || [];
+          },
+          error: () => {
+            this.isLoading = false;
+            alert('Failed to load doctors');
+          },
+        })
+    );
   }
 
   private getSpecialities() {
@@ -45,31 +73,38 @@ export class DoctorsListViewComponent {
         next: (res) => {
           this.specialities = res || [];
         },
-        error: (err) => {
-          console.log(err);
+        error: () => {
+          alert('Failed to load specialities');
         },
       })
     );
   }
 
-  // Error Handle Pending
-  private getDoctorsList() {
+  private getConsultationTypes() {
     this.subs$.push(
-      this.doctorsListService
-        .getDoctorsList(this.perPage, this.selectedSpeciality)
-        .subscribe({
-          next: (res) => {
-            this.doctors = res.result || [];
-          },
-          error: (err) => {
-            console.log(err);
-          },
-        })
+      this.doctorsListService.getConsultationTypes().subscribe({
+        next: (res) => {
+          this.consultationTypes = res || [];
+        },
+        error: () => {
+          alert('Failed to load specialities');
+        },
+      })
     );
   }
 
-  onSpecialityFilter(option: SelectOption) {
+  onSpecialityChanegFilter(option: SelectOption) {
     this.selectedSpeciality = option.value;
+    this.getDoctorsList();
+  }
+
+  onConsultationChangeFilter(option: SelectOption) {
+    this.selectedConsultationType = option.value;
+    this.getDoctorsList();
+  }
+
+  onActiveStatusChangeFilter(option: SelectOption) {
+    this.selectedActiveType = option.value;
     this.getDoctorsList();
   }
 

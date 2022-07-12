@@ -3,19 +3,35 @@ import { Injectable } from '@angular/core';
 import { map } from 'rxjs';
 import { doctorRoutes, sharedRoutes } from 'src/app/api-routes/routes';
 import { PaginatedBaseAPiResponse } from 'src/app/types/api.response.types';
-import { SpecialityEntity } from 'src/app/types/cms.response.types';
+import {
+  ConsultationEntity,
+  SpecialityEntity,
+} from 'src/app/types/cms.response.types';
 import { DoctorListResponse } from 'src/app/types/doctor.response.types';
 
 @Injectable()
 export class DoctorsListViewService {
   constructor(private http: HttpClient) {}
 
-  getDoctorsList(perPage = 10, speciality: string) {
+  getDoctorsList(
+    perPage = 10,
+    speciality: string,
+    consultationType: string,
+    activeState: string
+  ) {
     const params: { [key: string]: string } = {};
 
     params['per_page'] = `${perPage}`;
     if (speciality) {
       params['speciality_id[eq]'] = speciality;
+    }
+
+    if (consultationType) {
+      params['consultation_type_id[eq]'] = consultationType;
+    }
+
+    if (activeState) {
+      params['is_active[eq]'] = activeState;
     }
 
     return this.http.get<DoctorListResponse>(doctorRoutes.DoctorsList, {
@@ -34,10 +50,31 @@ export class DoctorsListViewService {
       )
       .pipe(
         map((res) => {
-          return res.result?.map((res) => ({
-            title: res.title,
-            value: res.id,
-          }));
+          const data =
+            res.result?.map((res) => ({
+              title: res.title,
+              value: res.id,
+            })) || [];
+
+          return [{ title: 'All', value: '' }, ...data];
+        })
+      );
+  }
+
+  getConsultationTypes() {
+    return this.http
+      .get<PaginatedBaseAPiResponse<ConsultationEntity[]>>(
+        sharedRoutes.ConsultationTypes
+      )
+      .pipe(
+        map((res) => {
+          const data =
+            res.result?.map((res) => ({
+              title: res.type,
+              value: res.id,
+            })) || [];
+
+          return [{ title: 'All', value: '' }, ...data];
         })
       );
   }

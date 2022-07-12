@@ -7,6 +7,7 @@ import { ChevronIconComponent } from './chevron/chevron-icon.component';
 import { ConsultatationIconComponent } from './consultation/consultation-icon.component';
 import { DoctorIconComponent } from './doctor/doctor-icon.component';
 import { DotsIconComponent } from './dots/dots-icon.component';
+import { ThreeDotsIconComponent } from './dots/three-dots.component';
 import { EditorIconComponent } from './editor/editor-icon.component';
 import { HomeIconComponent } from './home/home-icon.component';
 import { HospitalIconComponent } from './hospital/hospital-icon.component';
@@ -40,6 +41,7 @@ import { UserIconComponent } from './user/user-icon.component';
     ArrowUpIconComponent,
     LogoutIconComponent,
     ChevronIconComponent,
+    ThreeDotsIconComponent,
   ],
   exports: [
     MailIconComponent,
@@ -60,6 +62,7 @@ import { UserIconComponent } from './user/user-icon.component';
     ArrowUpIconComponent,
     LogoutIconComponent,
     ChevronIconComponent,
+    ThreeDotsIconComponent,
   ],
 })
 export class IconsModule {}

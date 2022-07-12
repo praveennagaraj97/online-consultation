@@ -26,3 +26,13 @@ export interface SpecialityEntity {
   slug: string;
   thumbnail: ImageType | null;
 }
+
+export interface ConsultationEntity {
+  id: string;
+  title: string;
+  icon: ImageType;
+  description: string;
+  price: number;
+  action_name: string;
+  type: string;
+}
