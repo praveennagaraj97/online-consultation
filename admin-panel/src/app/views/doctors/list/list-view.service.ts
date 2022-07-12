@@ -18,7 +18,8 @@ export class DoctorsListViewService {
     speciality: string,
     consultationType: string,
     activeState: string,
-    paginateId: string
+    paginateId: string,
+    search: string
   ) {
     const params: { [key: string]: string } = {};
 
@@ -37,6 +38,10 @@ export class DoctorsListViewService {
 
     if (paginateId) {
       params['paginate_id'] = paginateId;
+    }
+
+    if (search) {
+      params['name'] = search;
     }
 
     // Disable next available populate

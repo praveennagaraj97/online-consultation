@@ -40,6 +40,8 @@
             type="text"
             name="search"
             placeholder="Search"
+            [ngModel]="searchTerm"
+            (ngModelChange)="onSearch($event)"
             autocomplete="off"
             class="common-input input-focus input-colors p-1.5 rounded-lg text-sm"
           />

@@ -39,6 +39,7 @@ export class DoctorsListViewComponent {
   totalCount = 0;
   pageNum = 1;
   paginateId = '';
+  searchTerm = '';
 
   constructor(
     private doctorsListService: DoctorsListViewService,
@@ -68,7 +69,8 @@ export class DoctorsListViewComponent {
           this.selectedSpeciality,
           this.selectedConsultationType,
           this.selectedActiveType,
-          paginateId
+          paginateId,
+          this.searchTerm
         )
         .subscribe({
           next: (res) => {
@@ -133,6 +135,12 @@ export class DoctorsListViewComponent {
   updatePerPageLimit(value: number) {
     this.perPage = value;
 
+    this.getDoctorsList();
+  }
+
+  onSearch(value: string) {
+    this.router.navigate([], { queryParams: {} });
+    this.searchTerm = value;
     this.getDoctorsList();
   }
 
