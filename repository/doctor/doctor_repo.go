@@ -328,15 +328,12 @@ func (r *DoctorRepository) FindAll(pgOpts *api.PaginationOptions,
 		pipeline = append(pipeline, nextAvailableLookUp)
 	}
 
-	if populateNextAvailable {
+	unwindNextAvailableSlot := bson.D{{Key: "$unwind", Value: bson.M{
+		"path":                       "$next_available_slot",
+		"preserveNullAndEmptyArrays": true,
+	}}}
 
-		unwindNextAvailableSlot := bson.D{{Key: "$unwind", Value: bson.M{
-			"path":                       "$next_available_slot",
-			"preserveNullAndEmptyArrays": true,
-		}}}
-
-		pipeline = append(pipeline, unwindNextAvailableSlot)
-	}
+	pipeline = append(pipeline, unwindNextAvailableSlot)
 
 	// Sort Options
 	sortBy := bson.D{{Key: "$sort", Value: *srtOpts}}

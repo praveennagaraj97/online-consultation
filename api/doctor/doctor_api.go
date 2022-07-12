@@ -275,10 +275,14 @@ func (a *DoctorAPI) FindAllDoctors(showInActive bool) gin.HandlerFunc {
 		}
 
 		// Populate Next Available | Default is true.
-		populateNextAvailable, err := strconv.ParseBool(ctx.Query("populate_next_available"))
-		if err != nil {
+		populateNextKey := ctx.Query("populate_next_available")
+
+		populateNextAvailable, err := strconv.ParseBool(populateNextKey)
+		if err != nil || populateNextKey == "" {
 			populateNextAvailable = true
 		}
+
+		fmt.Println(populateNextAvailable)
 
 		res, err := a.repo.FindAll(pgOpts, fltrOpts, &sortOpts, ketSortBy, searchOpts,
 			showInActive, slotsExistsOn, populateNextAvailable)

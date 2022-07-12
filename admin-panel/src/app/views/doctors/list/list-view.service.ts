@@ -34,6 +34,9 @@ export class DoctorsListViewService {
       params['is_active[eq]'] = activeState;
     }
 
+    // Disable next available populate
+    params['populate_next_available'] = 'fasle';
+
     return this.http.get<DoctorListResponse>(doctorRoutes.DoctorsList, {
       params: params,
     });

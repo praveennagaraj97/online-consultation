@@ -8,6 +8,8 @@ import { NoDoctorsFoundComponent } from './404s/no-doctors.component';
 import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
 import { DoctorListTableDataComponent } from './doctors/table-data/table-data.component';
 import { EmailSentComponent } from './email-sent/email-sent.component';
+import { PaginationControlsComponent } from './pagination/controls.component';
+import { PaginationCountDisplayComponent } from './pagination/display-count.component';
 import { PerPageOptionsComponent } from './pagination/per-page-options.component';
 import { ThemeProviderComponent } from './providers/theme-provider/theme-provider.component';
 import { SelectDropdownComponent } from './select-dropdown/select-dropdown.component';
@@ -32,6 +34,8 @@ import { DoctorsListSkeletonComponent } from './skeletons/doctors/list-skeleton.
     SelectDropdownComponent,
     NoDoctorsFoundComponent,
     DoctorsListSkeletonComponent,
+    PaginationControlsComponent,
+    PaginationCountDisplayComponent,
   ],
   exports: [
     ThemeProviderComponent,
@@ -43,6 +47,8 @@ import { DoctorsListSkeletonComponent } from './skeletons/doctors/list-skeleton.
     SelectDropdownComponent,
     NoDoctorsFoundComponent,
     DoctorsListSkeletonComponent,
+    PaginationControlsComponent,
+    PaginationCountDisplayComponent,
   ],
 })
 export class ComponentsModule {}

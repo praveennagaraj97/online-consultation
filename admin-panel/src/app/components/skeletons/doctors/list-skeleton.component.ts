@@ -35,7 +35,10 @@ import { Component } from '@angular/core';
           </th>
         </thead>
         <tbody>
-          <tr *ngFor="let _ of repeatArray">
+          <tr
+            *ngFor="let _ of repeatArray"
+            class="border-b dark:border-gray-50/20"
+          >
             <td class="p-2">
               <div class="flex items-center space-x-1">
                 <div class="w-8 h-8 rounded-full skeleton"></div>

@@ -35,6 +35,7 @@ export class DoctorsListViewComponent {
   selectedSpeciality = '';
   selectedConsultationType = '';
   selectedActiveType = '';
+  totalCount = 0;
 
   constructor(private doctorsListService: DoctorsListViewService) {}
 
@@ -58,6 +59,7 @@ export class DoctorsListViewComponent {
           next: (res) => {
             this.isLoading = false;
             this.doctors = res.result || [];
+            this.totalCount = res.count;
           },
           error: () => {
             this.isLoading = false;
