@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
   selector: 'app-per-page-component',
@@ -7,14 +7,25 @@ import { Component } from '@angular/core';
       <small>Show</small>
       <select
         name="per_page"
+        [ngModel]="defaultSelected"
+        (ngModelChange)="onChangeListner($event)"
+        [value]="defaultSelected"
         class="common-input input-focus input-colors rounded-md p-1 text-sm"
       >
-        <option value="">10</option>
-        <option value="">20</option>
-        <option value="">50</option>
+        <option [value]="opt.value" *ngFor="let opt of options">
+          {{ opt.title }}
+        </option>
       </select>
       <small>Entries</small>
     </div>
   `,
 })
-export class PerPageOptionsComponent {}
+export class PerPageOptionsComponent {
+  @Input() options: { value: string | number; title: string }[] = [];
+  @Input() defaultSelected?: string | number;
+  @Output() onChange = new EventEmitter<number>();
+
+  onChangeListner(value: number) {
+    this.onChange.emit(value);
+  }
+}

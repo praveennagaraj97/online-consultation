@@ -7,9 +7,9 @@ import { DoctorListResponse } from 'src/app/types/doctor.response.types';
 export class DoctorsListViewService {
   constructor(private http: HttpClient) {}
 
-  getDoctorsList() {
+  getDoctorsList(perPage = 10) {
     return this.http.get<DoctorListResponse>(doctorRoutes.DoctorsList, {
-      params: { next_available_slot: true },
+      params: { per_page: perPage },
     });
   }
 }
