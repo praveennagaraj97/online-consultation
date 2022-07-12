@@ -1,5 +1,8 @@
 <header
-  class="w-full dark:bg-gray-700 bg-gray-50 rounded-lg shadow-lg flex justify-end items-cente px-4 py-2"
+  class="w-full dark:bg-gray-700 bg-gray-50 rounded-lg shadow-lg flex justify-between items-cente px-4 py-2"
 >
+  <div class="sm:hidden block">
+    <button (click)="onBurgerMenuExpand.emit(true)">Show</button>
+  </div>
   <app-user-options></app-user-options>
 </header>

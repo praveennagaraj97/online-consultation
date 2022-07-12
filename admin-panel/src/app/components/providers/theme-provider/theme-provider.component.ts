@@ -1,5 +1,5 @@
 import { animate, style, transition, trigger } from '@angular/animations';
-import { Overlay } from '@angular/cdk/overlay';
+import { Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
 import {
   Component,
@@ -13,9 +13,13 @@ import {
   templateUrl: 'theme-provider.component.html',
   animations: [
     trigger('backInRight', [
-      transition('void <=> *', [
+      transition('void => *', [
         style({ opacity: 0, transform: `translateX(100%)` }),
         animate('0.5s', style({ opacity: 1, transform: `translateX(0)` })),
+      ]),
+      transition('* => void', [
+        style({ opacity: 1 }),
+        animate('0.5s', style({ opacity: 0, transform: `translateX(100%)` })),
       ]),
     ]),
   ],
@@ -23,6 +27,7 @@ import {
 export class ThemeProviderComponent {
   @ViewChild('themePortal') themePortalRef?: TemplateRef<unknown>;
   selectedTheme: 'dark' | 'light' = 'dark';
+  protected overlayRef?: OverlayRef;
 
   constructor(
     private overlay: Overlay,
@@ -76,12 +81,18 @@ export class ThemeProviderComponent {
     this.toggleTheme(theme);
   }
 
+  closeSwitch() {
+    this.overlayRef?.detach();
+  }
+
   ngAfterViewInit() {
-    const overlayRef = this.overlay.create();
+    const overlayRef = this.overlay.create({ disposeOnNavigation: false });
     if (this.themePortalRef) {
       overlayRef.attach(
         new TemplatePortal(this.themePortalRef, this.viewContainerRef)
       );
     }
+
+    this.overlayRef = overlayRef;
   }
 }

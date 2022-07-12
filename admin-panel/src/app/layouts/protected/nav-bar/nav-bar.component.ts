@@ -28,7 +28,6 @@ export class NavBarComponent {
   toggleMenu(state: boolean) {
     this.expandState = state ? 'open' : 'closed';
     this.expandMenu = state;
-
     this.onExpand.emit(state);
   }
 }

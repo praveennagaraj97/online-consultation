@@ -2,15 +2,15 @@
   <app-nav-bar (onExpand)="onMenuExpand($event)" class="fixed z-20">
   </app-nav-bar>
   <main
-    class="p-3 w-full relative transform duration-200 will-change-transform flex flex-col justify-between min-h-[100vh]"
-    [ngClass]="menuExpanded ? 'ml-64' : 'ml-24'"
+    class="p-3 w-full relative transform duration-200 will-change-transform flex flex-col justify-between min-h-[100vh] overflow-x-hidden"
+    [ngClass]="menuExpanded ? 'sm:ml-64' : 'sm:ml-24'"
   >
     <div>
       <app-header class="sticky top-0 left-0 right-0 z-20"></app-header>
       <router-outlet></router-outlet>
     </div>
     <footer
-      class="w-full dark:bg-gray-700 bg-gray-50 rounded-lg shadow-lg py-4 text-center mt-4 text-sm"
+      class="w-full dark:bg-gray-700 bg-gray-50 rounded-lg shadow-lg py-4 text-center mt-4 sm:text-sm text-xs"
     >
       © 2022 Copyright | <a className="text-white">Online Consulation</a>
     </footer>

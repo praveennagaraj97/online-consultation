@@ -2,10 +2,17 @@
   <app-breadcrumb-component [paths]="breadcrumbPaths" className="py-3 mt-2">
   </app-breadcrumb-component>
 
+  <!-- Search Filters -->
   <div
     class="dark:bg-gray-700 bg-gray-50 rounded-lg shadow-lg mt-2 overflow-hidden"
   >
-    <header class="p-3 flex justify-between items-center">
+    <!--  -->
+  </div>
+
+  <div
+    class="dark:bg-gray-700 bg-gray-50 rounded-lg shadow-lg mt-2 overflow-hidden"
+  >
+    <!-- <header class="p-3 flex justify-between items-center">
       <app-per-page-component
         [options]="limitOptions"
         [defaultSelected]="perPage"
@@ -26,7 +33,7 @@
           Add new doctor
         </button>
       </div>
-    </header>
+    </header> -->
 
     <app-doctor-list-data-component
       [doctors]="doctors"
