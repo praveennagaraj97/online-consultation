@@ -91,6 +91,7 @@ func ParsePaginationOptions(c *gin.Context, cur string) *PaginationOptions {
 		perPage = constants.DefaultPerPageResults
 	}
 
+	// Max limit for pagination
 	if perPage > 50 {
 		perPage = 50
 	}

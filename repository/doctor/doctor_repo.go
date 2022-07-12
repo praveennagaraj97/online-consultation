@@ -3,7 +3,6 @@ package doctorrepo
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/praveennagaraj97/online-consultation/api"
@@ -254,6 +253,7 @@ func (r *DoctorRepository) FindAll(pgOpts *api.PaginationOptions,
 	searchOpts *bson.M,
 	showInActive bool,
 	slotsExistsOn *primitive.DateTime,
+	populateNextAvailable bool,
 ) ([]doctormodel.DoctorEntity, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
@@ -309,7 +309,7 @@ func (r *DoctorRepository) FindAll(pgOpts *api.PaginationOptions,
 		pipeline = append(pipeline, bson.D{{Key: "$match", Value: bson.M{"is_active": true}}})
 	}
 
-	if slotsExistsOn == nil {
+	if slotsExistsOn == nil && populateNextAvailable {
 		// Next Available Slot
 		nextAvailableLookUp := bson.D{{Key: "$lookup", Value: bson.M{
 			"from":         "appointment_slot",
@@ -328,18 +328,19 @@ func (r *DoctorRepository) FindAll(pgOpts *api.PaginationOptions,
 		pipeline = append(pipeline, nextAvailableLookUp)
 	}
 
-	unwindNextAvailableSlot := bson.D{{Key: "$unwind", Value: bson.M{
-		"path":                       "$next_available_slot",
-		"preserveNullAndEmptyArrays": true,
-	}}}
+	if populateNextAvailable {
 
-	pipeline = append(pipeline, unwindNextAvailableSlot)
+		unwindNextAvailableSlot := bson.D{{Key: "$unwind", Value: bson.M{
+			"path":                       "$next_available_slot",
+			"preserveNullAndEmptyArrays": true,
+		}}}
+
+		pipeline = append(pipeline, unwindNextAvailableSlot)
+	}
 
 	// Sort Options
 	sortBy := bson.D{{Key: "$sort", Value: *srtOpts}}
 	pipeline = append(pipeline, sortBy)
-
-	fmt.Println(sortBy)
 
 	// Pagination Options
 	if pgOpts.PaginateId != nil {

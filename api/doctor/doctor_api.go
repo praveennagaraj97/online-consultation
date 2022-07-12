@@ -3,6 +3,7 @@ package doctorapi
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -273,7 +274,14 @@ func (a *DoctorAPI) FindAllDoctors(showInActive bool) gin.HandlerFunc {
 			slotsExistsOn = &slotDate
 		}
 
-		res, err := a.repo.FindAll(pgOpts, fltrOpts, &sortOpts, ketSortBy, searchOpts, showInActive, slotsExistsOn)
+		// Populate Next Available | Default is true.
+		populateNextAvailable, err := strconv.ParseBool(ctx.Query("populate_next_available"))
+		if err != nil {
+			populateNextAvailable = true
+		}
+
+		res, err := a.repo.FindAll(pgOpts, fltrOpts, &sortOpts, ketSortBy, searchOpts,
+			showInActive, slotsExistsOn, populateNextAvailable)
 		if err != nil {
 			api.SendErrorResponse(ctx, "Something went wrong", http.StatusBadRequest, &map[string]string{
 				"reason": err.Error(),
@@ -288,6 +296,7 @@ func (a *DoctorAPI) FindAllDoctors(showInActive bool) gin.HandlerFunc {
 		var lastId *primitive.ObjectID
 
 		if pgOpts.PaginateId == nil {
+			fmt.Println("Invoked")
 			docCount, err = a.repo.GetDocumentsCount(fltrOpts, searchOpts, showInActive, slotsExistsOn)
 			if err != nil {
 				api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, &map[string]string{

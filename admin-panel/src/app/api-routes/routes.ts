@@ -8,5 +8,5 @@ export const authRoutes = {
 export const adminRoutes = { ProfileDetails: '/admin/me' };
 
 export const doctorRoutes = {
-  DoctorsList: `/doctor`,
+  DoctorsList: `/admin/doctor`,
 };

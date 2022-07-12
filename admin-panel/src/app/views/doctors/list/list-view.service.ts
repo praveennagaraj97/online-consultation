@@ -9,7 +9,7 @@ export class DoctorsListViewService {
 
   getDoctorsList(perPage = 10) {
     return this.http.get<DoctorListResponse>(doctorRoutes.DoctorsList, {
-      params: { per_page: perPage },
+      params: { per_page: perPage, populate_next_available: false },
     });
   }
 }
