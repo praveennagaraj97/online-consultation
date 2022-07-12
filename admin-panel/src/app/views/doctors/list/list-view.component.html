@@ -61,12 +61,22 @@
     ></app-doctor-list-data-component>
 
     <!-- Pagination Controls -->
-    <div class="my-1 p-2 flex justify-between items-center">
+    <div class="my-1 p-2 flex justify-between items-center" *ngIf="!isLoading">
       <app-pagination-count-display-component
         [totalCount]="totalCount"
-        [loading]="isLoading"
+        [startCount]="doctors.length ? (pageNum - 1) * perPage + 1 : 0"
+        [endCount]="(pageNum - 1) * perPage + doctors.length || 0"
       ></app-pagination-count-display-component>
-      <app-pagination-controls-component></app-pagination-controls-component>
+      <app-pagination-controls-component
+        [pageNum]="pageNum"
+        nextPageLink="/doctors"
+        [paginateId]="paginateId"
+      ></app-pagination-controls-component>
+    </div>
+
+    <div class="my-1 p-2 flex justify-between items-center" *ngIf="isLoading">
+      <app-pagination-count-skeleton-component></app-pagination-count-skeleton-component>
+      <app-pagination-controls-skeleton-component></app-pagination-controls-skeleton-component>
     </div>
   </div>
 </section>

@@ -7,3 +7,7 @@ export enum UserRoles {
 }
 
 export type SelectOption = { title: string; value: string };
+
+export type PaginateKeySetCache = {
+  [pageNum: number]: string;
+};

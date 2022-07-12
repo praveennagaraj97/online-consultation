@@ -17,7 +17,8 @@ export class DoctorsListViewService {
     perPage = 10,
     speciality: string,
     consultationType: string,
-    activeState: string
+    activeState: string,
+    paginateId: string
   ) {
     const params: { [key: string]: string } = {};
 
@@ -34,8 +35,12 @@ export class DoctorsListViewService {
       params['is_active[eq]'] = activeState;
     }
 
+    if (paginateId) {
+      params['paginate_id'] = paginateId;
+    }
+
     // Disable next available populate
-    params['populate_next_available'] = 'fasle';
+    params['populate_next_available'] = 'false';
 
     return this.http.get<DoctorListResponse>(doctorRoutes.DoctorsList, {
       params: params,

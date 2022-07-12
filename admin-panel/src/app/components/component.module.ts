@@ -15,6 +15,8 @@ import { ThemeProviderComponent } from './providers/theme-provider/theme-provide
 import { SelectDropdownComponent } from './select-dropdown/select-dropdown.component';
 import { ProfileSkeletonComponent } from './skeletons/dashboard/profile/profile-skeleton.component';
 import { DoctorsListSkeletonComponent } from './skeletons/doctors/list-skeleton.component';
+import { PaginationControlsSkeletonComponent } from './skeletons/pagination/controls-skeleton.component';
+import { PaginationSkeletonComponent } from './skeletons/pagination/pagination-count-skeleton.component';
 
 @NgModule({
   imports: [
@@ -36,6 +38,8 @@ import { DoctorsListSkeletonComponent } from './skeletons/doctors/list-skeleton.
     DoctorsListSkeletonComponent,
     PaginationControlsComponent,
     PaginationCountDisplayComponent,
+    PaginationSkeletonComponent,
+    PaginationControlsSkeletonComponent,
   ],
   exports: [
     ThemeProviderComponent,
@@ -49,6 +53,8 @@ import { DoctorsListSkeletonComponent } from './skeletons/doctors/list-skeleton.
     DoctorsListSkeletonComponent,
     PaginationControlsComponent,
     PaginationCountDisplayComponent,
+    PaginationSkeletonComponent,
+    PaginationControlsSkeletonComponent,
   ],
 })
 export class ComponentsModule {}

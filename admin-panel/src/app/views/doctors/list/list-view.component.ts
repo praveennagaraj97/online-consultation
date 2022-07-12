@@ -1,5 +1,6 @@
 import { transition, trigger, useAnimation } from '@angular/animations';
 import { Component } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { fadeInTransformAnimation } from 'src/app/animations';
 import { SelectOption } from 'src/app/types/app.types';
@@ -36,16 +37,29 @@ export class DoctorsListViewComponent {
   selectedConsultationType = '';
   selectedActiveType = '';
   totalCount = 0;
+  pageNum = 1;
+  paginateId = '';
 
-  constructor(private doctorsListService: DoctorsListViewService) {}
+  constructor(
+    private doctorsListService: DoctorsListViewService,
+    private activeRoute: ActivatedRoute,
+    private router: Router
+  ) {}
 
   ngOnInit() {
     this.getDoctorsList();
     this.getSpecialities();
     this.getConsultationTypes();
+    this.listenToBrowserHistory();
   }
 
   private getDoctorsList() {
+    const url = this.router.url;
+    const paginateId =
+      this.router.parseUrl(url).queryParams?.['paginate_cur'] || '';
+    this.pageNum =
+      parseInt(this.router.parseUrl(url).queryParams?.['page_num']) || 1;
+
     this.isLoading = true;
     this.subs$.push(
       this.doctorsListService
@@ -53,13 +67,15 @@ export class DoctorsListViewComponent {
           this.perPage,
           this.selectedSpeciality,
           this.selectedConsultationType,
-          this.selectedActiveType
+          this.selectedActiveType,
+          paginateId
         )
         .subscribe({
           next: (res) => {
             this.isLoading = false;
             this.doctors = res.result || [];
             this.totalCount = res.count;
+            this.paginateId = res.paginate_id || '';
           },
           error: () => {
             this.isLoading = false;
@@ -96,16 +112,20 @@ export class DoctorsListViewComponent {
   }
 
   onSpecialityChanegFilter(option: SelectOption) {
+    this.router.navigate([], { queryParams: {} });
+
     this.selectedSpeciality = option.value;
     this.getDoctorsList();
   }
 
   onConsultationChangeFilter(option: SelectOption) {
+    this.router.navigate([], { queryParams: {} });
     this.selectedConsultationType = option.value;
     this.getDoctorsList();
   }
 
   onActiveStatusChangeFilter(option: SelectOption) {
+    this.router.navigate([], { queryParams: {} });
     this.selectedActiveType = option.value;
     this.getDoctorsList();
   }
@@ -114,6 +134,14 @@ export class DoctorsListViewComponent {
     this.perPage = value;
 
     this.getDoctorsList();
+  }
+
+  private listenToBrowserHistory() {
+    this.activeRoute.queryParams.subscribe({
+      next: () => {
+        this.getDoctorsList();
+      },
+    });
   }
 
   ngOnDestropy() {

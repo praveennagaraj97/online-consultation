@@ -1,6 +1,5 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Overlay, OverlayRef } from '@angular/cdk/overlay';
-import { TemplatePortal } from '@angular/cdk/portal';
 import {
   Component,
   TemplateRef,
@@ -88,9 +87,9 @@ export class ThemeProviderComponent {
   ngAfterViewInit() {
     const overlayRef = this.overlay.create({ disposeOnNavigation: false });
     if (this.themePortalRef) {
-      overlayRef.attach(
-        new TemplatePortal(this.themePortalRef, this.viewContainerRef)
-      );
+      // overlayRef.attach(
+      //   new TemplatePortal(this.themePortalRef, this.viewContainerRef)
+      // );
     }
 
     this.overlayRef = overlayRef;

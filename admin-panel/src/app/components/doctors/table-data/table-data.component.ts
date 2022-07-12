@@ -31,7 +31,7 @@ import { DoctorsEntity } from 'src/app/types/doctor.response.types';
           <th class="text-sm font-medium p-2 whitespace-nowrap text-left">
             Status
           </th>
-          <th class="text-sm font-medium p-2 whitespace-nowrap text-left">
+          <th class="text-sm font-medium p-2 whitespace-nowrap text-center">
             Actions
           </th>
         </thead>
@@ -92,7 +92,11 @@ import { DoctorsEntity } from 'src/app/types/doctor.response.types';
             <td class="text-xs p-2 whitespace-nowrap">
               {{ doctor.is_active ? 'active' : 'inactive' }}
             </td>
-            <td class="text-xs p-2 whitespace-nowrap">...</td>
+            <td class="text-xs p-2 whitespace-nowrap">
+              <app-three-dots-icon
+                className="h-5 w-5  fill-gray-500 stroke-gray-500 dark:fill-gray-100 dark:stroke-gray-100 mx-auto"
+              ></app-three-dots-icon>
+            </td>
           </tr>
         </tbody>
 
