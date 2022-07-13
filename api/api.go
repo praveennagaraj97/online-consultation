@@ -83,7 +83,8 @@ func ParseFilterByOptions(c *gin.Context) *map[string]bson.M {
 
 			if operator == "search" {
 				operator = "regex"
-				filterValue = primitive.Regex{Pattern: filterValue.(string), Options: "i"}
+
+				filterValue = primitive.Regex{Pattern: fmt.Sprintf("%s", filterValue), Options: "i"}
 			}
 
 			opts[filterBy[0]] = bson.M{fmt.Sprintf("$%s", operator): filterValue}
