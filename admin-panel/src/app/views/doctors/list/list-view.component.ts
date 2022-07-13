@@ -133,8 +133,8 @@ export class DoctorsListViewComponent {
   }
 
   updatePerPageLimit(value: number) {
+    this.router.navigate([], { queryParams: {} });
     this.perPage = value;
-
     this.getDoctorsList();
   }
 

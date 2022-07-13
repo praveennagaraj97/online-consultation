@@ -47,10 +47,10 @@ import { DoctorsEntity } from 'src/app/types/doctor.response.types';
                     doctor.profile_pic?.image_src ||
                     '/assets/img-placeholder.png'
                   "
-                  width="48"
-                  height="48"
+                  width="32"
+                  height="32"
                   alt="img"
-                  class="rounded-full w-8 h-8 overflow-hidden"
+                  class="rounded-full w-8 h-8 min-w-[32px] min-h-[32px] overflow-hidden"
                 />
                 <div class="flex flex-col">
                   <span>

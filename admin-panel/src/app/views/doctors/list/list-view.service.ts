@@ -41,7 +41,7 @@ export class DoctorsListViewService {
     }
 
     if (search) {
-      params['name'] = search;
+      params['name[search]'] = search;
     }
 
     // Disable next available populate
