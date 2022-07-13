@@ -1,10 +1,17 @@
+import { transition, trigger, useAnimation } from '@angular/animations';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { AbstractControl, FormControl } from '@angular/forms';
+import { fadeInTransformAnimation } from 'src/app/animations';
 import { SelectOption } from 'src/app/types/app.types';
 
 @Component({
   selector: 'app-select-input-component',
   templateUrl: 'select-input.component.html',
+  animations: [
+    trigger('fadeIn', [
+      transition('void => *', [useAnimation(fadeInTransformAnimation())]),
+    ]),
+  ],
 })
 export class SelectInputComponent {
   // Props
@@ -28,6 +35,7 @@ export class SelectInputComponent {
 
   // State
   showOptions = false;
+  selectOption = '';
 
   get control(): FormControl {
     return this.fc as FormControl;
@@ -37,5 +45,10 @@ export class SelectInputComponent {
     const errorKey = Object.keys(this.fc?.errors || {})?.[0] || '';
     console.log(this.fc?.errors);
     return this.errors?.[errorKey] || 'Entered value is invalid';
+  }
+
+  onSelect(opt: SelectOption) {
+    this.selectOption = opt.title;
+    this.onChange.emit(opt);
   }
 }

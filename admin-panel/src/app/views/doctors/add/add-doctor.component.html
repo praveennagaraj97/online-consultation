@@ -110,6 +110,19 @@
           (onSearch)="onHospitalSearch($event)"
           (onChange)="onHospitalSelect($event)"
         ></app-select-input-component>
+
+        <app-select-input-component
+          [errors]="errors.consultation_type_id"
+          [fc]="doctorForm.controls?.['consultation_type_id']"
+          [showError]="shouldShowError"
+          labelName="Consultation type"
+          htmlFor="consultation_type_id"
+          guideLine="Type of consultation"
+          placeholder="Select doctor's consultation type"
+          [isAsync]="false"
+          [options]="consultationTypeOptions"
+          (onChange)="onConsultationTypeSelect($event.value)"
+        ></app-select-input-component>
       </div>
 
       <hr class="my-4" />
@@ -119,7 +132,6 @@
       >
         Add Doctor
       </button>
-      <div class="h-96"></div>
     </form>
   </div>
 </section>

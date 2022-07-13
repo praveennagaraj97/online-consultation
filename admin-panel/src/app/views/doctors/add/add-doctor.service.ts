@@ -4,7 +4,10 @@ import { map } from 'rxjs';
 import { sharedRoutes } from 'src/app/api-routes/routes';
 import { PaginatedBaseAPiResponse } from 'src/app/types/api.response.types';
 import { SelectOption } from 'src/app/types/app.types';
-import { HospitalEntity } from 'src/app/types/cms.response.types';
+import {
+  ConsultationEntity,
+  HospitalEntity,
+} from 'src/app/types/cms.response.types';
 
 @Injectable()
 export class AddDoctorService {
@@ -53,6 +56,21 @@ export class AddDoctorService {
             ],
             nextId: res.paginate_id,
           };
+        })
+      );
+  }
+
+  getConsultaionTypeOptions() {
+    return this.http
+      .get<PaginatedBaseAPiResponse<ConsultationEntity[]>>(
+        sharedRoutes.ConsultationTypes
+      )
+      .pipe(
+        map((res) => {
+          return res.result?.map((type) => ({
+            title: type.title,
+            value: type.id,
+          }));
         })
       );
   }

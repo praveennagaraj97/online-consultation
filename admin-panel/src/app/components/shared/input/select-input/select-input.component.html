@@ -11,9 +11,10 @@
     (callback)="showOptions = false"
   >
     <input
-      [formControl]="control"
+      [ngModel]=""
       [type]="type"
       name="htmlFor"
+      [ngModel]="selectOption"
       autocomplete="off"
       class="common-input w-full input-focus input-colors p-2 rounded-md text-sm shadow-md"
       [placeholder]="placeholder"
@@ -56,5 +57,6 @@
   [hasMore]="hasNext"
   (loadMore)="loadMore.emit()"
   (onSearch)="onSearch.emit($event)"
-  (onChange)="onChange.emit($event); showOptions = false"
+  (onChange)="onSelect($event); showOptions = false"
+  [isAsync]="isAsync"
 ></app-select-input-options-component>

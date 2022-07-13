@@ -45,6 +45,7 @@ export class AddNewDoctorViewComponent {
   hospitalsLoading = false;
   nextHospitalsPaginateId: string | null = null;
   hospitalSearchTerm = '';
+  consultationTypeOptions: SelectOption[] = [];
 
   // Input Form Group State
   profilePic: File | null = null;
@@ -70,12 +71,14 @@ export class AddNewDoctorViewComponent {
       validators: [Validators.required, Validators.pattern('^[0-9]+$')],
     }),
     hospital_id: new FormControl(''),
-    // Ref
-    hospital_title: new FormControl(''),
+    consultation_type_id: new FormControl('', {
+      validators: [Validators.required],
+    }),
   });
 
   ngOnInit() {
     this.getHospitalsOptions();
+    this.getConsultationTypes();
   }
 
   getFormValue(name: string): string {
@@ -94,6 +97,7 @@ export class AddNewDoctorViewComponent {
     }
   }
 
+  // Hospital input
   private getHospitalsOptions(shouldReset = false) {
     this.hospitalsLoading = true;
     this.subs$.push(
@@ -130,8 +134,25 @@ export class AddNewDoctorViewComponent {
   }
 
   onHospitalSelect(opt: SelectOption) {
-    this.doctorForm.controls?.['hospital_title'].setValue(opt.title);
     this.doctorForm.controls?.['hospital_id'].setValue(opt.value);
+  }
+
+  // Consultation Type Input
+  private getConsultationTypes() {
+    this.subs$.push(
+      this.addNewDocService.getConsultaionTypeOptions().subscribe({
+        next: (options) => {
+          this.consultationTypeOptions = options || [];
+        },
+        error: (err) => {
+          alert(err);
+        },
+      })
+    );
+  }
+
+  onConsultationTypeSelect(id: string) {
+    this.doctorForm.controls?.['consultation_type_id']?.setValue(id);
   }
 
   ngOnDestroy() {

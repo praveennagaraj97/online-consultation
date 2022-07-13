@@ -20,4 +20,7 @@ export const doctorFormErrors = {
     required: "Doctor's experience cannot be empty",
     pattern: "Doctor's experience must be number",
   },
+  consultation_type_id: {
+    required: "Doctor's Consultation type cannot be empty",
+  },
 };

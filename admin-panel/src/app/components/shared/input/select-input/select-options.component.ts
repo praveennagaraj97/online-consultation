@@ -26,13 +26,14 @@ import { clearSubscriptions } from 'src/app/utils/helpers';
         @openClose
       >
         <input
+          *ngIf="isAsync"
           type="text"
           class="w-full py-2 px-1 common-input text-sm input-focus input-colors !border-t-0 !border-x-0 rounded-lg mt-1"
           [placeholder]="placeholder"
           [ngModel]="searchFormValue"
           (ngModelChange)="onSearchChange($event)"
         />
-        <div class="max-h-[260px] overflow-y-auto inner-scrollbar">
+        <div class="max-h-[144px] overflow-y-auto inner-scrollbar">
           <button
             class="p-2  smooth-animate hover:bg-sky-500/30 w-full  flex space-x-2 items-center text-xs"
             *ngFor="let option of options"
@@ -42,7 +43,7 @@ import { clearSubscriptions } from 'src/app/utils/helpers';
             {{ option.title }}
           </button>
           <div
-            *ngIf="hasMore && !loading"
+            *ngIf="hasMore && !loading && isAsync"
             intersectionObserve
             (callback)="loadMoreEvent($event)"
           ></div>
@@ -80,6 +81,7 @@ export class SelectInputOptionsComponent {
   @Input() placeholder = '';
   @Input() loading = false;
   @Input() hasMore = false;
+  @Input() isAsync = false;
 
   // Event Emitters
   @Output() onChange = new EventEmitter<SelectOption>(false);
