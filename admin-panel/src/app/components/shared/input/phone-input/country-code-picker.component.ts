@@ -35,7 +35,7 @@ import { clearSubscriptions } from 'src/app/utils/helpers';
           placeholder="Search your country"
         />
         <button
-          (click)="onChange.emit(country)"
+          (click)="onSelect(country)"
           class="p-2  smooth-animate hover:bg-sky-500/30 w-full  flex space-x-2 items-center"
           *ngFor="let country of countries"
           [title]="country.name"
@@ -134,6 +134,11 @@ export class CountryCodePickerComponent {
         },
       })
     );
+  }
+
+  onSelect(country: Country) {
+    this.countries = this.countriesData;
+    this.onChange.emit(country);
   }
 
   onSearchChange(value: string) {
