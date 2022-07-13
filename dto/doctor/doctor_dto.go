@@ -19,6 +19,7 @@ type AddNewDoctorDTO struct {
 	Experience        uint8  `json:"experience" form:"experience"`
 	ProfilePicWidth   uint64 `json:"profile_pic_width" form:"profile_pic_width"`
 	ProfilePicHeight  uint64 `json:"profile_pic_height" form:"profile_pic_height"`
+	IsActive          bool   `json:"is_active" form:"is_active"`
 
 	// Input ref fields
 	HospitalId         string   `json:"hospital_id" form:"hospital_id"`

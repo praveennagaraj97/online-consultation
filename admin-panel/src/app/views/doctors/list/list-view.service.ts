@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { map } from 'rxjs';
+import { debounceTime, map } from 'rxjs';
 import { doctorRoutes, sharedRoutes } from 'src/app/api-routes/routes';
 import { PaginatedBaseAPiResponse } from 'src/app/types/api.response.types';
 import {
@@ -47,9 +47,11 @@ export class DoctorsListViewService {
     // Disable next available populate
     params['populate_next_available'] = 'false';
 
-    return this.http.get<DoctorListResponse>(doctorRoutes.DoctorsList, {
-      params: params,
-    });
+    return this.http
+      .get<DoctorListResponse>(doctorRoutes.DoctorsList, {
+        params: params,
+      })
+      .pipe(debounceTime(search.length ? 300 : 0));
   }
 
   // Get All Specialities with Key Set Pagination

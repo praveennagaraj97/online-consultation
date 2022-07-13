@@ -43,13 +43,17 @@
             [ngModel]="searchTerm"
             (ngModelChange)="onSearch($event)"
             autocomplete="off"
-            class="common-input input-focus input-colors p-1.5 rounded-lg text-sm"
+            class="common-input w-full input-focus input-colors p-1.5 rounded-lg text-sm"
           />
         </div>
 
-        <button class="action-btn px-3 py-2 text-sm rounded-lg">
+        <a
+          role="button"
+          routerLink="/doctors/add"
+          class="action-btn px-3 py-2 text-sm rounded-lg"
+        >
           Add new doctor
-        </button>
+        </a>
       </div>
     </header>
 

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { DirectiveModule } from '../directives/directive.module';
 import { IconsModule } from '../icons/icons.module';
@@ -13,6 +13,9 @@ import { PaginationCountDisplayComponent } from './pagination/display-count.comp
 import { PerPageOptionsComponent } from './pagination/per-page-options.component';
 import { ThemeProviderComponent } from './providers/theme-provider/theme-provider.component';
 import { SelectDropdownComponent } from './select-dropdown/select-dropdown.component';
+import { CommonInputComponent } from './shared/input/common-input/common-input.component';
+import { CountryCodePickerComponent } from './shared/input/phone-input/country-code-picker.component';
+import { PhoneInputComponent } from './shared/input/phone-input/phone-input.component';
 import { ProfileSkeletonComponent } from './skeletons/dashboard/profile/profile-skeleton.component';
 import { DoctorsListSkeletonComponent } from './skeletons/doctors/list-skeleton.component';
 import { PaginationControlsSkeletonComponent } from './skeletons/pagination/controls-skeleton.component';
@@ -25,6 +28,7 @@ import { PaginationSkeletonComponent } from './skeletons/pagination/pagination-c
     RouterModule,
     FormsModule,
     DirectiveModule,
+    ReactiveFormsModule,
   ],
   declarations: [
     ThemeProviderComponent,
@@ -40,6 +44,9 @@ import { PaginationSkeletonComponent } from './skeletons/pagination/pagination-c
     PaginationCountDisplayComponent,
     PaginationSkeletonComponent,
     PaginationControlsSkeletonComponent,
+    PhoneInputComponent,
+    CommonInputComponent,
+    CountryCodePickerComponent,
   ],
   exports: [
     ThemeProviderComponent,
@@ -55,6 +62,8 @@ import { PaginationSkeletonComponent } from './skeletons/pagination/pagination-c
     PaginationCountDisplayComponent,
     PaginationSkeletonComponent,
     PaginationControlsSkeletonComponent,
+    PhoneInputComponent,
+    CommonInputComponent,
   ],
 })
 export class ComponentsModule {}

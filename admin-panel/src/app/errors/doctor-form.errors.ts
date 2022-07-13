@@ -1,0 +1,23 @@
+export const doctorFormErrors = {
+  name: {
+    required: "Doctor's name cannot be empty",
+  },
+  email: {
+    required: "Doctor's email cannot be empty",
+    email: 'Entered email is not valid',
+  },
+  professional_title: {
+    required: "Doctor's professional title cannot be empty",
+  },
+  phone_number: {
+    required: "Doctor's phone number cannot be empty",
+    pattern: 'Provided phone number is not valid',
+  },
+  education: {
+    required: "Doctor's education cannot be empty",
+  },
+  experience: {
+    required: "Doctor's experience cannot be empty",
+    pattern: "Doctor's experience must be number",
+  },
+};

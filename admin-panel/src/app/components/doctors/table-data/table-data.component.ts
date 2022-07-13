@@ -82,7 +82,7 @@ import { DoctorsEntity } from 'src/app/types/doctor.response.types';
               <select
                 aria-readonly="true"
                 name="languages"
-                class="common-input input-focus input-colors rounded-md p-1"
+                class="common-input w-full input-focus input-colors rounded-md p-1"
               >
                 <option value="" *ngFor="let lang of doctor.spoken_languages">
                   {{ lang.name }}

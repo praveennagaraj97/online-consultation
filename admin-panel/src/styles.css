@@ -28,7 +28,7 @@
   }
 
   .common-input {
-    @apply w-full  placeholder-gray-400/80  border dark:border-gray-200/30 border-gray-500/30 focus:outline-none;
+    @apply placeholder-gray-400/80  border dark:border-gray-200/30 border-gray-500/30 focus:outline-none;
   }
 
   .input-focus {
@@ -113,6 +113,10 @@
 
   .action-btn {
     @apply bg-amber-600 smooth-animate hover:bg-amber-800 text-gray-50;
+  }
+
+  .ghost-btn {
+    @apply border border-gray-400/50 hover:bg-sky-400/30 smooth-animate;
   }
 
   .inner-scrollbar::-webkit-scrollbar {

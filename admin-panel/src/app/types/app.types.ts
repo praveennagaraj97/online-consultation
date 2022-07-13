@@ -11,3 +11,12 @@ export type SelectOption = { title: string; value: string };
 export type PaginateKeySetCache = {
   [pageNum: number]: string;
 };
+
+export type BreadcrumbPath = { path: string; title: string };
+
+export interface Country {
+  name: string;
+  flag: string;
+  code: string;
+  dial_code: string;
+}

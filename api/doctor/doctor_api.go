@@ -78,6 +78,7 @@ func (a *DoctorAPI) AddNewDoctor() gin.HandlerFunc {
 			Education:          payload.Education,
 			SpokenLanguagesIds: payload.SpokenLanguages,
 			RefreshToken:       "",
+			IsActive:           payload.IsActive,
 		}
 
 		multipartFile, _ := ctx.FormFile("profile_pic")
@@ -111,19 +112,23 @@ func (a *DoctorAPI) AddNewDoctor() gin.HandlerFunc {
 			return
 		}
 
-		token, err := tokens.GenerateNoExpiryTokenWithCustomType(doc.ID.Hex(), "activate-doctor", "doctor")
-		if err != nil {
-			api.SendErrorResponse(ctx, err.Error(), http.StatusInternalServerError, nil)
-			return
-		}
+		// Direct Active Do Not send activation email.
+		if !payload.IsActive {
 
-		activateLink := fmt.Sprintf("%s/?token=%s", env.GetEnvVariable("CLIENT_DOCTOR_ACTIVATE_ACCOUNT_LINK"), token)
+			token, err := tokens.GenerateNoExpiryTokenWithCustomType(doc.ID.Hex(), "activate-doctor", "doctor")
+			if err != nil {
+				api.SendErrorResponse(ctx, err.Error(), http.StatusInternalServerError, nil)
+				return
+			}
 
-		if err := a.appConf.EmailClient.SendNoReplyMail([]string{doc.Email},
-			"Welcome to Online Consultation", "new-doctor", "welcome",
-			mailer.GetNewDoctorAddedTemplateData(doc.Name, doc.ProfessionalTitle, activateLink)); err != nil {
-			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, nil)
-			return
+			activateLink := fmt.Sprintf("%s/?token=%s", env.GetEnvVariable("CLIENT_DOCTOR_ACTIVATE_ACCOUNT_LINK"), token)
+
+			if err := a.appConf.EmailClient.SendNoReplyMail([]string{doc.Email},
+				"Welcome to Online Consultation", "new-doctor", "welcome",
+				mailer.GetNewDoctorAddedTemplateData(doc.Name, doc.ProfessionalTitle, activateLink)); err != nil {
+				api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, nil)
+				return
+			}
 		}
 
 		if multipartFile != nil {

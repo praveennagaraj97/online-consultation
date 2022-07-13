@@ -10,7 +10,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
         [ngModel]="defaultSelected"
         (ngModelChange)="onChangeListner($event)"
         [value]="defaultSelected"
-        class="common-input input-focus input-colors rounded-md p-1 text-sm"
+        class="common-input w-full input-focus input-colors rounded-md p-1 text-sm"
       >
         <option [value]="opt.value" *ngFor="let opt of options">
           {{ opt.title }}

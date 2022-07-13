@@ -1,0 +1,108 @@
+<section aria-describedby="Doctors List View" @fadeInOut>
+  <app-breadcrumb-component [paths]="breadcrumbPaths" className="py-3 mt-2">
+  </app-breadcrumb-component>
+
+  <div
+    class="dark:bg-gray-700 bg-gray-50 rounded-lg shadow-lg my-4 overflow-hidden p-3"
+  >
+    <!-- Profile Pic -->
+    <div class="flex space-x-4">
+      <div class="w-28 h-28 rounded-md">
+        <img
+          src="/assets/img-placeholder.png"
+          alt=""
+          class="rounded-md w-full h-full object-cover"
+        />
+      </div>
+      <div class="my-auto">
+        <h2 class="text-lg font-medium" @fadeIn>{{ getFormValue("name") }}</h2>
+        <small class="block text-xs mb-0.5" @fadeIn>{{
+          getFormValue("professional_title")
+        }}</small>
+
+        <div class="flex space-x-1.5 mt-3">
+          <button class="action-btn px-4 py-1 text-xs rounded-md">
+            Change
+          </button>
+          <button class="ghost-btn px-4 py-1 text-xs rounded-md">Remove</button>
+        </div>
+      </div>
+    </div>
+    <form
+      [formGroup]="doctorForm"
+      (ngSubmit)="onFormSubmit(doctorForm)"
+      autocomplete="off"
+    >
+      <div
+        class="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 mt-4 gap-x-4 gap-y-1"
+      >
+        <app-common-input-component
+          [errors]="errors.name"
+          [fc]="doctorForm.controls?.['name']"
+          [showError]="shouldShowError"
+          labelName="Name"
+          htmlFor="name"
+          guideLine="Provide doctor's full name"
+          placeholder="Enter doctor's full name"
+          tabindex="0"
+        ></app-common-input-component>
+        <app-common-input-component
+          [errors]="errors.email"
+          [fc]="doctorForm.controls?.['email']"
+          [showError]="shouldShowError"
+          labelName="Email"
+          htmlFor="email"
+          guideLine="Confirmation email will be sent to this address"
+          placeholder="Enter doctor's email address"
+          type="email"
+        ></app-common-input-component>
+        <app-phone-input-component
+          [errors]="errors.phone_number"
+          [fc]="doctorForm.controls?.['phone_number']"
+          [fcPhoneCode]="doctorForm.controls?.['phone_code']"
+          [showError]="shouldShowError"
+          labelName="Phone Number"
+          htmlFor="phone_number"
+          guideLine="This phone number will be used for primary login."
+          placeholder="Enter doctor's phone number"
+        >
+        </app-phone-input-component>
+        <app-common-input-component
+          [errors]="errors.professional_title"
+          [fc]="doctorForm.controls?.['professional_title']"
+          [showError]="shouldShowError"
+          labelName="Professional title"
+          htmlFor="professional_title"
+          guideLine="Provide doctor's professional title"
+          placeholder="Enter doctor's professional title"
+        ></app-common-input-component>
+        <app-common-input-component
+          [errors]="errors.education"
+          [fc]="doctorForm.controls?.['education']"
+          [showError]="shouldShowError"
+          labelName="Education"
+          htmlFor="education"
+          guideLine="*Provide with comma separated by space"
+          placeholder="Enter doctor's education (MBBS, MD)"
+        ></app-common-input-component>
+        <app-common-input-component
+          [errors]="errors.experience"
+          [fc]="doctorForm.controls?.['experience']"
+          [showError]="shouldShowError"
+          labelName="Experience"
+          htmlFor="experience"
+          guideLine="Provide doctor's experience in years"
+          placeholder="Enter doctor's experience"
+        ></app-common-input-component>
+      </div>
+
+      <hr class="my-4" />
+      <button
+        type="submit"
+        class="action-btn text-sm px-4 py-1.5 rounded-md mx-auto block"
+      >
+        Add Doctor
+      </button>
+    </form>
+  </div>
+</section>

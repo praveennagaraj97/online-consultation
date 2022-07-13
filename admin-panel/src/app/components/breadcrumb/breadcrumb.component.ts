@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { BreadcrumbPath } from 'src/app/types/app.types';
 
 @Component({
   selector: 'app-breadcrumb-component',
@@ -30,6 +31,6 @@ import { Component, Input } from '@angular/core';
   `,
 })
 export class BreadcrumbComponent {
-  @Input() paths: { path: string; title: string }[] = [];
+  @Input() paths: BreadcrumbPath[] = [];
   @Input() className = '';
 }

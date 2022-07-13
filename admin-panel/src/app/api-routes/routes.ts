@@ -15,3 +15,7 @@ export const sharedRoutes = {
   Specialities: `/speciality`,
   ConsultationTypes: `/consultation/`,
 };
+
+export const additionalRoutes = {
+  GetCountryCodes: `/additional/countries.json`,
+};
