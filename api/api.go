@@ -33,7 +33,7 @@ func GetUserIdFromContext(c *gin.Context) (*primitive.ObjectID, error) {
 
 	id, err := primitive.ObjectIDFromHex(fmt.Sprintf("%v", value))
 	if err != nil {
-		return nil, errors.New("User Context is not available")
+		return nil, errors.New("user Context is not available")
 	}
 	return &id, nil
 }
