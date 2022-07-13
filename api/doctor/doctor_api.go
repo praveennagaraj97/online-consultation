@@ -20,7 +20,6 @@ import (
 	doctorrepo "github.com/praveennagaraj97/online-consultation/repository/doctor"
 	onetimepasswordrepository "github.com/praveennagaraj97/online-consultation/repository/onetimepassword"
 	"github.com/praveennagaraj97/online-consultation/serialize"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -249,10 +248,6 @@ func (a *DoctorAPI) FindAllDoctors(showInActive bool) gin.HandlerFunc {
 		fltrOpts := api.ParseFilterByOptions(ctx)
 		ketSortBy := "$lt"
 
-		// Search Options
-		var searchOpts *bson.M = nil
-		name := ctx.Query("name")
-
 		// Doctor Appointments Availability on particular Date
 		var slotsExistsOn *primitive.DateTime = nil
 		availableOn := ctx.Query("available_on")
@@ -263,10 +258,6 @@ func (a *DoctorAPI) FindAllDoctors(showInActive bool) gin.HandlerFunc {
 			sortOpts["next_available_slot"] = -1
 		}
 		sortOpts["_id"] = -1
-
-		if name != "" {
-			searchOpts = &bson.M{"name": bson.M{"$regex": primitive.Regex{Pattern: name, Options: "i"}}}
-		}
 
 		if availableOn != "" {
 			t, err := time.Parse("2006-01-02", availableOn)
@@ -287,9 +278,7 @@ func (a *DoctorAPI) FindAllDoctors(showInActive bool) gin.HandlerFunc {
 			populateNextAvailable = true
 		}
 
-		fmt.Println(populateNextAvailable)
-
-		res, err := a.repo.FindAll(pgOpts, fltrOpts, &sortOpts, ketSortBy, searchOpts,
+		res, err := a.repo.FindAll(pgOpts, fltrOpts, &sortOpts, ketSortBy,
 			showInActive, slotsExistsOn, populateNextAvailable)
 		if err != nil {
 			api.SendErrorResponse(ctx, "Something went wrong", http.StatusBadRequest, &map[string]string{
@@ -305,7 +294,7 @@ func (a *DoctorAPI) FindAllDoctors(showInActive bool) gin.HandlerFunc {
 		var lastId *primitive.ObjectID
 
 		if pgOpts.PaginateId == nil {
-			docCount, err = a.repo.GetDocumentsCount(fltrOpts, searchOpts, showInActive, slotsExistsOn)
+			docCount, err = a.repo.GetDocumentsCount(fltrOpts, showInActive, slotsExistsOn)
 			if err != nil {
 				api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, &map[string]string{
 					"reason": err.Error(),

@@ -81,6 +81,11 @@ func ParseFilterByOptions(c *gin.Context) *map[string]bson.M {
 				filterValue = []interface{}{filterValue}
 			}
 
+			if operator == "search" {
+				operator = "regex"
+				filterValue = primitive.Regex{Pattern: filterValue.(string), Options: "i"}
+			}
+
 			opts[filterBy[0]] = bson.M{fmt.Sprintf("$%s", operator): filterValue}
 		}
 	}
@@ -99,7 +104,7 @@ func filterParamsBinder(param string) []string {
 	return nil
 }
 
-var acceptedFilterKeys []string = []string{"eq", "lte", "gte", "in", "gt", "lt", "ne"}
+var acceptedFilterKeys []string = []string{"eq", "lte", "gte", "in", "gt", "lt", "ne", "search"}
 
 func contains(searchterm string) bool {
 	for i := 0; i < len(acceptedFilterKeys); i++ {

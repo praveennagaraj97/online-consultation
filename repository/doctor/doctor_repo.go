@@ -250,7 +250,6 @@ func (r *DoctorRepository) FindAll(pgOpts *api.PaginationOptions,
 	fltrOpts *map[string]primitive.M,
 	srtOpts *map[string]int8,
 	keySortBy string,
-	searchOpts *bson.M,
 	showInActive bool,
 	slotsExistsOn *primitive.DateTime,
 	populateNextAvailable bool,
@@ -292,11 +291,6 @@ func (r *DoctorRepository) FindAll(pgOpts *api.PaginationOptions,
 		}}}
 
 		pipeline = append(pipeline, apptAvailLookup, apptAvailMatch, apptAvailAdddFields)
-	}
-
-	// Search Match
-	if searchOpts != nil {
-		pipeline = append(pipeline, bson.D{{Key: "$match", Value: *searchOpts}})
 	}
 
 	// Filter Options
@@ -417,7 +411,6 @@ func (r *DoctorRepository) FindAll(pgOpts *api.PaginationOptions,
 // Is Called only first first page.
 func (r *DoctorRepository) GetDocumentsCount(
 	fltrOpts *map[string]primitive.M,
-	searchOpts *bson.M,
 	showInActive bool,
 	slotsExistsOn *primitive.DateTime,
 ) (int64, error) {
@@ -457,11 +450,6 @@ func (r *DoctorRepository) GetDocumentsCount(
 		}}}
 
 		pipeline = append(pipeline, apptAvailLookup, apptAvailMatch, apptAvailAdddFields)
-	}
-
-	// Search Match
-	if searchOpts != nil {
-		pipeline = append(pipeline, bson.D{{Key: "$match", Value: *searchOpts}})
 	}
 
 	// Filter Options
