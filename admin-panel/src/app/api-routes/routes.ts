@@ -14,6 +14,7 @@ export const doctorRoutes = {
 export const sharedRoutes = {
   Specialities: `/speciality`,
   ConsultationTypes: `/consultation/`,
+  Hospitals: `/hospital`,
 };
 
 export const additionalRoutes = {

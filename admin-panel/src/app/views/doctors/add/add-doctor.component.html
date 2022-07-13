@@ -20,7 +20,7 @@
           getFormValue("professional_title")
         }}</small>
 
-        <div class="flex space-x-1.5 mt-3">
+        <div class="flex space-x-1.5 mt-3" *ngIf="profilePic">
           <button class="action-btn px-4 py-1 text-xs rounded-md">
             Change
           </button>
@@ -94,6 +94,22 @@
           guideLine="Provide doctor's experience in years"
           placeholder="Enter doctor's experience"
         ></app-common-input-component>
+        <app-select-input-component
+          [fc]="doctorForm.controls?.['hospital_title']"
+          [showError]="false"
+          labelName="Hospital"
+          htmlFor="hospital_id"
+          guideLine="Doctor's workplace (optional)"
+          placeholder="Select / Add doctor's hospital"
+          [isAsync]="true"
+          [options]="hospitalOptions"
+          searchPlaceholder="Search hospital name"
+          [isLoading]="hospitalsLoading"
+          [hasNext]="nextHospitalsPaginateId != null"
+          (loadMore)="loadMoreHospitals()"
+          (onSearch)="onHospitalSearch($event)"
+          (onChange)="onHospitalSelect($event)"
+        ></app-select-input-component>
       </div>
 
       <hr class="my-4" />
@@ -103,6 +119,7 @@
       >
         Add Doctor
       </button>
+      <div class="h-96"></div>
     </form>
   </div>
 </section>

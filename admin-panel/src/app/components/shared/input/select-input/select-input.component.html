@@ -1,0 +1,60 @@
+<div>
+  <label [for]="htmlFor" class="text-xs font-semibold">{{ labelName }}</label>
+  <small class="block text-xs mb-2 opacity-70" *ngIf="guideLine">
+    {{ guideLine }}
+  </small>
+  <div
+    class="relative"
+    (click)="$event.stopPropagation(); showOptions = !showOptions"
+    #portalPostionRef
+    clickOutside
+    (callback)="showOptions = false"
+  >
+    <input
+      [formControl]="control"
+      [type]="type"
+      name="htmlFor"
+      autocomplete="off"
+      class="common-input w-full input-focus input-colors p-2 rounded-md text-sm shadow-md"
+      [placeholder]="placeholder"
+      [ngClass]="
+        showError
+          ? fc?.invalid
+            ? '!border-red-500/70'
+            : '!border-green-500/70'
+          : ''
+      "
+    />
+    <button
+      type="button"
+      tabindex="-1"
+      class="absolute top-0 right-1 bottom-0 flex items-center"
+    >
+      <app-chevron-icon
+        className="rotate-90
+      w-4 h-4 dark:fill-gray-50/50 dark:stroke-gray-50/50"
+      ></app-chevron-icon>
+    </button>
+  </div>
+  <div class="min-h-[18px] mt-0.5 smooth-animate">
+    <small
+      class="block text-red-500 text-xs"
+      *ngIf="fc?.invalid && showError"
+      @fadeIn
+    >
+      {{ parseError }}
+    </small>
+  </div>
+</div>
+
+<app-select-input-options-component
+  [showOptions]="showOptions"
+  [renderPosition]="portalPostionRef.getBoundingClientRect()"
+  [options]="options"
+  [placeholder]="searchPlaceholder"
+  [loading]="isLoading"
+  [hasMore]="hasNext"
+  (loadMore)="loadMore.emit()"
+  (onSearch)="onSearch.emit($event)"
+  (onChange)="onChange.emit($event); showOptions = false"
+></app-select-input-options-component>

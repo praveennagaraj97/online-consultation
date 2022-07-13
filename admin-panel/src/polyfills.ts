@@ -45,6 +45,7 @@
 /***************************************************************************************************
  * Zone JS is required by default for Angular itself.
  */
+import 'intersection-observer'; // Intersection observer
 import 'web-animations-js'; // Web animation
 import 'zone.js'; // Included with Angular CLI.
 

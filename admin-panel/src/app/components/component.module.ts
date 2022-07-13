@@ -16,6 +16,8 @@ import { SelectDropdownComponent } from './select-dropdown/select-dropdown.compo
 import { CommonInputComponent } from './shared/input/common-input/common-input.component';
 import { CountryCodePickerComponent } from './shared/input/phone-input/country-code-picker.component';
 import { PhoneInputComponent } from './shared/input/phone-input/phone-input.component';
+import { SelectInputComponent } from './shared/input/select-input/select-input.component';
+import { SelectInputOptionsComponent } from './shared/input/select-input/select-options.component';
 import { ProfileSkeletonComponent } from './skeletons/dashboard/profile/profile-skeleton.component';
 import { DoctorsListSkeletonComponent } from './skeletons/doctors/list-skeleton.component';
 import { PaginationControlsSkeletonComponent } from './skeletons/pagination/controls-skeleton.component';
@@ -44,9 +46,11 @@ import { PaginationSkeletonComponent } from './skeletons/pagination/pagination-c
     PaginationCountDisplayComponent,
     PaginationSkeletonComponent,
     PaginationControlsSkeletonComponent,
-    PhoneInputComponent,
     CommonInputComponent,
+    PhoneInputComponent,
     CountryCodePickerComponent,
+    SelectInputComponent,
+    SelectInputOptionsComponent,
   ],
   exports: [
     ThemeProviderComponent,
@@ -62,8 +66,9 @@ import { PaginationSkeletonComponent } from './skeletons/pagination/pagination-c
     PaginationCountDisplayComponent,
     PaginationSkeletonComponent,
     PaginationControlsSkeletonComponent,
-    PhoneInputComponent,
     CommonInputComponent,
+    PhoneInputComponent,
+    SelectInputComponent,
   ],
 })
 export class ComponentsModule {}

@@ -71,7 +71,7 @@ export class UserOptionsComponent {
         },
         error: (err: ErrorResponse) => {
           this.loading = false;
-          console.log(err);
+          alert(err);
         },
       })
     );

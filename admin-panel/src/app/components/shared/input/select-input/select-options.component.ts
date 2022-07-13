@@ -1,7 +1,6 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
-import { HttpClient } from '@angular/common/http';
 import {
   Component,
   EventEmitter,
@@ -13,12 +12,11 @@ import {
   ViewContainerRef,
 } from '@angular/core';
 import { fromEvent, Subscription } from 'rxjs';
-import { additionalRoutes } from 'src/app/api-routes/routes';
-import { Country } from 'src/app/types/app.types';
+import { SelectOption } from 'src/app/types/app.types';
 import { clearSubscriptions } from 'src/app/utils/helpers';
 
 @Component({
-  selector: 'app-country-code-picker-component',
+  selector: 'app-select-input-options-component',
   template: `
     <ng-template #portalRef>
       <div
@@ -28,26 +26,30 @@ import { clearSubscriptions } from 'src/app/utils/helpers';
         @openClose
       >
         <input
-          [ngModel]="searchFormValue"
-          (ngModelChange)="onSearchChange($event)"
           type="text"
           class="w-full py-2 px-1 common-input text-sm input-focus input-colors !border-t-0 !border-x-0 rounded-lg mt-1"
-          placeholder="Search your country"
+          [placeholder]="placeholder"
+          [ngModel]="searchFormValue"
+          (ngModelChange)="onSearchChange($event)"
         />
         <div class="max-h-[260px] overflow-y-auto inner-scrollbar">
           <button
-            (click)="onSelect(country)"
-            class="p-2  smooth-animate hover:bg-sky-500/30 w-full  flex space-x-2 items-center"
-            *ngFor="let country of countries"
-            [title]="country.name"
+            class="p-2  smooth-animate hover:bg-sky-500/30 w-full  flex space-x-2 items-center text-xs"
+            *ngFor="let option of options"
+            [title]="option.title"
+            (click)="onChange.emit(option)"
           >
-            <p class="pt-0.5 text-lg">
-              {{ country.flag }}
-            </p>
-            <p class="text-sm cut-text-1">
-              {{ country.name }}
-            </p>
+            {{ option.title }}
           </button>
+          <div
+            *ngIf="hasMore && !loading"
+            intersectionObserve
+            (callback)="loadMoreEvent($event)"
+          ></div>
+          <app-spinner-icon
+            *ngIf="loading"
+            className="animate-spin fill-gray-50 stroke-gray-50 w-6 h-6 mx-auto my-3 py-1"
+          ></app-spinner-icon>
         </div>
       </div>
     </ng-template>
@@ -70,15 +72,22 @@ import { clearSubscriptions } from 'src/app/utils/helpers';
     ]),
   ],
 })
-export class CountryCodePickerComponent {
+export class SelectInputOptionsComponent {
   // Props
   @Input() renderPosition: DOMRect | null = null;
-  @Input() showCountryPicker = false;
-  @Output() onChange = new EventEmitter<Country>(false);
+  @Input() showOptions = false;
+  @Input() options: SelectOption[] = [];
+  @Input() placeholder = '';
+  @Input() loading = false;
+  @Input() hasMore = false;
+
+  // Event Emitters
+  @Output() onChange = new EventEmitter<SelectOption>(false);
+  @Output() loadMore = new EventEmitter<void>(false);
+  @Output() onSearch = new EventEmitter<string>(false);
 
   // State
-  countries: Country[] = [];
-  private countriesData: Country[] = [];
+  dummyCards = new Array(10).fill('');
   posStyle: { [key: string]: string | number } = {};
   searchFormValue = '';
 
@@ -91,24 +100,19 @@ export class CountryCodePickerComponent {
   private subs$: Subscription[] = [];
 
   constructor(
-    private http: HttpClient,
     private overlay: Overlay,
     private viewContainer: ViewContainerRef
   ) {}
 
-  ngOnInit() {
-    this.getCountriesCodes();
-  }
-
   ngOnChanges(changes: SimpleChanges) {
-    if (changes?.['showCountryPicker']?.currentValue) {
+    if (changes?.['showOptions']?.currentValue) {
       this.overlayRef?.attach(this.templateRef);
 
       this.updateModalPosition();
       this.listenToWindowChanges();
     }
 
-    if (changes?.['showCountryPicker']?.currentValue === false) {
+    if (changes?.['showOptions']?.currentValue === false) {
       this.overlayRef?.detach();
     }
   }
@@ -122,41 +126,6 @@ export class CountryCodePickerComponent {
     this.overlayRef = overlay;
 
     this.templateRef = new TemplatePortal(this.portalRef, this.viewContainer);
-  }
-
-  private getCountriesCodes() {
-    this.subs$.push(
-      this.http.get<Country[]>(additionalRoutes.GetCountryCodes).subscribe({
-        next: (countries) => {
-          this.countries = countries;
-          this.countriesData = countries;
-        },
-        error: (err) => {
-          alert('Something went wrong while loading countries');
-        },
-      })
-    );
-  }
-
-  onSelect(country: Country) {
-    this.countries = this.countriesData;
-    this.onChange.emit(country);
-  }
-
-  onSearchChange(value: string) {
-    const searchedValue = value.toLowerCase();
-    this.countries = this.countriesData;
-
-    const searchedCountries = this.countries.filter((country) => {
-      const countryNameLower = country.name.toLowerCase();
-      return (
-        countryNameLower === searchedValue ||
-        countryNameLower.startsWith(searchedValue) ||
-        countryNameLower.includes(searchedValue)
-      );
-    });
-
-    this.countries = searchedCountries;
   }
 
   private updateModalPosition() {
@@ -188,6 +157,16 @@ export class CountryCodePickerComponent {
         },
       })
     );
+  }
+
+  loadMoreEvent(state: boolean) {
+    if (state) {
+      this.loadMore.emit();
+    }
+  }
+
+  onSearchChange(term: string) {
+    this.onSearch.emit(term);
   }
 
   ngOnDestroy() {
