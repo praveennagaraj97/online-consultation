@@ -9,6 +9,7 @@ export const adminRoutes = { ProfileDetails: '/admin/me' };
 
 export const doctorRoutes = {
   DoctorsList: `/admin/doctor`,
+  AddDoctor: `/admin/doctor`,
 };
 
 export const sharedRoutes = {

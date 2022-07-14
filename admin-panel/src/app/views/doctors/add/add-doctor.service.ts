@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 import { map } from 'rxjs';
-import { sharedRoutes } from 'src/app/api-routes/routes';
+import { doctorRoutes, sharedRoutes } from 'src/app/api-routes/routes';
 import { PaginatedBaseAPiResponse } from 'src/app/types/api.response.types';
 import { SelectOption } from 'src/app/types/app.types';
 import {
@@ -10,6 +11,7 @@ import {
   LanguageEntity,
   SpecialityEntity,
 } from 'src/app/types/cms.response.types';
+import { DoctorFormDTO } from 'src/app/types/dto.types';
 
 @Injectable()
 export class AddDoctorService {
@@ -168,5 +170,31 @@ export class AddDoctorService {
           };
         })
       );
+  }
+
+  handleAddDoctor(form: FormGroup<DoctorFormDTO>, profilePic: File | null) {
+    const formData = new FormData();
+
+    const keys = Object.keys(form.value);
+
+    keys.forEach((key) => {
+      const value = form.get(key)?.value;
+
+      if (value) {
+        if (key == 'spoken_language_id') {
+          value.forEach((val: string) => {
+            formData.append('spoken_language_id', val);
+          });
+        } else {
+          formData.append(key, value);
+        }
+      }
+    });
+    if (profilePic) {
+      formData.append('profile_pic_width', '160');
+      formData.append('profile_pic_height', '160');
+    }
+
+    return this.http.post(doctorRoutes.AddDoctor, formData);
   }
 }

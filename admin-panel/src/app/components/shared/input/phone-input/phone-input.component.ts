@@ -45,7 +45,7 @@ export class PhoneInputComponent {
 
   get parseError(): string {
     const errorKey = Object.keys(this.fc?.errors || {})?.[0] || '';
-    console.log(this.fc?.errors, this.htmlFor);
+
     return this.errors?.[errorKey] || 'Entered value is invalid';
   }
 

@@ -7,6 +7,7 @@ import { IconsModule } from '../icons/icons.module';
 import { NoDoctorsFoundComponent } from './404s/no-doctors.component';
 import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
 import { DoctorListTableDataComponent } from './doctors/table-data/table-data.component';
+import { DropzoneComponent } from './dropzone/drop-zone.component';
 import { EmailSentComponent } from './email-sent/email-sent.component';
 import { PaginationControlsComponent } from './pagination/controls.component';
 import { PaginationCountDisplayComponent } from './pagination/display-count.component';
@@ -51,6 +52,7 @@ import { PaginationSkeletonComponent } from './skeletons/pagination/pagination-c
     CountryCodePickerComponent,
     SelectInputComponent,
     SelectInputOptionsComponent,
+    DropzoneComponent,
   ],
   exports: [
     ThemeProviderComponent,
@@ -69,6 +71,7 @@ import { PaginationSkeletonComponent } from './skeletons/pagination/pagination-c
     CommonInputComponent,
     PhoneInputComponent,
     SelectInputComponent,
+    DropzoneComponent,
   ],
 })
 export class ComponentsModule {}

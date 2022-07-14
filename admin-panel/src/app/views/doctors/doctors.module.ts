@@ -3,6 +3,8 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule, Routes } from '@angular/router';
 import { ComponentsModule } from 'src/app/components/component.module';
+import { DirectiveModule } from 'src/app/directives/directive.module';
+import { IconsModule } from 'src/app/icons/icons.module';
 import { AddNewDoctorViewComponent } from './add/add-doctor.component';
 import { AddDoctorService } from './add/add-doctor.service';
 import { EditDoctorViewComponent } from './edit/edit-doctor.component';
@@ -35,6 +37,8 @@ const routes: Routes = [
     ComponentsModule,
     FormsModule,
     ReactiveFormsModule,
+    IconsModule,
+    DirectiveModule,
   ],
   providers: [DoctorsListViewService, AddDoctorService],
 })

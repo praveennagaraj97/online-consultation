@@ -31,13 +31,23 @@ export class SelectInputComponent {
   @Input() placeholder = '';
   // Optional
   @Input() type: string = 'text';
+  // Optional
   @Input() isAsync = false;
+  // Optional
   @Input() hasNext = false;
+  // Optional
   @Input() isLoading = false;
   @Input() options: SelectOption[] = [];
+  // Optional
   @Input() searchPlaceholder = '';
+  // Optional
   @Input() isMulti = false;
+  // Optional
   @Input() multiInputIgnoreKeys: string[] = [];
+  // Optional
+  @Input() defaultValue: string | null = null;
+
+  // State
   multipleOptions: SelectOption[] = [];
 
   // Event Emitters
@@ -47,7 +57,7 @@ export class SelectInputComponent {
 
   // State
   showOptions = false;
-  selectOption = '';
+  selectOptionValue = '';
   multiViewScrollViewOptions: ScrollIntoViewOptions = {
     behavior: 'smooth',
     block: 'nearest',
@@ -60,8 +70,14 @@ export class SelectInputComponent {
 
   get parseError(): string {
     const errorKey = Object.keys(this.fc?.errors || {})?.[0] || '';
-    console.log(this.fc?.errors, this.htmlFor);
+
     return this.errors?.[errorKey] || 'Entered value is invalid';
+  }
+
+  ngOnInit() {
+    if (this.defaultValue) {
+      this.selectOptionValue = this.defaultValue;
+    }
   }
 
   onSelect(opt: SelectOption) {
@@ -84,7 +100,7 @@ export class SelectInputComponent {
     }
 
     this.showOptions = false;
-    this.selectOption = opt.title;
+    this.selectOptionValue = opt.title;
     this.onChange?.emit(opt);
   }
 

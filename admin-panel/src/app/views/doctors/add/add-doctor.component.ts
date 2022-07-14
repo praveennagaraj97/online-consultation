@@ -11,6 +11,7 @@ import { Subscription } from 'rxjs';
 import { fadeInTransformAnimation } from 'src/app/animations';
 import { doctorFormErrors } from 'src/app/errors/doctor-form.errors';
 import { BreadcrumbPath, SelectOption } from 'src/app/types/app.types';
+import type { DoctorFormDTO } from 'src/app/types/dto.types';
 import { clearSubscriptions } from 'src/app/utils/helpers';
 import { AddDoctorService } from './add-doctor.service';
 
@@ -40,6 +41,10 @@ export class AddNewDoctorViewComponent {
     { path: '/doctors', title: 'Doctors' },
     { path: '/doctors/add', title: 'Add New Doctor' },
   ];
+  activeStatusOptions: SelectOption[] = [
+    { title: 'Active', value: 'true' },
+    { title: 'In Active', value: 'false' },
+  ];
   shouldShowError = false;
   errors = doctorFormErrors;
   hospitalOptions: SelectOption[] = [];
@@ -58,7 +63,7 @@ export class AddNewDoctorViewComponent {
 
   // Input Form Group State
   profilePic: File | null = null;
-  doctorForm: FormGroup = this.fb.group({
+  doctorForm: FormGroup<DoctorFormDTO> = this.fb.group({
     name: new FormControl('Dr. ', {
       validators: [Validators.required],
     }),
@@ -70,6 +75,7 @@ export class AddNewDoctorViewComponent {
       validators: [Validators.required],
     }),
     phone_code: new FormControl('+91'),
+
     phone_number: new FormControl('', {
       validators: [Validators.required, Validators.pattern('^[0-9]+$')],
     }),
@@ -87,6 +93,7 @@ export class AddNewDoctorViewComponent {
     spoken_language_id: new FormArray<FormControl<string>>([], {
       validators: [Validators.required, Validators.min(1)],
     }),
+    is_active: new FormControl('false'),
   });
 
   ngOnInit() {
@@ -104,11 +111,18 @@ export class AddNewDoctorViewComponent {
     return this.doctorForm.get(name)?.value || '';
   }
 
-  onFormSubmit(form: FormGroup) {
+  onFormSubmit(form: FormGroup<DoctorFormDTO>) {
     if (form.invalid) {
       this.shouldShowError = true;
     } else {
-      console.log(form.value);
+      this.addNewDocService.handleAddDoctor(form, this.profilePic).subscribe({
+        next: (val) => {
+          console.log(val);
+        },
+        error: (err) => {
+          console.log(err);
+        },
+      });
     }
   }
 
@@ -266,6 +280,10 @@ export class AddNewDoctorViewComponent {
           this.doctorForm.controls?.['consultation_type_id']?.value
       )?.title === 'Schedule'
     );
+  }
+
+  handleProfilePicChange(files: File[]) {
+    this.profilePic = files[0];
   }
 
   ngOnDestroy() {

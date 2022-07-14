@@ -6,25 +6,59 @@
     class="dark:bg-gray-700 bg-gray-50 rounded-lg shadow-lg my-4 overflow-hidden p-3"
   >
     <div class="flex space-x-4">
-      <div class="w-28 h-28 rounded-md">
+      <app-dropzone-component
+        [isMulti]="false"
+        dropfileType="image"
+        accept="image/*"
+        (onChange)="handleProfilePicChange($event)"
+        *ngIf="profilePic == null"
+        @fadeIn
+      >
+        <div
+          class="w-40 h-40 sm:dark:bg-gray-500 sm:bg-indigo-100 sm:shadow-md rounded-md p-2 smooth-animate hover:scale-105 flex flex-col items-center justify-center"
+          role="button"
+        >
+          <p class="text-xs dark:text-gray-100 text-gray-900 text-center">
+            Doctor's profile picture
+          </p>
+          <app-image-icon
+            className="w-12 h-12 dark:fill-gray-100 dark:stroke-gray-100 fill-gray-600 stroke-gray-600 mx-auto my-4"
+          ></app-image-icon>
+          <small
+            class="text-xs block dark:text-gray-300 text-gray-600 text-center"
+          >
+            Drop / click here to select
+          </small>
+        </div>
+      </app-dropzone-component>
+
+      <div
+        class="w-40 h-40 rounded-md shadow-md overflow-hidden relative"
+        @fadeIn
+        *ngIf="profilePic"
+      >
         <img
           src="/assets/img-placeholder.png"
           alt=""
-          class="rounded-md w-full h-full object-cover"
+          blobImageViewer
+          [file]="profilePic"
+          class="object-cover h-full w-full"
         />
+        <div class="absolute bottom-0 left-0 right-0">
+          <button
+            class="action-btn px-4 py-1.5 text-xs rounded-md w-full"
+            (click)="profilePic = null"
+          >
+            Remove / Change
+          </button>
+        </div>
       </div>
+
       <div class="my-auto">
         <h2 class="text-lg font-medium" @fadeIn>{{ getFormValue("name") }}</h2>
         <small class="block text-xs mb-0.5" @fadeIn>{{
           getFormValue("professional_title")
         }}</small>
-
-        <div class="flex space-x-1.5 mt-3" *ngIf="profilePic">
-          <button class="action-btn px-4 py-1 text-xs rounded-md">
-            Change
-          </button>
-          <button class="ghost-btn px-4 py-1 text-xs rounded-md">Remove</button>
-        </div>
       </div>
     </div>
     <form
@@ -90,7 +124,7 @@
         ></app-select-input-component>
 
         <app-select-input-component
-          [fc]="doctorForm.controls?.['hospital_title']"
+          [fc]="doctorForm.controls?.['hospital_id']"
           [showError]="false"
           labelName="Hospital"
           htmlFor="hospital_id"
@@ -164,9 +198,21 @@
           [errors]="errors.spoken_language_id"
         >
         </app-select-input-component>
+
+        <app-select-input-component
+          labelName="Status"
+          guideLine="Choosing active will skip activation email. (optional)"
+          placeholder="Doctor active status"
+          htmlFor="doctor_status"
+          [fc]="doctorForm.controls.is_active"
+          [options]="activeStatusOptions"
+          (onChange)="doctorForm.controls.is_active.setValue($event.value)"
+          [defaultValue]="doctorForm.controls.is_active.value"
+        >
+        </app-select-input-component>
       </div>
 
-      <hr class="my-4" />
+      <hr class="my-10 opacity-50" />
       <button
         type="submit"
         class="action-btn text-sm px-4 py-1.5 rounded-md mx-auto block"
@@ -174,6 +220,5 @@
         Add Doctor
       </button>
     </form>
-    <div class="h-96"></div>
   </div>
 </section>

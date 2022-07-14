@@ -12,6 +12,7 @@ import { ThreeDotsIconComponent } from './dots/three-dots.component';
 import { EditorIconComponent } from './editor/editor-icon.component';
 import { HomeIconComponent } from './home/home-icon.component';
 import { HospitalIconComponent } from './hospital/hospital-icon.component';
+import { ImageIconComponent } from './image/image-icon.component';
 import { LanguageIconComponent } from './language/language-icon.component';
 import { LockIconComponent } from './lock/lock-icon.component';
 import { LogoutIconComponent } from './logout/logout-icon.component';
@@ -50,6 +51,7 @@ import { UserIconComponent } from './user/user-icon.component';
     PreviousIconComponent,
     SearchIconComponent,
     CloseIconComponent,
+    ImageIconComponent,
   ],
   exports: [
     MailIconComponent,
@@ -75,6 +77,7 @@ import { UserIconComponent } from './user/user-icon.component';
     PreviousIconComponent,
     SearchIconComponent,
     CloseIconComponent,
+    ImageIconComponent,
   ],
 })
 export class IconsModule {}

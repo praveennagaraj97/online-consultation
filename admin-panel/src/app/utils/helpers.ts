@@ -11,3 +11,11 @@ export function clearSubscriptions(subs: Subscription[]) {
     }
   });
 }
+
+export function convertFileUploadToBlobUrl(file: File) {
+  if (file) {
+    return URL.createObjectURL(file);
+  }
+
+  return '/assets/img-placeholder.png';
+}
