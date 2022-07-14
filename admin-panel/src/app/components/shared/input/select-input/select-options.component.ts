@@ -25,14 +25,13 @@ import { clearSubscriptions } from 'src/app/utils/helpers';
         [ngStyle]="posStyle"
         @openClose
       >
-        <div class="relative">
+        <div class="relative" *ngIf="isAsync">
           <div class="absolute left-2 top-0 bottom-0 flex items-center">
             <app-search-icon
-              className="w-4 h-4 dark:fill-gray-300 dark:stroke-gray-300"
+              className="w-4 h-4 dark:fill-gray-300 dark:stroke-gray-300 stroke-gray-700 fill-gray-700 pt-1"
             ></app-search-icon>
           </div>
           <input
-            *ngIf="isAsync"
             type="text"
             class="w-full p-2 pl-8 common-input text-sm input-focus input-colors !border-t-0 !border-x-0 rounded-lg mt-1"
             [placeholder]="placeholder"
@@ -40,12 +39,15 @@ import { clearSubscriptions } from 'src/app/utils/helpers';
             (ngModelChange)="onSearchChange($event)"
           />
         </div>
+
+        <!-- Multiple Inputs Display -->
+
         <div class="max-h-[144px] overflow-y-auto inner-scrollbar">
           <button
             class="p-2  smooth-animate hover:bg-sky-500/30 w-full  flex space-x-2 items-center text-xs"
             *ngFor="let option of options"
             [title]="option.title"
-            (click)="onChange.emit(option)"
+            (click)="handleOnSelect(option)"
           >
             {{ option.title }}
           </button>
@@ -56,7 +58,7 @@ import { clearSubscriptions } from 'src/app/utils/helpers';
           ></div>
           <app-spinner-icon
             *ngIf="loading"
-            className="animate-spin fill-gray-50 stroke-gray-50 w-6 h-6 mx-auto my-3 py-1"
+            className="animate-spin dark:fill-gray-300 dark:stroke-gray-300 stroke-gray-700 fill-gray-700 w-6 h-6 mx-auto my-3 py-1"
           ></app-spinner-icon>
         </div>
       </div>
@@ -146,6 +148,10 @@ export class SelectInputOptionsComponent {
     this.overlayRef = overlay;
 
     this.templateRef = new TemplatePortal(this.portalRef, this.viewContainer);
+  }
+
+  handleOnSelect(opt: SelectOption) {
+    this.onChange.emit(opt);
   }
 
   private updateModalPosition() {

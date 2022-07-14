@@ -5,7 +5,6 @@
   <div
     class="dark:bg-gray-700 bg-gray-50 rounded-lg shadow-lg my-4 overflow-hidden p-3"
   >
-    <!-- Profile Pic -->
     <div class="flex space-x-4">
       <div class="w-28 h-28 rounded-md">
         <img
@@ -140,6 +139,23 @@
           (onChange)="onSpecialitySelect($event)"
         >
         </app-select-input-component>
+
+        <app-select-input-component
+          labelName="Language(s)"
+          guideLine="Languages doctor can communicate with"
+          placeholder="Select / Add language"
+          [isAsync]="true"
+          searchPlaceholder="Search language"
+          [options]="languagesOptions"
+          [hasNext]="languagesHasNext != null"
+          [isLoading]="languagesLoading"
+          (loadMore)="loadMoreLanguges()"
+          (onSearch)="onLanguageSearch($event)"
+          (onChange)="onLanguageSelect($event)"
+          [isMulti]="true"
+          [multiInputIgnoreKeys]="['add_new']"
+        >
+        </app-select-input-component>
       </div>
 
       <hr class="my-4" />
@@ -150,5 +166,6 @@
         Add Doctor
       </button>
     </form>
+    <div class="h-96"></div>
   </div>
 </section>

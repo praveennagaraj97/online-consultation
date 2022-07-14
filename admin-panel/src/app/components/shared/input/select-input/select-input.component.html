@@ -11,14 +11,13 @@
     (callback)="showOptions = false"
   >
     <input
-      [ngModel]=""
       [type]="type"
       name="htmlFor"
-      [ngModel]="selectOption"
+      [ngModel]="isMulti ? '' : selectOption"
       autocomplete="off"
       readonly
       class="common-input w-full input-focus input-colors p-2 rounded-md text-sm shadow-md"
-      [placeholder]="placeholder"
+      [placeholder]="multipleOptions.length ? '' : placeholder"
       [ngClass]="
         showError
           ? fc?.invalid
@@ -27,6 +26,37 @@
           : ''
       "
     />
+
+    <!-- Multiple Options  -->
+    <div
+      class="flex absolute top-0 left-2 right-8 bottom-0 items-center overflow-y-auto inner-scrollbar space-x-2"
+      *ngIf="isMulti && multipleOptions.length"
+      (click)="$event.stopPropagation()"
+      @fadeIn
+    >
+      <div
+        *ngFor="let mlopt of multipleOptions"
+        class="hover:bg-sky-700/80 bg-sky-700/40 drop-shadow-2xl shadow-lg rounded-md px-2 py-0.5 flex items-center smooth-animate"
+        @fadeIn
+        scrollIntoView
+        [viewOptions]="multiViewScrollViewOptions"
+      >
+        <small class="block text-sm">
+          {{ mlopt.title }}
+        </small>
+        <button
+          tabindex="-1"
+          type="button"
+          (click)="removeSelection(mlopt)"
+          class="smooth-animate hover:scale-110 border border-gray-50/30 rounded-md bg-red-500 ml-2"
+        >
+          <app-close-icon
+            className="w-4 h-4 fill-gray-50 stroke-gray-50"
+          ></app-close-icon>
+        </button>
+      </div>
+    </div>
+
     <button
       type="button"
       tabindex="-1"
@@ -58,6 +88,6 @@
   [hasMore]="hasNext"
   (loadMore)="loadMore.emit()"
   (onSearch)="onSearch.emit($event)"
-  (onChange)="onSelect($event); showOptions = false"
+  (onChange)="onSelect($event); (isMulti)"
   [isAsync]="isAsync"
 ></app-select-input-options-component>

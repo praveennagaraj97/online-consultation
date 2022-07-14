@@ -7,6 +7,7 @@ import { SelectOption } from 'src/app/types/app.types';
 import {
   ConsultationEntity,
   HospitalEntity,
+  LanguageEntity,
   SpecialityEntity,
 } from 'src/app/types/cms.response.types';
 
@@ -14,6 +15,7 @@ import {
 export class AddDoctorService {
   private hospitals: HospitalEntity[] = [];
   private specialities: SpecialityEntity[] = [];
+  private languages: LanguageEntity[] = [];
 
   constructor(private http: HttpClient) {}
 
@@ -116,6 +118,51 @@ export class AddDoctorService {
             specialities: [
               { title: 'Add new speciality', value: 'add_new' },
               ...specialities,
+            ],
+            nextId: res.paginate_id,
+          };
+        })
+      );
+  }
+
+  getLangaugesOptions(
+    paginateId: string | null,
+    search: string,
+    shouldReset: boolean
+  ) {
+    let params: { [key: string]: string } = {};
+    params['per_page'] = '50';
+    if (paginateId) {
+      params['paginate_id'] = paginateId;
+    }
+
+    if (search.trim().length) {
+      params['name[search]'] = search;
+    }
+    if (shouldReset) {
+      this.languages = [];
+    }
+
+    return this.http
+      .get<PaginatedBaseAPiResponse<LanguageEntity[]>>(sharedRoutes.Languages, {
+        params,
+      })
+      .pipe(
+        map((res) => {
+          if (res.result) {
+            this.languages = [...this.languages, ...res.result];
+          }
+
+          const langauges: SelectOption[] =
+            this.languages?.map((speciality) => ({
+              title: speciality.name,
+              value: speciality.id,
+            })) || [];
+
+          return {
+            langauges: [
+              { title: 'Add new language', value: 'add_new' },
+              ...langauges,
             ],
             nextId: res.paginate_id,
           };

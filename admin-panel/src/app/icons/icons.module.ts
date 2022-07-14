@@ -4,6 +4,7 @@ import { AdminIconComponent } from './admin/admin-icon.component';
 import { AppointmentIconComponent } from './appointment/appointment-icon.component';
 import { ArrowUpIconComponent } from './arrow/arrow-up-icon.component';
 import { ChevronIconComponent } from './chevron/chevron-icon.component';
+import { CloseIconComponent } from './close/close-icon.component';
 import { ConsultatationIconComponent } from './consultation/consultation-icon.component';
 import { DoctorIconComponent } from './doctor/doctor-icon.component';
 import { DotsIconComponent } from './dots/dots-icon.component';
@@ -48,6 +49,7 @@ import { UserIconComponent } from './user/user-icon.component';
     NextIconComponent,
     PreviousIconComponent,
     SearchIconComponent,
+    CloseIconComponent,
   ],
   exports: [
     MailIconComponent,
@@ -72,6 +74,7 @@ import { UserIconComponent } from './user/user-icon.component';
     NextIconComponent,
     PreviousIconComponent,
     SearchIconComponent,
+    CloseIconComponent,
   ],
 })
 export class IconsModule {}

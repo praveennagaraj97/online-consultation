@@ -36,3 +36,9 @@ export interface ConsultationEntity {
   action_name: string;
   type: string;
 }
+
+export interface LanguageEntity {
+  id: string;
+  name: string;
+  locale_name: string;
+}

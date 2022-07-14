@@ -28,7 +28,11 @@ export class SelectInputComponent {
   @Input() isLoading = false;
   @Input() options: SelectOption[] = [];
   @Input() searchPlaceholder = '';
+  @Input() isMulti = false;
+  @Input() multiInputIgnoreKeys: string[] = [];
+  multipleOptions: SelectOption[] = [];
 
+  // Event Emitters
   @Output() loadMore = new EventEmitter<void>(false);
   @Output() onSearch = new EventEmitter<string>(false);
   @Output() onChange = new EventEmitter<SelectOption>(false);
@@ -36,6 +40,11 @@ export class SelectInputComponent {
   // State
   showOptions = false;
   selectOption = '';
+  multiViewScrollViewOptions: ScrollIntoViewOptions = {
+    behavior: 'smooth',
+    block: 'nearest',
+    inline: 'start',
+  };
 
   get control(): FormControl {
     return this.fc as FormControl;
@@ -48,7 +57,34 @@ export class SelectInputComponent {
   }
 
   onSelect(opt: SelectOption) {
+    if (this.isMulti) {
+      // Custom event trigger keys
+      if (this.multiInputIgnoreKeys.includes(opt.value)) {
+        this.showOptions = false;
+        return;
+      }
+      if (this.multipleOptions.find((mo) => mo.value == opt.value)) {
+        this.multipleOptions = this.multipleOptions.filter(
+          (option) => option.value != opt.value
+        );
+      } else {
+        this.multipleOptions = [...this.multipleOptions, opt];
+      }
+
+      this.onChange.emit(opt);
+      return;
+    }
+
+    this.showOptions = false;
     this.selectOption = opt.title;
+    this.onChange.emit(opt);
+  }
+
+  // Remove multi select option
+  removeSelection(opt: SelectOption) {
+    this.multipleOptions = this.multipleOptions.filter(
+      (option) => option.value != opt.value
+    );
     this.onChange.emit(opt);
   }
 }

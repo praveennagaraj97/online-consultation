@@ -50,6 +50,10 @@ export class AddNewDoctorViewComponent {
   specialityHasNext: string | null = null;
   specialityLoading = false;
   specialitySearchTerm = '';
+  languagesOptions: SelectOption[] = [];
+  languagesHasNext: string | null = null;
+  languagesLoading = false;
+  languagesSearchTerm = '';
 
   // Input Form Group State
   profilePic: File | null = null;
@@ -85,6 +89,7 @@ export class AddNewDoctorViewComponent {
     this.getHospitalsOptions();
     this.getConsultationTypes();
     this.getSpecialities();
+    this.getLanguages();
   }
 
   getFormValue(name: string): string {
@@ -199,6 +204,46 @@ export class AddNewDoctorViewComponent {
 
   onSpecialitySelect(opt: SelectOption) {
     this.doctorForm.controls?.['speciality_id'].setValue(opt.value);
+  }
+
+  // Languages
+  private getLanguages(shouldReset = false) {
+    this.languagesLoading = true;
+    this.subs$.push(
+      this.addNewDocService
+        .getLangaugesOptions(
+          this.nextHospitalsPaginateId,
+          this.languagesSearchTerm,
+          shouldReset
+        )
+        .subscribe({
+          next: (options) => {
+            this.languagesOptions = options.langauges || [];
+            this.languagesHasNext = options.nextId;
+            this.languagesLoading = false;
+          },
+          error: (err) => {
+            this.languagesLoading = false;
+            alert(err);
+          },
+        })
+    );
+  }
+
+  loadMoreLanguges() {
+    this.getLanguages();
+  }
+
+  onLanguageSearch(term: string) {
+    this.nextHospitalsPaginateId = null;
+    this.languagesLoading = true;
+    this.languagesOptions = [];
+    this.languagesSearchTerm = term;
+    this.getLanguages(true);
+  }
+
+  onLanguageSelect(opt: SelectOption) {
+    console.log(opt);
   }
 
   ngOnDestroy() {
