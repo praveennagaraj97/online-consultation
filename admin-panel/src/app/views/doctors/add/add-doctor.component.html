@@ -67,33 +67,6 @@
           placeholder="Enter doctor's phone number"
         >
         </app-phone-input-component>
-        <app-common-input-component
-          [errors]="errors.professional_title"
-          [fc]="doctorForm.controls?.['professional_title']"
-          [showError]="shouldShowError"
-          labelName="Professional title"
-          htmlFor="professional_title"
-          guideLine="Provide doctor's professional title"
-          placeholder="Enter doctor's professional title"
-        ></app-common-input-component>
-        <app-common-input-component
-          [errors]="errors.education"
-          [fc]="doctorForm.controls?.['education']"
-          [showError]="shouldShowError"
-          labelName="Education"
-          htmlFor="education"
-          guideLine="*Provide with comma separated by space"
-          placeholder="Enter doctor's education (MBBS, MD)"
-        ></app-common-input-component>
-        <app-common-input-component
-          [errors]="errors.experience"
-          [fc]="doctorForm.controls?.['experience']"
-          [showError]="shouldShowError"
-          labelName="Experience"
-          htmlFor="experience"
-          guideLine="Provide doctor's experience in years"
-          placeholder="Enter doctor's experience"
-        ></app-common-input-component>
         <app-select-input-component
           [fc]="doctorForm.controls?.['hospital_title']"
           [showError]="false"
@@ -123,6 +96,33 @@
           [options]="consultationTypeOptions"
           (onChange)="onConsultationTypeSelect($event.value)"
         ></app-select-input-component>
+        <app-common-input-component
+          [errors]="errors.professional_title"
+          [fc]="doctorForm.controls?.['professional_title']"
+          [showError]="shouldShowError"
+          labelName="Professional title"
+          htmlFor="professional_title"
+          guideLine="Provide doctor's professional title"
+          placeholder="Enter doctor's professional title"
+        ></app-common-input-component>
+        <app-common-input-component
+          [errors]="errors.education"
+          [fc]="doctorForm.controls?.['education']"
+          [showError]="shouldShowError"
+          labelName="Education"
+          htmlFor="education"
+          guideLine="*Provide with comma separated by space"
+          placeholder="Enter doctor's education (MBBS, MD)"
+        ></app-common-input-component>
+        <app-common-input-component
+          [errors]="errors.experience"
+          [fc]="doctorForm.controls?.['experience']"
+          [showError]="shouldShowError"
+          labelName="Experience"
+          htmlFor="experience"
+          guideLine="Provide doctor's experience in years"
+          placeholder="Enter doctor's experience"
+        ></app-common-input-component>
       </div>
 
       <hr class="my-4" />

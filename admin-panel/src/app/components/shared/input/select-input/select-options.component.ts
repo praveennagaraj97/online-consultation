@@ -11,7 +11,7 @@ import {
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
-import { fromEvent, Subscription } from 'rxjs';
+import { debounceTime, fromEvent, Subject, Subscription } from 'rxjs';
 import { SelectOption } from 'src/app/types/app.types';
 import { clearSubscriptions } from 'src/app/utils/helpers';
 
@@ -74,6 +74,9 @@ import { clearSubscriptions } from 'src/app/utils/helpers';
   ],
 })
 export class SelectInputOptionsComponent {
+  // Subs
+  private subs$: Subscription[] = [];
+
   // Props
   @Input() renderPosition: DOMRect | null = null;
   @Input() showOptions = false;
@@ -87,6 +90,7 @@ export class SelectInputOptionsComponent {
   @Output() onChange = new EventEmitter<SelectOption>(false);
   @Output() loadMore = new EventEmitter<void>(false);
   @Output() onSearch = new EventEmitter<string>(false);
+  debouncer: Subject<string> = new Subject<string>();
 
   // State
   dummyCards = new Array(10).fill('');
@@ -98,13 +102,20 @@ export class SelectInputOptionsComponent {
   @ViewChild('portalRef') portalRef?: TemplateRef<unknown>;
   private templateRef!: TemplatePortal;
 
-  // Subsriptions
-  private subs$: Subscription[] = [];
-
   constructor(
     private overlay: Overlay,
     private viewContainer: ViewContainerRef
   ) {}
+
+  ngOnInit() {
+    this.subs$.push(
+      this.debouncer.pipe(debounceTime(250)).subscribe({
+        next: (value) => {
+          this.onSearch.emit(value);
+        },
+      })
+    );
+  }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes?.['showOptions']?.currentValue) {
@@ -168,7 +179,7 @@ export class SelectInputOptionsComponent {
   }
 
   onSearchChange(term: string) {
-    this.onSearch.emit(term);
+    this.debouncer.next(term);
   }
 
   ngOnDestroy() {
