@@ -1,4 +1,5 @@
 import { ImageType } from './api.response.types';
+import { ConsultationType } from './app.types';
 
 export interface HospitalEntity {
   id: string;
@@ -34,7 +35,7 @@ export interface ConsultationEntity {
   description: string;
   price: number;
   action_name: string;
-  type: string;
+  type: ConsultationType;
 }
 
 export interface LanguageEntity {

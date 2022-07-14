@@ -23,4 +23,10 @@ export const doctorFormErrors = {
   consultation_type_id: {
     required: "Doctor's Consultation type cannot be empty",
   },
+  speciality_id: {
+    required: 'Speciality is required for Scheduled consultation',
+  },
+  spoken_language_id: {
+    required: 'Select atleast one language which doctor speaks',
+  },
 };

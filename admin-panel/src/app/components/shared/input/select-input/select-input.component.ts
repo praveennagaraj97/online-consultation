@@ -15,13 +15,21 @@ import { SelectOption } from 'src/app/types/app.types';
 })
 export class SelectInputComponent {
   // Props
+  // Errors Messages for this input
   @Input() errors: { [key: string]: string } = {};
-  @Input() fc!: AbstractControl<any, any> | undefined;
+  // FormControl on which input will error existence will be checked
+  @Input() fc?: AbstractControl<any, any> | undefined;
+  // COndition for when to display the errors
   @Input() showError = false;
+  // Label name for input - Optional
   @Input() labelName = '';
+  // Optional
   @Input() htmlFor = '';
+  // Optional
   @Input() guideLine = '';
+  // Optional
   @Input() placeholder = '';
+  // Optional
   @Input() type: string = 'text';
   @Input() isAsync = false;
   @Input() hasNext = false;
@@ -52,7 +60,7 @@ export class SelectInputComponent {
 
   get parseError(): string {
     const errorKey = Object.keys(this.fc?.errors || {})?.[0] || '';
-    console.log(this.fc?.errors);
+    console.log(this.fc?.errors, this.htmlFor);
     return this.errors?.[errorKey] || 'Entered value is invalid';
   }
 
@@ -71,13 +79,13 @@ export class SelectInputComponent {
         this.multipleOptions = [...this.multipleOptions, opt];
       }
 
-      this.onChange.emit(opt);
+      this.onChange?.emit(opt);
       return;
     }
 
     this.showOptions = false;
     this.selectOption = opt.title;
-    this.onChange.emit(opt);
+    this.onChange?.emit(opt);
   }
 
   // Remove multi select option
@@ -85,6 +93,6 @@ export class SelectInputComponent {
     this.multipleOptions = this.multipleOptions.filter(
       (option) => option.value != opt.value
     );
-    this.onChange.emit(opt);
+    this.onChange?.emit(opt);
   }
 }

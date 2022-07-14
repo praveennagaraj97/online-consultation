@@ -137,6 +137,10 @@
           (loadMore)="loadMoreSpecialities()"
           (onSearch)="onSpecialitySearch($event)"
           (onChange)="onSpecialitySelect($event)"
+          [errors]="errors.speciality_id"
+          htmlFor="speciality_id"
+          [fc]="doctorForm.controls?.['speciality_id']"
+          [showError]="false"
         >
         </app-select-input-component>
 
@@ -154,6 +158,10 @@
           (onChange)="onLanguageSelect($event)"
           [isMulti]="true"
           [multiInputIgnoreKeys]="['add_new']"
+          htmlFor="spoken_language_id"
+          [fc]="doctorForm.controls?.['spoken_language_id']"
+          [showError]="shouldShowError"
+          [errors]="errors.spoken_language_id"
         >
         </app-select-input-component>
       </div>

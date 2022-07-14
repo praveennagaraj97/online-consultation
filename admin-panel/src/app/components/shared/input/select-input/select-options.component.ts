@@ -120,7 +120,7 @@ export class SelectInputOptionsComponent {
     this.subs$.push(
       this.debouncer.pipe(debounceTime(250)).subscribe({
         next: (value) => {
-          this.onSearch.emit(value);
+          this.onSearch?.emit(value);
         },
       })
     );
@@ -187,7 +187,7 @@ export class SelectInputOptionsComponent {
 
   loadMoreEvent(state: boolean) {
     if (state) {
-      this.loadMore.emit();
+      this.loadMore?.emit();
     }
   }
 

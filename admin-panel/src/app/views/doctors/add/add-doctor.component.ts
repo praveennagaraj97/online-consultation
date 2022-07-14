@@ -1,6 +1,7 @@
 import { transition, trigger, useAnimation } from '@angular/animations';
 import { Component } from '@angular/core';
 import {
+  FormArray,
   FormBuilder,
   FormControl,
   FormGroup,
@@ -83,6 +84,9 @@ export class AddNewDoctorViewComponent {
       validators: [Validators.required],
     }),
     speciality_id: new FormControl(''),
+    spoken_language_id: new FormArray<FormControl<string>>([], {
+      validators: [Validators.required, Validators.min(1)],
+    }),
   });
 
   ngOnInit() {
@@ -124,7 +128,7 @@ export class AddNewDoctorViewComponent {
             this.hospitalOptions = res.hospitals;
             this.nextHospitalsPaginateId = res.nextId;
           },
-          error: (err) => {
+          error: () => {
             this.hospitalsLoading = false;
             alert('Failed to load hospitals');
           },
@@ -243,7 +247,25 @@ export class AddNewDoctorViewComponent {
   }
 
   onLanguageSelect(opt: SelectOption) {
-    console.log(opt);
+    const input = this.doctorForm.controls?.['spoken_language_id'] as FormArray;
+
+    if (input.value?.includes(opt.value)) {
+      input.removeAt(input.value?.findIndex((val: string) => val == opt.value));
+      return;
+    }
+    if (input) {
+      input.push(new FormControl(opt.value));
+    }
+  }
+
+  get checkIfConsultationTypeIsSchedule() {
+    return (
+      this.consultationTypeOptions.find(
+        (type) =>
+          type.value ==
+          this.doctorForm.controls?.['consultation_type_id']?.value
+      )?.title === 'Schedule'
+    );
   }
 
   ngOnDestroy() {

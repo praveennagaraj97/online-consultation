@@ -20,3 +20,5 @@ export interface Country {
   code: string;
   dial_code: string;
 }
+
+export type ConsultationType = 'Instant' | 'Schedule';
