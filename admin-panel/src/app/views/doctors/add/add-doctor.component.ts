@@ -46,6 +46,10 @@ export class AddNewDoctorViewComponent {
   nextHospitalsPaginateId: string | null = null;
   hospitalSearchTerm = '';
   consultationTypeOptions: SelectOption[] = [];
+  specialityOptions: SelectOption[] = [];
+  specialityHasNext: string | null = null;
+  specialityLoading = false;
+  specialitySearchTerm = '';
 
   // Input Form Group State
   profilePic: File | null = null;
@@ -74,11 +78,13 @@ export class AddNewDoctorViewComponent {
     consultation_type_id: new FormControl('', {
       validators: [Validators.required],
     }),
+    speciality_id: new FormControl(''),
   });
 
   ngOnInit() {
     this.getHospitalsOptions();
     this.getConsultationTypes();
+    this.getSpecialities();
   }
 
   getFormValue(name: string): string {
@@ -153,6 +159,46 @@ export class AddNewDoctorViewComponent {
 
   onConsultationTypeSelect(id: string) {
     this.doctorForm.controls?.['consultation_type_id']?.setValue(id);
+  }
+
+  // Specialities
+  private getSpecialities(shouldReset = false) {
+    this.specialityLoading = true;
+    this.subs$.push(
+      this.addNewDocService
+        .getSpecialitiesOptions(
+          this.nextHospitalsPaginateId,
+          this.specialitySearchTerm,
+          shouldReset
+        )
+        .subscribe({
+          next: (options) => {
+            this.specialityOptions = options.specialities || [];
+            this.specialityHasNext = options.nextId;
+            this.specialityLoading = false;
+          },
+          error: (err) => {
+            this.specialityLoading = false;
+            alert(err);
+          },
+        })
+    );
+  }
+
+  loadMoreSpecialities() {
+    this.getSpecialities();
+  }
+
+  onSpecialitySearch(term: string) {
+    this.nextHospitalsPaginateId = null;
+    this.specialityLoading = true;
+    this.specialityOptions = [];
+    this.specialitySearchTerm = term;
+    this.getSpecialities(true);
+  }
+
+  onSpecialitySelect(opt: SelectOption) {
+    this.doctorForm.controls?.['speciality_id'].setValue(opt.value);
   }
 
   ngOnDestroy() {

@@ -67,6 +67,29 @@
           placeholder="Enter doctor's phone number"
         >
         </app-phone-input-component>
+        <app-common-input-component
+          [errors]="errors.professional_title"
+          [fc]="doctorForm.controls?.['professional_title']"
+          [showError]="shouldShowError"
+          labelName="Professional title"
+          htmlFor="professional_title"
+          guideLine="Provide doctor's professional title"
+          placeholder="Enter doctor's professional title"
+        ></app-common-input-component>
+
+        <app-select-input-component
+          [errors]="errors.consultation_type_id"
+          [fc]="doctorForm.controls?.['consultation_type_id']"
+          [showError]="shouldShowError"
+          labelName="Consultation type"
+          htmlFor="consultation_type_id"
+          guideLine="Type of consultation"
+          placeholder="Select doctor's consultation type"
+          [isAsync]="false"
+          [options]="consultationTypeOptions"
+          (onChange)="onConsultationTypeSelect($event.value)"
+        ></app-select-input-component>
+
         <app-select-input-component
           [fc]="doctorForm.controls?.['hospital_title']"
           [showError]="false"
@@ -84,27 +107,6 @@
           (onChange)="onHospitalSelect($event)"
         ></app-select-input-component>
 
-        <app-select-input-component
-          [errors]="errors.consultation_type_id"
-          [fc]="doctorForm.controls?.['consultation_type_id']"
-          [showError]="shouldShowError"
-          labelName="Consultation type"
-          htmlFor="consultation_type_id"
-          guideLine="Type of consultation"
-          placeholder="Select doctor's consultation type"
-          [isAsync]="false"
-          [options]="consultationTypeOptions"
-          (onChange)="onConsultationTypeSelect($event.value)"
-        ></app-select-input-component>
-        <app-common-input-component
-          [errors]="errors.professional_title"
-          [fc]="doctorForm.controls?.['professional_title']"
-          [showError]="shouldShowError"
-          labelName="Professional title"
-          htmlFor="professional_title"
-          guideLine="Provide doctor's professional title"
-          placeholder="Enter doctor's professional title"
-        ></app-common-input-component>
         <app-common-input-component
           [errors]="errors.education"
           [fc]="doctorForm.controls?.['education']"
@@ -123,6 +125,21 @@
           guideLine="Provide doctor's experience in years"
           placeholder="Enter doctor's experience"
         ></app-common-input-component>
+
+        <app-select-input-component
+          labelName="Speciality"
+          guideLine="Doctor's speciality (*required for schedule type)"
+          placeholder="Select / Add doctor's speciality"
+          [isAsync]="true"
+          searchPlaceholder="Search speciality title"
+          [options]="specialityOptions"
+          [hasNext]="specialityHasNext != null"
+          [isLoading]="specialityLoading"
+          (loadMore)="loadMoreSpecialities()"
+          (onSearch)="onSpecialitySearch($event)"
+          (onChange)="onSpecialitySelect($event)"
+        >
+        </app-select-input-component>
       </div>
 
       <hr class="my-4" />

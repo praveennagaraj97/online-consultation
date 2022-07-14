@@ -7,11 +7,13 @@ import { SelectOption } from 'src/app/types/app.types';
 import {
   ConsultationEntity,
   HospitalEntity,
+  SpecialityEntity,
 } from 'src/app/types/cms.response.types';
 
 @Injectable()
 export class AddDoctorService {
   private hospitals: HospitalEntity[] = [];
+  private specialities: SpecialityEntity[] = [];
 
   constructor(private http: HttpClient) {}
 
@@ -68,9 +70,55 @@ export class AddDoctorService {
       .pipe(
         map((res) => {
           return res.result?.map((type) => ({
-            title: type.title,
+            title: type.type,
             value: type.id,
           }));
+        })
+      );
+  }
+
+  getSpecialitiesOptions(
+    paginateId: string | null,
+    search: string,
+    shouldReset: boolean
+  ) {
+    let params: { [key: string]: string } = {};
+    params['per_page'] = '50';
+    if (paginateId) {
+      params['paginate_id'] = paginateId;
+    }
+
+    if (search.trim().length) {
+      params['title[search]'] = search;
+    }
+    if (shouldReset) {
+      this.specialities = [];
+    }
+
+    return this.http
+      .get<PaginatedBaseAPiResponse<SpecialityEntity[]>>(
+        sharedRoutes.Specialities,
+        { params }
+      )
+      .pipe(
+        map((res) => {
+          if (res.result) {
+            this.specialities = [...this.specialities, ...res.result];
+          }
+
+          const specialities: SelectOption[] =
+            this.specialities?.map((speciality) => ({
+              title: speciality.title,
+              value: speciality.id,
+            })) || [];
+
+          return {
+            specialities: [
+              { title: 'Add new speciality', value: 'add_new' },
+              ...specialities,
+            ],
+            nextId: res.paginate_id,
+          };
         })
       );
   }

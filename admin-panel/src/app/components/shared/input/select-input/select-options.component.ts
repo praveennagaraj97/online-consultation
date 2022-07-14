@@ -25,14 +25,21 @@ import { clearSubscriptions } from 'src/app/utils/helpers';
         [ngStyle]="posStyle"
         @openClose
       >
-        <input
-          *ngIf="isAsync"
-          type="text"
-          class="w-full py-2 px-1 common-input text-sm input-focus input-colors !border-t-0 !border-x-0 rounded-lg mt-1"
-          [placeholder]="placeholder"
-          [ngModel]="searchFormValue"
-          (ngModelChange)="onSearchChange($event)"
-        />
+        <div class="relative">
+          <div class="absolute left-2 top-0 bottom-0 flex items-center">
+            <app-search-icon
+              className="w-4 h-4 dark:fill-gray-300 dark:stroke-gray-300"
+            ></app-search-icon>
+          </div>
+          <input
+            *ngIf="isAsync"
+            type="text"
+            class="w-full p-2 pl-8 common-input text-sm input-focus input-colors !border-t-0 !border-x-0 rounded-lg mt-1"
+            [placeholder]="placeholder"
+            [ngModel]="searchFormValue"
+            (ngModelChange)="onSearchChange($event)"
+          />
+        </div>
         <div class="max-h-[144px] overflow-y-auto inner-scrollbar">
           <button
             class="p-2  smooth-animate hover:bg-sky-500/30 w-full  flex space-x-2 items-center text-xs"
