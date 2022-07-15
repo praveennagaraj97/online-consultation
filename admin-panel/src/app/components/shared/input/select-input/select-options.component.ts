@@ -141,7 +141,7 @@ export class SelectInputOptionsComponent {
     }
 
     if (changes?.['options']) {
-      this.optionsList = this.options;
+      this.optionsList = changes?.['options'].currentValue;
     }
   }
 

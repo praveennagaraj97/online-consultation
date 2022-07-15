@@ -195,6 +195,7 @@ export class AddDoctorService {
       }
     });
     if (profilePic) {
+      formData.append('profile_pic', profilePic);
       formData.append('profile_pic_width', '160');
       formData.append('profile_pic_height', '160');
     }

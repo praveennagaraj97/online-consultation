@@ -1,5 +1,11 @@
 import { transition, trigger, useAnimation } from '@angular/animations';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
 import { AbstractControl, FormControl } from '@angular/forms';
 import { fadeInTransformAnimation } from 'src/app/animations';
 import { SelectOption } from 'src/app/types/app.types';
@@ -49,6 +55,7 @@ export class SelectInputComponent {
 
   // State
   multipleOptions: SelectOption[] = [];
+  selectOptions: SelectOption[] = [];
 
   // Event Emitters
   @Output() loadMore = new EventEmitter<void>(false);
@@ -77,6 +84,12 @@ export class SelectInputComponent {
   ngOnInit() {
     if (this.defaultValue) {
       this.selectOptionValue = this.defaultValue;
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes?.['options']) {
+      this.selectOptions = changes?.['options'].currentValue;
     }
   }
 
