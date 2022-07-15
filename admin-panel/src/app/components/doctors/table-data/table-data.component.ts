@@ -44,7 +44,7 @@ import { DoctorsEntity } from 'src/app/types/doctor.response.types';
               <div class="flex items-center space-x-1">
                 <img
                   [src]="
-                    doctor.profile_pic?.image_src ||
+                    doctor.profile_pic?.blur_data_url ||
                     '/assets/img-placeholder.png'
                   "
                   width="32"

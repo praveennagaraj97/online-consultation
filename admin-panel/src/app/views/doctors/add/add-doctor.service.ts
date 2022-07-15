@@ -39,9 +39,6 @@ export class AddDoctorService {
     if (search.trim().length) {
       params['name[search]'] = search;
     }
-    if (shouldReset) {
-      this.hospitals = [];
-    }
 
     return this.http
       .get<PaginatedBaseAPiResponse<HospitalEntity[]>>(sharedRoutes.Hospitals, {
@@ -49,6 +46,9 @@ export class AddDoctorService {
       })
       .pipe(
         map((res) => {
+          if (shouldReset) {
+            this.hospitals = [];
+          }
           if (res.result) {
             this.hospitals = [...this.hospitals, ...res.result];
           }
@@ -99,9 +99,6 @@ export class AddDoctorService {
     if (search.trim().length) {
       params['title[search]'] = search;
     }
-    if (shouldReset) {
-      this.specialities = [];
-    }
 
     return this.http
       .get<PaginatedBaseAPiResponse<SpecialityEntity[]>>(
@@ -110,6 +107,9 @@ export class AddDoctorService {
       )
       .pipe(
         map((res) => {
+          if (shouldReset) {
+            this.specialities = [];
+          }
           if (res.result) {
             this.specialities = [...this.specialities, ...res.result];
           }
@@ -145,9 +145,6 @@ export class AddDoctorService {
     if (search.trim().length) {
       params['name[search]'] = search;
     }
-    if (shouldReset) {
-      this.languages = [];
-    }
 
     return this.http
       .get<PaginatedBaseAPiResponse<LanguageEntity[]>>(sharedRoutes.Languages, {
@@ -155,6 +152,10 @@ export class AddDoctorService {
       })
       .pipe(
         map((res) => {
+          if (shouldReset) {
+            this.languages = [];
+          }
+
           if (res.result) {
             this.languages = [...this.languages, ...res.result];
           }

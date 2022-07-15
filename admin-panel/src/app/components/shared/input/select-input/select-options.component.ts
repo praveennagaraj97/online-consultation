@@ -45,7 +45,7 @@ import { clearSubscriptions } from 'src/app/utils/helpers';
         <div class="max-h-[144px] overflow-y-auto inner-scrollbar">
           <button
             class="p-2  smooth-animate hover:bg-sky-500/30 w-full  flex space-x-2 items-center text-xs"
-            *ngFor="let option of optionsList"
+            *ngFor="let option of options"
             [title]="option.title"
             (click)="handleOnSelect(option)"
           >
@@ -95,8 +95,6 @@ export class SelectInputOptionsComponent {
   @Input() hasMore = false;
   @Input() isAsync = false;
 
-  optionsList: SelectOption[] = [];
-
   // Event Emitters
   @Output() onChange = new EventEmitter<SelectOption>(false);
   @Output() loadMore = new EventEmitter<void>(false);
@@ -131,17 +129,13 @@ export class SelectInputOptionsComponent {
   ngOnChanges(changes: SimpleChanges) {
     if (changes?.['showOptions']?.currentValue) {
       this.overlayRef?.attach(this.templateRef);
-
       this.updateModalPosition();
       this.listenToWindowChanges();
     }
 
     if (changes?.['showOptions']?.currentValue === false) {
+      this.onSearchChange('');
       this.overlayRef?.detach();
-    }
-
-    if (changes?.['options']) {
-      this.optionsList = changes?.['options'].currentValue;
     }
   }
 

@@ -36,7 +36,7 @@
           (onChange)="updatePerPageLimit($event)"
         ></app-per-page-component>
         <div class="flex space-x-3 items-center">
-          <div class="md:w-96">
+          <div class="md:w-96 relative">
             <input
               type="text"
               name="search"
@@ -44,8 +44,13 @@
               [ngModel]="searchTerm"
               (ngModelChange)="onSearch($event)"
               autocomplete="off"
-              class="common-input w-full input-focus input-colors p-1.5 rounded-lg text-sm"
+              class="common-input w-full input-focus input-colors p-1.5 pl-7 rounded-lg text-sm"
             />
+            <div class="absolute left-2 top-0 bottom-0 flex items-center">
+              <app-search-icon
+                className="w-4 h-4 dark:fill-gray-300 dark:stroke-gray-300 stroke-gray-700 fill-gray-700 "
+              ></app-search-icon>
+            </div>
           </div>
 
           <a
