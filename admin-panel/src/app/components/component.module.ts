@@ -13,7 +13,6 @@ import { PaginationControlsComponent } from './pagination/controls.component';
 import { PaginationCountDisplayComponent } from './pagination/display-count.component';
 import { PerPageOptionsComponent } from './pagination/per-page-options.component';
 import { ThemeProviderComponent } from './providers/theme-provider/theme-provider.component';
-import { SelectDropdownComponent } from './select-dropdown/select-dropdown.component';
 import { CommonInputComponent } from './shared/input/common-input/common-input.component';
 import { CountryCodePickerComponent } from './shared/input/phone-input/country-code-picker.component';
 import { PhoneInputComponent } from './shared/input/phone-input/phone-input.component';
@@ -41,7 +40,6 @@ import { PaginationSkeletonComponent } from './skeletons/pagination/pagination-c
     BreadcrumbComponent,
     PerPageOptionsComponent,
     DoctorListTableDataComponent,
-    SelectDropdownComponent,
     NoDoctorsFoundComponent,
     DoctorsListSkeletonComponent,
     PaginationControlsComponent,
@@ -63,7 +61,6 @@ import { PaginationSkeletonComponent } from './skeletons/pagination/pagination-c
     BreadcrumbComponent,
     PerPageOptionsComponent,
     DoctorListTableDataComponent,
-    SelectDropdownComponent,
     NoDoctorsFoundComponent,
     DoctorsListSkeletonComponent,
     PaginationControlsComponent,

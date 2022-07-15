@@ -113,7 +113,7 @@ export class DoctorsListViewComponent {
     );
   }
 
-  onSpecialityChanegFilter(option: SelectOption) {
+  onSpecialityChangeFilter(option: SelectOption) {
     this.router.navigate([], { queryParams: {} });
 
     this.selectedSpeciality = option.value;
