@@ -10,7 +10,12 @@ import {
 import { Subscription } from 'rxjs';
 import { fadeInTransformAnimation } from 'src/app/animations';
 import { doctorFormErrors } from 'src/app/errors/doctor-form.errors';
-import { BreadcrumbPath, SelectOption } from 'src/app/types/app.types';
+import { ErrorResponse } from 'src/app/types/api.response.types';
+import {
+  BreadcrumbPath,
+  ResponseMessageType,
+  SelectOption,
+} from 'src/app/types/app.types';
 import type { DoctorFormDTO } from 'src/app/types/dto.types';
 import { clearSubscriptions } from 'src/app/utils/helpers';
 import { AddDoctorService } from './add-doctor.service';
@@ -60,6 +65,8 @@ export class AddNewDoctorViewComponent {
   languagesHasNext: string | null = null;
   languagesLoading = false;
   languagesSearchTerm = '';
+  submitting = false;
+  response: ResponseMessageType | null = null;
 
   // Input Form Group State
   profilePic: File | null = null;
@@ -113,14 +120,24 @@ export class AddNewDoctorViewComponent {
 
   onFormSubmit(form: FormGroup<DoctorFormDTO>) {
     if (form.invalid) {
+      this.response = {
+        message: 'Please fill all required field',
+        type: 'error',
+      };
       this.shouldShowError = true;
     } else {
       this.addNewDocService.handleAddDoctor(form, this.profilePic).subscribe({
         next: (val) => {
-          console.log(val);
+          this.response = {
+            message: val.message,
+            type: 'success',
+          };
         },
-        error: (err) => {
-          console.log(err);
+        error: (err: ErrorResponse) => {
+          this.response = {
+            message: err.error.message,
+            type: 'success',
+          };
         },
       });
     }

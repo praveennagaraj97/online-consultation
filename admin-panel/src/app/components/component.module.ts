@@ -19,6 +19,7 @@ import { CountryCodePickerComponent } from './shared/input/phone-input/country-c
 import { PhoneInputComponent } from './shared/input/phone-input/phone-input.component';
 import { SelectInputComponent } from './shared/input/select-input/select-input.component';
 import { SelectInputOptionsComponent } from './shared/input/select-input/select-options.component';
+import { MessageTagComponent } from './shared/message/messsage-tag.component';
 import { ProfileSkeletonComponent } from './skeletons/dashboard/profile/profile-skeleton.component';
 import { DoctorsListSkeletonComponent } from './skeletons/doctors/list-skeleton.component';
 import { PaginationControlsSkeletonComponent } from './skeletons/pagination/controls-skeleton.component';
@@ -53,6 +54,7 @@ import { PaginationSkeletonComponent } from './skeletons/pagination/pagination-c
     SelectInputComponent,
     SelectInputOptionsComponent,
     DropzoneComponent,
+    MessageTagComponent,
   ],
   exports: [
     ThemeProviderComponent,
@@ -72,6 +74,7 @@ import { PaginationSkeletonComponent } from './skeletons/pagination/pagination-c
     PhoneInputComponent,
     SelectInputComponent,
     DropzoneComponent,
+    MessageTagComponent,
   ],
 })
 export class ComponentsModule {}

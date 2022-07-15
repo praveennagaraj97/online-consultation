@@ -3,7 +3,10 @@ import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { map } from 'rxjs';
 import { doctorRoutes, sharedRoutes } from 'src/app/api-routes/routes';
-import { PaginatedBaseAPiResponse } from 'src/app/types/api.response.types';
+import {
+  BaseAPiResponse,
+  PaginatedBaseAPiResponse,
+} from 'src/app/types/api.response.types';
 import { SelectOption } from 'src/app/types/app.types';
 import {
   ConsultationEntity,
@@ -11,6 +14,7 @@ import {
   LanguageEntity,
   SpecialityEntity,
 } from 'src/app/types/cms.response.types';
+import { DoctorsEntity } from 'src/app/types/doctor.response.types';
 import { DoctorFormDTO } from 'src/app/types/dto.types';
 
 @Injectable()
@@ -195,6 +199,9 @@ export class AddDoctorService {
       formData.append('profile_pic_height', '160');
     }
 
-    return this.http.post(doctorRoutes.AddDoctor, formData);
+    return this.http.post<BaseAPiResponse<DoctorsEntity>>(
+      doctorRoutes.AddDoctor,
+      formData
+    );
   }
 }

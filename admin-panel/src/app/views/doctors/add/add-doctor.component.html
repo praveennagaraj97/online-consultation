@@ -213,9 +213,14 @@
       </div>
 
       <hr class="my-10 opacity-50" />
+      <app-message-tag-component
+        [response]="response"
+        (onEnd)="response = null"
+        className="text-center text-sm min-h-[20px]"
+      ></app-message-tag-component>
       <button
         type="submit"
-        class="action-btn text-sm px-4 py-1.5 rounded-md mx-auto block"
+        class="action-btn text-sm px-4 py-1.5 rounded-md mx-auto block mt-4"
       >
         Add Doctor
       </button>

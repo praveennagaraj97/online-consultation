@@ -22,3 +22,9 @@ export interface Country {
 }
 
 export type ConsultationType = 'Instant' | 'Schedule';
+
+export type ResponseMessageType = {
+  message: string;
+  type: 'error' | 'success' | 'info';
+  timeOut?: number;
+};
