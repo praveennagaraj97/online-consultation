@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { DoctorsEntity } from 'src/app/types/doctor.response.types';
 
 @Component({
-  selector: 'app-doctor-list-data-component',
+  selector: 'app-doctor-list-data',
   template: `
     <div class="overflow-x-auto inner-scrollbar">
       <table class="w-full min-w-[1000px]">
@@ -105,7 +105,7 @@ import { DoctorsEntity } from 'src/app/types/doctor.response.types';
             <tr>
               <td colspan="9">
                 <div class="flex items-center justify-center">
-                  <app-no-doctors-component></app-no-doctors-component>
+                  <app-no-doctors></app-no-doctors>
                 </div>
               </td>
             </tr>

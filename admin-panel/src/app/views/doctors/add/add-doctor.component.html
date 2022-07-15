@@ -1,12 +1,12 @@
 <section aria-describedby="Doctors List View" @fadeInOut>
-  <app-breadcrumb-component [paths]="breadcrumbPaths" className="py-3 mt-2">
-  </app-breadcrumb-component>
+  <app-breadcrumb [paths]="breadcrumbPaths" className="py-3 mt-2">
+  </app-breadcrumb>
 
   <div
     class="dark:bg-gray-700 bg-gray-50 rounded-lg shadow-lg my-4 overflow-hidden p-3"
   >
     <div class="flex space-x-4">
-      <app-dropzone-component
+      <app-dropzone
         [isMulti]="false"
         dropfileType="image"
         accept="image/*"
@@ -30,7 +30,7 @@
             Drop / click here to select
           </small>
         </div>
-      </app-dropzone-component>
+      </app-dropzone>
 
       <div
         class="w-40 h-40 rounded-md shadow-md overflow-hidden relative"
@@ -69,7 +69,7 @@
       <div
         class="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 mt-4 gap-x-4 gap-y-1"
       >
-        <app-common-input-component
+        <app-common-input
           [errors]="errors.name"
           [fc]="doctorForm.controls?.['name']"
           [showError]="shouldShowError"
@@ -78,8 +78,8 @@
           guideLine="Provide doctor's full name"
           placeholder="Enter doctor's full name"
           tabindex="0"
-        ></app-common-input-component>
-        <app-common-input-component
+        ></app-common-input>
+        <app-common-input
           [errors]="errors.email"
           [fc]="doctorForm.controls?.['email']"
           [showError]="shouldShowError"
@@ -88,8 +88,8 @@
           guideLine="Confirmation email will be sent to this address"
           placeholder="Enter doctor's email address"
           type="email"
-        ></app-common-input-component>
-        <app-phone-input-component
+        ></app-common-input>
+        <app-phone-input
           [errors]="errors.phone_number"
           [fc]="doctorForm.controls?.['phone_number']"
           [fcPhoneCode]="doctorForm.controls?.['phone_code']"
@@ -99,8 +99,8 @@
           guideLine="This phone number will be used for primary login."
           placeholder="Enter doctor's phone number"
         >
-        </app-phone-input-component>
-        <app-common-input-component
+        </app-phone-input>
+        <app-common-input
           [errors]="errors.professional_title"
           [fc]="doctorForm.controls?.['professional_title']"
           [showError]="shouldShowError"
@@ -108,9 +108,9 @@
           htmlFor="professional_title"
           guideLine="Provide doctor's professional title"
           placeholder="Enter doctor's professional title"
-        ></app-common-input-component>
+        ></app-common-input>
 
-        <app-select-input-component
+        <app-select-input
           [errors]="errors.consultation_type_id"
           [fc]="doctorForm.controls?.['consultation_type_id']"
           [showError]="shouldShowError"
@@ -121,9 +121,9 @@
           [isAsync]="false"
           [options]="consultationTypeOptions"
           (onChange)="onConsultationTypeSelect($event.value)"
-        ></app-select-input-component>
+        ></app-select-input>
 
-        <app-select-input-component
+        <app-select-input
           [fc]="doctorForm.controls?.['hospital_id']"
           [showError]="false"
           labelName="Hospital"
@@ -138,9 +138,9 @@
           (loadMore)="loadMoreHospitals()"
           (onSearch)="onHospitalSearch($event)"
           (onChange)="onHospitalSelect($event)"
-        ></app-select-input-component>
+        ></app-select-input>
 
-        <app-common-input-component
+        <app-common-input
           [errors]="errors.education"
           [fc]="doctorForm.controls?.['education']"
           [showError]="shouldShowError"
@@ -148,8 +148,8 @@
           htmlFor="education"
           guideLine="*Provide with comma separated by space"
           placeholder="Enter doctor's education (MBBS, MD)"
-        ></app-common-input-component>
-        <app-common-input-component
+        ></app-common-input>
+        <app-common-input
           [errors]="errors.experience"
           [fc]="doctorForm.controls?.['experience']"
           [showError]="shouldShowError"
@@ -157,9 +157,9 @@
           htmlFor="experience"
           guideLine="Provide doctor's experience in years"
           placeholder="Enter doctor's experience"
-        ></app-common-input-component>
+        ></app-common-input>
 
-        <app-select-input-component
+        <app-select-input
           labelName="Speciality"
           guideLine="Doctor's speciality (*required for schedule type)"
           placeholder="Select / Add doctor's speciality"
@@ -176,9 +176,9 @@
           [fc]="doctorForm.controls?.['speciality_id']"
           [showError]="false"
         >
-        </app-select-input-component>
+        </app-select-input>
 
-        <app-select-input-component
+        <app-select-input
           labelName="Language(s)"
           guideLine="Languages doctor can communicate with"
           placeholder="Select / Add language"
@@ -197,9 +197,9 @@
           [showError]="shouldShowError"
           [errors]="errors.spoken_language_id"
         >
-        </app-select-input-component>
+        </app-select-input>
 
-        <app-select-input-component
+        <app-select-input
           labelName="Status"
           guideLine="Choosing active will skip activation email. (optional)"
           placeholder="Doctor active status"
@@ -209,15 +209,15 @@
           (onChange)="doctorForm.controls.is_active.setValue($event.value)"
           [defaultValue]="doctorForm.controls.is_active.value"
         >
-        </app-select-input-component>
+        </app-select-input>
       </div>
 
       <hr class="my-4 opacity-50" />
-      <app-message-tag-component
+      <app-message-tag
         [response]="response"
         (onEnd)="response = null"
         className="text-center text-sm min-h-[20px]"
-      ></app-message-tag-component>
+      ></app-message-tag>
       <button
         type="submit"
         class="action-btn text-sm px-4 py-1.5 rounded-md mx-auto block mt-2"

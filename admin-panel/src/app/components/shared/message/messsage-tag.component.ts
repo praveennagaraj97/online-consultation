@@ -4,7 +4,7 @@ import { fadeInTransformAnimation } from 'src/app/animations';
 import { ResponseMessageType } from 'src/app/types/app.types';
 
 @Component({
-  selector: 'app-message-tag-component',
+  selector: 'app-message-tag',
   template: `
     <div
       [ngClass]="{

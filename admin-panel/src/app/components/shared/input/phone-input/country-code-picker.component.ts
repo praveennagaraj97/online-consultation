@@ -18,7 +18,7 @@ import { Country } from 'src/app/types/app.types';
 import { clearSubscriptions } from 'src/app/utils/helpers';
 
 @Component({
-  selector: 'app-country-code-picker-component',
+  selector: 'app-country-code-picker',
   template: `
     <ng-template #portalRef>
       <div

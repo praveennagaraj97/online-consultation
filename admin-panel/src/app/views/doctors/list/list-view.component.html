@@ -1,6 +1,6 @@
 <section aria-describedby="Doctors List View" @fadeInOut>
-  <app-breadcrumb-component [paths]="breadcrumbPaths" className="py-3 mt-2">
-  </app-breadcrumb-component>
+  <app-breadcrumb [paths]="breadcrumbPaths" className="py-3 mt-2">
+  </app-breadcrumb>
 
   <!-- Search Filters -->
   <div
@@ -8,22 +8,22 @@
   >
     <h2 class="font-semibold mb-3">Search Filter</h2>
     <div class="grid md:grid-cols-3 grid-cols-1 gap-4">
-      <app-select-input-component
+      <app-select-input
         placeholder="Select Speciality"
         [options]="specialities"
         (onChange)="onSpecialityChangeFilter($event)"
       >
-      </app-select-input-component>
-      <app-select-input-component
+      </app-select-input>
+      <app-select-input
         placeholder="Select Consultation Type"
         [options]="consultationTypes"
         (onChange)="onConsultationChangeFilter($event)"
-      ></app-select-input-component>
-      <app-select-input-component
+      ></app-select-input>
+      <app-select-input
         [options]="activeStatus"
         placeholder="Select Status"
         (onChange)="onActiveStatusChangeFilter($event)"
-      ></app-select-input-component>
+      ></app-select-input>
     </div>
   </div>
 
@@ -32,10 +32,10 @@
   >
     <div class="overflow-x-auto inner-scollbar">
       <header class="p-3 flex justify-between items-center min-w-[500px]">
-        <app-per-page-component
+        <app-per-page
           [defaultSelected]="perPage"
           (onChange)="updatePerPageLimit($event)"
-        ></app-per-page-component>
+        ></app-per-page>
         <div class="flex space-x-3 items-center">
           <div class="md:w-96 relative">
             <input
@@ -65,32 +65,30 @@
       </header>
     </div>
 
-    <app-doctors-list-skeleton-component
-      *ngIf="isLoading"
-    ></app-doctors-list-skeleton-component>
+    <app-doctors-list-skeleton *ngIf="isLoading"></app-doctors-list-skeleton>
 
-    <app-doctor-list-data-component
+    <app-doctor-list-data
       *ngIf="!isLoading"
       [doctors]="doctors"
-    ></app-doctor-list-data-component>
+    ></app-doctor-list-data>
 
     <!-- Pagination Controls -->
     <div class="my-1 p-2 flex justify-between items-center" *ngIf="!isLoading">
-      <app-pagination-count-display-component
+      <app-pagination-count-display
         [totalCount]="totalCount"
         [startCount]="doctors.length ? (pageNum - 1) * perPage + 1 : 0"
         [endCount]="(pageNum - 1) * perPage + doctors.length || 0"
-      ></app-pagination-count-display-component>
-      <app-pagination-controls-component
+      ></app-pagination-count-display>
+      <app-pagination-controls
         [pageNum]="pageNum"
         nextPageLink="/doctors"
         [paginateId]="paginateId"
-      ></app-pagination-controls-component>
+      ></app-pagination-controls>
     </div>
 
     <div class="my-1 p-2 flex justify-between items-center" *ngIf="isLoading">
-      <app-pagination-count-skeleton-component></app-pagination-count-skeleton-component>
-      <app-pagination-controls-skeleton-component></app-pagination-controls-skeleton-component>
+      <app-pagination-count-skeleton></app-pagination-count-skeleton>
+      <app-pagination-controls-skeleton></app-pagination-controls-skeleton>
     </div>
   </div>
 </section>

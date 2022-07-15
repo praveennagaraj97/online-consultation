@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-pagination-controls-skeleton-component',
+  selector: 'app-pagination-controls-skeleton',
   template: `
     <div class="flex items-center space-x-1">
       <app-previous-icon

@@ -2,7 +2,7 @@ import { Location } from '@angular/common';
 import { Component, Input } from '@angular/core';
 
 @Component({
-  selector: 'app-pagination-controls-component',
+  selector: 'app-pagination-controls',
   template: `
     <div class="flex items-center space-x-1">
       <button

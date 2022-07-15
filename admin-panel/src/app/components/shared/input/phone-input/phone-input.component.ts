@@ -5,7 +5,7 @@ import { fadeInTransformAnimation } from 'src/app/animations';
 import { Country } from 'src/app/types/app.types';
 
 @Component({
-  selector: 'app-phone-input-component',
+  selector: 'app-phone-input',
   templateUrl: 'phone-input.component.html',
   animations: [
     trigger('fadeIn', [

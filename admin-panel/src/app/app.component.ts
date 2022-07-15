@@ -7,7 +7,7 @@ import { StoreState } from './store/store.module';
   selector: 'app-root',
   template: `
     <router-outlet></router-outlet>
-    <app-theme-provider-component></app-theme-provider-component>
+    <app-theme-provider></app-theme-provider>
   `,
 })
 export class AppComponent {

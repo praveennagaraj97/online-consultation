@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-doctors-list-skeleton-component',
+  selector: 'app-doctors-list-skeleton',
   template: `
     <div class="overflow-x-auto inner-scrollbar">
       <table class="w-full min-w-[1000px]">

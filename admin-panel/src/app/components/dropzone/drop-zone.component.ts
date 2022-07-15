@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
-  selector: 'app-dropzone-component',
+  selector: 'app-dropzone',
   template: `
     <div
       class="w-full h-full"

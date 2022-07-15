@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-no-doctors-component',
+  selector: 'app-no-doctors',
   template: `
     <div class="py-4 flex flex-col items-center justify-center">
       <img src="/assets/doctor-grp.png" alt="no-doctors" />

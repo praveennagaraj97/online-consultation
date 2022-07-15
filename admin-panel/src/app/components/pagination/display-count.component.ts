@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 
 @Component({
-  selector: 'app-pagination-count-display-component',
+  selector: 'app-pagination-count-display',
   template: `
     <small class="text-xs block">
       Showing {{ startCount }} - {{ endCount }} of {{ totalCount }}

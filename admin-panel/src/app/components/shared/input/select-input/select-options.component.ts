@@ -16,7 +16,7 @@ import { SelectOption } from 'src/app/types/app.types';
 import { clearSubscriptions } from 'src/app/utils/helpers';
 
 @Component({
-  selector: 'app-select-input-options-component',
+  selector: 'app-select-input-options',
   template: `
     <ng-template #portalRef>
       <div

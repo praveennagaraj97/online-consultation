@@ -4,7 +4,7 @@ import { AbstractControl, FormControl } from '@angular/forms';
 import { fadeInTransformAnimation } from 'src/app/animations';
 
 @Component({
-  selector: 'app-common-input-component',
+  selector: 'app-common-input',
   template: `
     <div>
       <label [for]="htmlFor" class="text-xs font-semibold">{{

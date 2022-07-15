@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { BreadcrumbPath } from 'src/app/types/app.types';
 
 @Component({
-  selector: 'app-breadcrumb-component',
+  selector: 'app-breadcrumb',
   template: `
     <div class="flex items-center" [ngClass]="className">
       <a

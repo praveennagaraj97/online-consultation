@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 
 @Component({
-  selector: 'app-email-sent-component',
+  selector: 'app-email-sent',
   template: `
     <div class="container mx-auto">
       <div

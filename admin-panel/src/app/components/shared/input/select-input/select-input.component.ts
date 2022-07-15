@@ -5,7 +5,7 @@ import { fadeInTransformAnimation } from 'src/app/animations';
 import { SelectOption } from 'src/app/types/app.types';
 
 @Component({
-  selector: 'app-select-input-component',
+  selector: 'app-select-input',
   templateUrl: 'select-input.component.html',
   animations: [
     trigger('fadeIn', [

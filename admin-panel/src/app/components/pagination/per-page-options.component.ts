@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
-  selector: 'app-per-page-component',
+  selector: 'app-per-page',
   template: `
     <div class="flex items-center space-x-1.5">
       <small>Show</small>

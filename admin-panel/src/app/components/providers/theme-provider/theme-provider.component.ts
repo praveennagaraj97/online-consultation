@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 
 @Component({
-  selector: 'app-theme-provider-component',
+  selector: 'app-theme-provider',
   templateUrl: 'theme-provider.component.html',
   animations: [
     trigger('backInRight', [

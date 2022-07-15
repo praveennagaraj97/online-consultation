@@ -79,7 +79,7 @@
   </div>
 </div>
 
-<app-select-input-options-component
+<app-select-input-options
   [showOptions]="showOptions"
   [renderPosition]="portalPostionRef.getBoundingClientRect()"
   [options]="options"
@@ -90,4 +90,4 @@
   (onSearch)="onSearch.emit($event)"
   (onChange)="onSelect($event); (isMulti)"
   [isAsync]="isAsync"
-></app-select-input-options-component>
+></app-select-input-options>
