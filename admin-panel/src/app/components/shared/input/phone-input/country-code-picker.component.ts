@@ -130,7 +130,7 @@ export class CountryCodePickerComponent {
 
   private getCountriesCodes() {
     this.subs$.push(
-      this.http.get<Country[]>(additionalRoutes.GetCountryCodes).subscribe({
+      this.http.get<Country[]>(additionalRoutes.GetCountries).subscribe({
         next: (countries) => {
           this.countries = countries;
           this.countriesData = countries;

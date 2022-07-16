@@ -14,3 +14,10 @@ export interface DoctorFormDTO {
   spoken_language_id: FormArray<FormControl<string>>;
   is_active: FormControl<string | null>;
 }
+
+export interface HospitalFormDTO {
+  name: FormControl<string | null>;
+  country: FormControl<string | null>;
+  city: FormControl<string | null>;
+  address: FormControl<string | null>;
+}

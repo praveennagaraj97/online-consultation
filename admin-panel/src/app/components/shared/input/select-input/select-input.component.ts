@@ -53,6 +53,7 @@ export class SelectInputComponent {
   // Event Emitters
   @Output() loadMore = new EventEmitter<void>(false);
   @Output() onSearch = new EventEmitter<string>(false);
+  // Optional - will be populate for form group
   @Output() onChange = new EventEmitter<SelectOption>(false);
 
   // State
@@ -87,6 +88,9 @@ export class SelectInputComponent {
     if (this.inputIgnoreKeys.includes(opt.value)) {
       this.showOptions = false;
       this.selectOptionValue = '';
+      if (this.fc) {
+        this.fc.setValue('');
+      }
       return;
     }
 
@@ -103,6 +107,10 @@ export class SelectInputComponent {
 
     this.showOptions = false;
     this.selectOptionValue = opt.title;
+
+    if (this.fc) {
+      this.fc.setValue(opt.value);
+    }
   }
 
   // Remove multi select option

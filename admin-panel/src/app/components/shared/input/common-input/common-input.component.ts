@@ -47,7 +47,7 @@ import { fadeInTransformAnimation } from 'src/app/animations';
 })
 export class CommonInputComponent {
   @Input() errors: { [key: string]: string } = {};
-  @Input() fc!: AbstractControl<any, any> | undefined;
+  @Input() fc!: AbstractControl<any, any> | undefined | FormControl<any>;
   @Input() showError = false;
   @Input() labelName = '';
   @Input() htmlFor = '';

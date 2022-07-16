@@ -16,6 +16,9 @@ export const doctorFormErrors = {
   education: {
     required: "Doctor's education cannot be empty",
   },
+  hospital_id: {
+    required: "Doctor's work place is required",
+  },
   experience: {
     required: "Doctor's experience cannot be empty",
     pattern: "Doctor's experience must be number",

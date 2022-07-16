@@ -3,14 +3,21 @@ import { Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
 import {
   Component,
+  EventEmitter,
   Input,
+  Output,
   SimpleChanges,
   TemplateRef,
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
+import { hospitalFormErrors } from 'src/app/errors/hospital-form.errors';
+import { SelectOption } from 'src/app/types/app.types';
+import { HospitalFormDTO } from 'src/app/types/dto.types';
 import { clearSubscriptions } from 'src/app/utils/helpers';
+import { HospitalFormService } from './hospital-form.service';
 
 @Component({
   selector: 'app-hospital-form-portal',
@@ -37,27 +44,49 @@ export class HospitalFormPortalComponent {
 
   //   Props
   @Input() showModal: boolean = false;
+  @Input() formType: 'add' | 'edit' = 'add';
+
+  // Event Emitters
+  @Output() onBackdropClick = new EventEmitter<void>();
+  @Output() onSuccessCallback = new EventEmitter();
 
   //   State
-  private overlayRef?: OverlayRef;
+  overlayRef?: OverlayRef;
   private templateRef?: TemplatePortal<HTMLDivElement>;
+  errors = hospitalFormErrors;
+  countriesOptions: SelectOption[] = [];
+  showErrors = false;
 
   constructor(
     private viewContainerRef: ViewContainerRef,
-    private overlay: Overlay
+    private overlay: Overlay,
+    private hspFormService: HospitalFormService
   ) {}
+
+  hospitalForm = new FormGroup<HospitalFormDTO>({
+    name: new FormControl('', { validators: Validators.required }),
+    country: new FormControl('India', { validators: Validators.required }),
+    city: new FormControl('', { validators: Validators.required }),
+    address: new FormControl('', { validators: Validators.required }),
+  });
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes?.['showModal'].currentValue) {
-      // Attach portal
       this.overlayRef?.attach(this.templateRef);
-    } else if (!changes?.['showModal'].currentValue) {
-      this.overlayRef?.dispose();
+    }
+    if (!changes?.['showModal'].currentValue) {
+      this.overlayRef?.detach();
     }
   }
 
+  ngOnInit() {
+    this.getCountries();
+  }
+
   ngAfterViewInit() {
-    const overlay = this.overlay.create({ disposeOnNavigation: true });
+    const overlay = this.overlay.create({
+      disposeOnNavigation: true,
+    });
     this.overlayRef = overlay;
 
     // Portal
@@ -65,14 +94,37 @@ export class HospitalFormPortalComponent {
       const portal = new TemplatePortal(this.portalRef, this.viewContainerRef);
       this.templateRef = portal;
     }
+  }
 
-    // this.overlayRef?.attach(this.templateRef);
+  private getCountries() {
+    this.subs$.push(
+      this.hspFormService.getCountries().subscribe({
+        next: (res) => {
+          this.countriesOptions = res;
+        },
+        error: (err) => {
+          alert(err);
+        },
+      })
+    );
+  }
 
-    this.overlayRef._outsidePointerEvents.subscribe({
-      next: () => {
-        this.overlayRef?.detach();
-      },
-    });
+  handleSubmit() {
+    if (this.hospitalForm.invalid) {
+      this.showErrors = true;
+      return;
+    }
+
+    this.subs$.push(
+      this.hspFormService.addNewHospital(this.hospitalForm).subscribe({
+        next: (res) => {
+          console.log(res);
+        },
+        error: (err) => {
+          console.log(err);
+        },
+      })
+    );
   }
 
   ngOnDestroy() {

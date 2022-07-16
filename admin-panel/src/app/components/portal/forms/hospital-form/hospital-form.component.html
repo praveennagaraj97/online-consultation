@@ -1,9 +1,73 @@
 <ng-template #portalRef>
   <div
-    *ngIf="showModal"
-    class="fixed right-0 top-0 bottom-0 w-96 modal-bg shadow-t-3xl"
+    class="fixed right-0 top-0 bottom-0 sm:w-96 w-full modal-container-bg shadow-t-3xl"
     @swipeInOut
+    portalBackdropClick
+    [overlayRef]="overlayRef"
+    (callback)="onBackdropClick.emit()"
   >
-    <div></div>
+    <header class="p-3 flex items-center justify-between modal-header-bg">
+      <p>
+        {{ formType === "add" ? "Add New Hospital" : "Edit Hospital Details" }}
+      </p>
+      <app-close-icon
+        role="button"
+        (click)="onBackdropClick.emit()"
+        className="fill-gray-50 stroke-gray-50 w-5 h-5 hover:scale-110 smooth-animate"
+      ></app-close-icon>
+    </header>
+    <form class="p-4" (ngSubmit)="handleSubmit()">
+      <app-common-input
+        [showError]="showErrors"
+        labelName="Name"
+        guideLine="Name of the hospital"
+        placeholder="Enter hospital name"
+        [fc]="hospitalForm.controls.name"
+        [errors]="errors.name"
+      ></app-common-input>
+
+      <app-select-input
+        [errors]="errors.country"
+        [showError]="showErrors"
+        labelName="Country"
+        guideLine="Which country hospital is located"
+        [fc]="hospitalForm.controls.country"
+        placeholder="Select country"
+        [options]="countriesOptions"
+        defaultValue="India"
+      >
+      </app-select-input>
+
+      <app-common-input
+        [showError]="showErrors"
+        labelName="City"
+        guideLine="Which city hospital is located"
+        placeholder="Enter city name"
+        [fc]="hospitalForm.controls.city"
+        [errors]="errors.city"
+      ></app-common-input>
+
+      <app-common-input
+        [showError]="showErrors"
+        labelName="Address"
+        guideLine="Address of the hospital"
+        placeholder="Enter hospital address"
+        [fc]="hospitalForm.controls.address"
+        [errors]="errors.address"
+      ></app-common-input>
+
+      <div class="flex space-x-2">
+        <button type="submit" class="action-btn px-4 py-1 rounded-md text-sm">
+          Sumit
+        </button>
+        <button
+          type="button"
+          (click)="onBackdropClick.emit()"
+          class="ghost-btn px-4 py-1 rounded-md text-sm"
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
   </div>
 </ng-template>

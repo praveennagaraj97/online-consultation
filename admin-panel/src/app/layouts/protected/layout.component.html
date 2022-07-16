@@ -1,5 +1,8 @@
 <div class="flex">
-  <app-nav-bar (onExpand)="onMenuExpand($event)" class="fixed z-20">
+  <app-nav-bar
+    (onExpand)="onMenuExpand($event)"
+    class="fixed z-20 sm:block hidden"
+  >
   </app-nav-bar>
   <main
     class="p-3 w-full relative transform duration-200 will-change-transform flex flex-col justify-between min-h-[100vh] overflow-x-hidden"

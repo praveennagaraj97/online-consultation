@@ -95,7 +95,7 @@ export class AddNewDoctorViewComponent {
     experience: new FormControl('', {
       validators: [Validators.required, Validators.pattern('^[0-9]+$')],
     }),
-    hospital_id: new FormControl(''),
+    hospital_id: new FormControl('', { validators: [Validators.required] }),
     consultation_type_id: new FormControl('', {
       validators: [Validators.required],
     }),

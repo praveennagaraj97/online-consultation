@@ -123,10 +123,11 @@
 
         <app-select-input
           [fc]="doctorForm.controls?.['hospital_id']"
-          [showError]="false"
+          [showError]="shouldShowError"
+          [errors]="errors.hospital_id"
           labelName="Hospital"
           htmlFor="hospital_id"
-          guideLine="Doctor's workplace (optional)"
+          guideLine="Doctor's workplace"
           placeholder="Select / Add doctor's hospital"
           [isAsync]="true"
           [inputIgnoreKeys]="['add_new']"
@@ -231,4 +232,6 @@
 <!-- Portals -->
 <app-hospital-form-portal
   [showModal]="showHospitalForm"
+  (onBackdropClick)="showHospitalForm = false"
+  formType="add"
 ></app-hospital-form-portal>

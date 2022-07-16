@@ -12,6 +12,10 @@ export const doctorRoutes = {
   AddDoctor: `/admin/doctor`,
 };
 
+export const adminCMSRoutes = {
+  Hospital: `/admin/hospital`,
+};
+
 export const sharedRoutes = {
   Specialities: `/speciality`,
   ConsultationTypes: `/consultation_type`,
@@ -20,5 +24,5 @@ export const sharedRoutes = {
 };
 
 export const additionalRoutes = {
-  GetCountryCodes: `/additional/countries.json`,
+  GetCountries: `/additional/countries.json`,
 };

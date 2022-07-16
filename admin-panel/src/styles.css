@@ -148,11 +148,20 @@
     @apply dark:placeholder:text-gray-400 dark:text-gray-50 bg-transparent;
   }
 
-  .modal-bg {
-    @apply dark:bg-gray-600 bg-sky-200;
+  .modal-container-bg {
+    @apply dark:bg-gray-600 bg-sky-100;
+  }
+
+  .modal-container {
+    @apply bg-sky-200/20 fixed top-0 left-0 w-full
+       h-full z-10 flex justify-center items-center backdrop-blur-sm dark:bg-gray-900/20;
+  }
+
+  .modal-header-bg {
+    @apply dark:bg-slate-800 bg-sky-600 text-gray-50;
   }
 
   .container-bg {
-    @apply dark:bg-gray-700 bg-indigo-100;
+    @apply dark:bg-gray-700 bg-gray-50;
   }
 }
