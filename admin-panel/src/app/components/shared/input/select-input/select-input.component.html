@@ -7,8 +7,6 @@
     class="relative"
     (click)="$event.stopPropagation(); showOptions = !showOptions"
     #portalPostionRef
-    clickOutside
-    (callback)="showOptions = false"
   >
     <input
       [type]="type"
@@ -90,4 +88,5 @@
   (onSearch)="onSearch.emit($event)"
   (onChange)="onSelect($event); (isMulti)"
   [isAsync]="isAsync"
+  (onBackdropClick)="showOptions = false"
 ></app-select-input-options>

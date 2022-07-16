@@ -24,6 +24,9 @@ import { clearSubscriptions } from 'src/app/utils/helpers';
         class="dark:bg-gray-700 bg-gray-50 rounded-lg fixed z-10 shadow-2xl overflow-hidden"
         [ngStyle]="posStyle"
         @openClose
+        portalBackdropClick
+        [overlayRef]="overlayRef"
+        (callback)="onBackdropClick.emit()"
       >
         <div class="relative" *ngIf="isAsync">
           <div class="absolute left-2 top-0 bottom-0 flex items-center">
@@ -40,8 +43,6 @@ import { clearSubscriptions } from 'src/app/utils/helpers';
           />
         </div>
 
-        <!-- Multiple Inputs Display -->
-
         <div class="max-h-[144px] overflow-y-auto inner-scrollbar">
           <button
             class="p-2  smooth-animate hover:bg-sky-500/30 w-full  flex space-x-2 items-center text-xs"
@@ -56,11 +57,11 @@ import { clearSubscriptions } from 'src/app/utils/helpers';
             intersectionObserve
             (callback)="loadMoreEvent($event)"
           ></div>
-          <app-spinner-icon
-            *ngIf="loading"
-            className="animate-spin dark:fill-gray-300 dark:stroke-gray-300 stroke-gray-700 fill-gray-700 w-6 h-6 mx-auto my-3 py-1"
-          ></app-spinner-icon>
         </div>
+        <app-spinner-icon
+          *ngIf="loading"
+          className="animate-spin dark:fill-gray-300 dark:stroke-gray-300 stroke-gray-700 fill-gray-700 h-8 w-8 min-h-[32px] min-w-[32px] mx-auto py-2"
+        ></app-spinner-icon>
       </div>
     </ng-template>
   `,
@@ -77,7 +78,7 @@ import { clearSubscriptions } from 'src/app/utils/helpers';
         style({
           opacity: 1,
         }),
-        animate('0.5s', style({ opacity: 0 })),
+        animate('0.8s', style({ opacity: 0 })),
       ]),
     ]),
   ],
@@ -99,6 +100,7 @@ export class SelectInputOptionsComponent {
   @Output() onChange = new EventEmitter<SelectOption>(false);
   @Output() loadMore = new EventEmitter<void>(false);
   @Output() onSearch = new EventEmitter<string>(false);
+  @Output() onBackdropClick = new EventEmitter<void>();
   debouncer: Subject<string> = new Subject<string>();
 
   // State
@@ -107,7 +109,7 @@ export class SelectInputOptionsComponent {
   searchFormValue = '';
 
   //   Refs
-  private overlayRef?: OverlayRef;
+  overlayRef?: OverlayRef;
   @ViewChild('portalRef') portalRef?: TemplateRef<unknown>;
   private templateRef!: TemplatePortal;
 

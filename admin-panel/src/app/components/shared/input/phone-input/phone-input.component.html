@@ -3,12 +3,7 @@
   <small class="block text-xs mb-2 opacity-70" *ngIf="guideLine">
     {{ guideLine }}
   </small>
-  <div
-    class="relative smooth-animate"
-    #inputPosRef
-    clickOutside
-    (callback)="showCountryPicker = false"
-  >
+  <div class="relative smooth-animate" #inputPosRef>
     <button
       #countryCodeRef
       tabindex="-1"
@@ -54,4 +49,5 @@
   [showCountryPicker]="showCountryPicker"
   [renderPosition]="inputPosRef.getBoundingClientRect()"
   (onChange)="onCountryCodeSelect($event)"
+  (onBackdropClose)="showCountryPicker = false"
 ></app-country-code-picker>

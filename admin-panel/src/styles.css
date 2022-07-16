@@ -147,4 +147,12 @@
   .input-colors {
     @apply dark:placeholder:text-gray-400 dark:text-gray-50 bg-transparent;
   }
+
+  .modal-bg {
+    @apply dark:bg-gray-600 bg-sky-200;
+  }
+
+  .container-bg {
+    @apply dark:bg-gray-700 bg-indigo-100;
+  }
 }

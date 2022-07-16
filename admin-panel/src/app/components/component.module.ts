@@ -12,6 +12,7 @@ import { EmailSentComponent } from './email-sent/email-sent.component';
 import { PaginationControlsComponent } from './pagination/controls.component';
 import { PaginationCountDisplayComponent } from './pagination/display-count.component';
 import { PerPageOptionsComponent } from './pagination/per-page-options.component';
+import { HospitalFormPortalComponent } from './portal/forms/hospital-form/hospital-form-portal.component';
 import { ThemeProviderComponent } from './providers/theme-provider/theme-provider.component';
 import { CommonInputComponent } from './shared/input/common-input/common-input.component';
 import { CountryCodePickerComponent } from './shared/input/phone-input/country-code-picker.component';
@@ -53,6 +54,7 @@ import { PaginationSkeletonComponent } from './skeletons/pagination/pagination-c
     SelectInputOptionsComponent,
     DropzoneComponent,
     MessageTagComponent,
+    HospitalFormPortalComponent,
   ],
   exports: [
     ThemeProviderComponent,
@@ -72,6 +74,7 @@ import { PaginationSkeletonComponent } from './skeletons/pagination/pagination-c
     SelectInputComponent,
     DropzoneComponent,
     MessageTagComponent,
+    HospitalFormPortalComponent,
   ],
 })
 export class ComponentsModule {}

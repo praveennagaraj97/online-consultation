@@ -43,7 +43,7 @@ export class SelectInputComponent {
   // Optional
   @Input() isMulti = false;
   // Optional
-  @Input() multiInputIgnoreKeys: string[] = [];
+  @Input() inputIgnoreKeys: string[] = [];
   // Optional
   @Input() defaultValue: string | null = null;
 
@@ -81,12 +81,16 @@ export class SelectInputComponent {
   }
 
   onSelect(opt: SelectOption) {
+    this.onChange?.emit(opt);
+
+    // Custom event skip trigger
+    if (this.inputIgnoreKeys.includes(opt.value)) {
+      this.showOptions = false;
+      this.selectOptionValue = '';
+      return;
+    }
+
     if (this.isMulti) {
-      // Custom event trigger keys
-      if (this.multiInputIgnoreKeys.includes(opt.value)) {
-        this.showOptions = false;
-        return;
-      }
       if (this.multipleOptions.find((mo) => mo.value == opt.value)) {
         this.multipleOptions = this.multipleOptions.filter(
           (option) => option.value != opt.value
@@ -94,14 +98,11 @@ export class SelectInputComponent {
       } else {
         this.multipleOptions = [...this.multipleOptions, opt];
       }
-
-      this.onChange?.emit(opt);
       return;
     }
 
     this.showOptions = false;
     this.selectOptionValue = opt.title;
-    this.onChange?.emit(opt);
   }
 
   // Remove multi select option

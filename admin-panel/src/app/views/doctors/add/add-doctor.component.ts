@@ -58,15 +58,18 @@ export class AddNewDoctorViewComponent {
   hospitalSearchTerm = '';
   consultationTypeOptions: SelectOption[] = [];
   specialityOptions: SelectOption[] = [];
-  specialityHasNext: string | null = null;
+  specialityNextPaginateId: string | null = null;
   specialityLoading = false;
   specialitySearchTerm = '';
   languagesOptions: SelectOption[] = [];
-  languagesHasNext: string | null = null;
+  languagesNextPaginateId: string | null = null;
   languagesLoading = false;
   languagesSearchTerm = '';
   submitting = false;
   response: ResponseMessageType | null = null;
+
+  // Portal State
+  showHospitalForm = false;
 
   // Input Form Group State
   profilePic: File | null = null;
@@ -104,10 +107,10 @@ export class AddNewDoctorViewComponent {
   });
 
   ngOnInit() {
-    this.getHospitalsOptions();
+    this.getHospitalsOptions(true);
     this.getConsultationTypes();
-    this.getSpecialities();
-    this.getLanguages();
+    this.getSpecialities(true);
+    this.getLanguages(true);
   }
 
   getFormValue(name: string): string {
@@ -180,6 +183,11 @@ export class AddNewDoctorViewComponent {
   }
 
   onHospitalSelect(opt: SelectOption) {
+    if (opt.value === 'add_new') {
+      this.showHospitalForm = true;
+      return;
+    }
+
     this.doctorForm.controls?.['hospital_id'].setValue(opt.value);
   }
 
@@ -207,15 +215,15 @@ export class AddNewDoctorViewComponent {
     this.subs$.push(
       this.addNewDocService
         .getSpecialitiesOptions(
-          this.nextHospitalsPaginateId,
+          this.specialityNextPaginateId,
           this.specialitySearchTerm,
           shouldReset
         )
         .subscribe({
           next: (options) => {
-            this.specialityOptions = options.specialities || [];
-            this.specialityHasNext = options.nextId;
             this.specialityLoading = false;
+            this.specialityOptions = options.specialities || [];
+            this.specialityNextPaginateId = options.nextId;
           },
           error: (err) => {
             this.specialityLoading = false;
@@ -247,15 +255,15 @@ export class AddNewDoctorViewComponent {
     this.subs$.push(
       this.addNewDocService
         .getLangaugesOptions(
-          this.nextHospitalsPaginateId,
+          this.languagesNextPaginateId,
           this.languagesSearchTerm,
           shouldReset
         )
         .subscribe({
           next: (options) => {
-            this.languagesOptions = options.langauges || [];
-            this.languagesHasNext = options.nextId;
             this.languagesLoading = false;
+            this.languagesOptions = options.langauges || [];
+            this.languagesNextPaginateId = options.nextId;
           },
           error: (err) => {
             this.languagesLoading = false;
@@ -266,7 +274,7 @@ export class AddNewDoctorViewComponent {
   }
 
   loadMoreLanguges() {
-    this.getLanguages();
+    this.getLanguages(false);
   }
 
   onLanguageSearch(term: string) {

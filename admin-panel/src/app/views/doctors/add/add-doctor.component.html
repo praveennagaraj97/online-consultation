@@ -2,9 +2,7 @@
   <app-breadcrumb [paths]="breadcrumbPaths" className="py-3 mt-2">
   </app-breadcrumb>
 
-  <div
-    class="dark:bg-gray-700 bg-gray-50 rounded-lg shadow-lg my-4 overflow-hidden p-3"
-  >
+  <div class="rounded-lg shadow-lg my-4 overflow-hidden p-3 container-bg">
     <div class="flex space-x-4">
       <app-dropzone
         [isMulti]="false"
@@ -15,7 +13,7 @@
         @fadeIn
       >
         <div
-          class="w-40 h-40 sm:dark:bg-gray-500 sm:bg-indigo-100 sm:shadow-md rounded-md p-2 smooth-animate hover:scale-105 flex flex-col items-center justify-center"
+          class="w-40 h-40 shadow-md rounded-md p-2 dark:bg-gray-500 smooth-animate hover:scale-105 flex flex-col items-center justify-center"
           role="button"
         >
           <p class="text-xs dark:text-gray-100 text-gray-900 text-center">
@@ -131,6 +129,7 @@
           guideLine="Doctor's workplace (optional)"
           placeholder="Select / Add doctor's hospital"
           [isAsync]="true"
+          [inputIgnoreKeys]="['add_new']"
           [options]="hospitalOptions"
           searchPlaceholder="Search hospital name"
           [isLoading]="hospitalsLoading"
@@ -164,9 +163,10 @@
           guideLine="Doctor's speciality (*required for schedule type)"
           placeholder="Select / Add doctor's speciality"
           [isAsync]="true"
+          [inputIgnoreKeys]="['add_new']"
           searchPlaceholder="Search speciality title"
           [options]="specialityOptions"
-          [hasNext]="specialityHasNext != null"
+          [hasNext]="specialityNextPaginateId != null"
           [isLoading]="specialityLoading"
           (loadMore)="loadMoreSpecialities()"
           (onSearch)="onSpecialitySearch($event)"
@@ -185,13 +185,13 @@
           [isAsync]="true"
           searchPlaceholder="Search language"
           [options]="languagesOptions"
-          [hasNext]="languagesHasNext != null"
+          [hasNext]="languagesNextPaginateId != null"
           [isLoading]="languagesLoading"
           (loadMore)="loadMoreLanguges()"
           (onSearch)="onLanguageSearch($event)"
           (onChange)="onLanguageSelect($event)"
           [isMulti]="true"
-          [multiInputIgnoreKeys]="['add_new']"
+          [inputIgnoreKeys]="['add_new']"
           htmlFor="spoken_language_id"
           [fc]="doctorForm.controls?.['spoken_language_id']"
           [showError]="shouldShowError"
@@ -227,3 +227,8 @@
     </form>
   </div>
 </section>
+
+<!-- Portals -->
+<app-hospital-form-portal
+  [showModal]="showHospitalForm"
+></app-hospital-form-portal>

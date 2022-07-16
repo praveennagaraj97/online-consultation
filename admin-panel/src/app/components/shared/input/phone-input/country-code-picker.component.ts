@@ -26,6 +26,9 @@ import { clearSubscriptions } from 'src/app/utils/helpers';
         class="dark:bg-gray-700 bg-gray-50 rounded-lg fixed z-10 shadow-2xl overflow-hidden"
         [ngStyle]="posStyle"
         @openClose
+        portalBackdropClick
+        [overlayRef]="overlayRef"
+        (callback)="onBackdropClose.emit()"
       >
         <input
           [ngModel]="searchFormValue"
@@ -75,6 +78,7 @@ export class CountryCodePickerComponent {
   @Input() renderPosition: DOMRect | null = null;
   @Input() showCountryPicker = false;
   @Output() onChange = new EventEmitter<Country>(false);
+  @Output() onBackdropClose = new EventEmitter<void>();
 
   // State
   countries: Country[] = [];
@@ -83,7 +87,7 @@ export class CountryCodePickerComponent {
   searchFormValue = '';
 
   //   Refs
-  private overlayRef?: OverlayRef;
+  overlayRef?: OverlayRef;
   @ViewChild('portalRef') portalRef?: TemplateRef<unknown>;
   private templateRef!: TemplatePortal;
 

@@ -34,7 +34,7 @@ import { UserOptionsService } from './user-options.service';
 
     <!-- Dropdown Portal -->
     <app-user-options-dropdown
-      *ngIf="showDropdown"
+      [showDropdown]="showDropdown"
       [position]="domRectOptions"
       (onClose)="showDropdown = false"
     ></app-user-options-dropdown>

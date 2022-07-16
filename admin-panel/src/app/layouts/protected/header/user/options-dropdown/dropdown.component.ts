@@ -6,6 +6,7 @@ import {
   EventEmitter,
   Input,
   Output,
+  SimpleChanges,
   TemplateRef,
   ViewChild,
   ViewContainerRef,
@@ -35,10 +36,11 @@ import {
 export class UserOptionsDropdownComponent {
   // Props
   @Input() position: DOMRect | null = null;
+  @Input() showDropdown = false;
 
   // Refs
   @ViewChild('dropdownRef') dropdownRef?: TemplateRef<HTMLDivElement>;
-  private overlayRef?: OverlayRef;
+  overlayRef?: OverlayRef;
 
   // State
   domPosition: { top: string; left: string } = { left: '', top: '' };
@@ -56,24 +58,29 @@ export class UserOptionsDropdownComponent {
       const overlay = this.overlay.create({
         disposeOnNavigation: true,
       });
-
-      this.domPosition = {
-        left: `${(this.position?.left || 0) + 15}px`,
-        top: `${(this.position?.top || 0) + 55}px`,
-      };
-
-      overlay.attach(
-        new TemplatePortal(this.dropdownRef, this.viewContainerRef)
-      );
-
       this.overlayRef = overlay;
     }
   }
 
-  onCloseCallback(state: boolean) {
-    if (state) {
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes?.['showDropdown'].currentValue) {
+      this.updatePosition();
+      this.overlayRef?.attach(
+        new TemplatePortal(this.dropdownRef!, this.viewContainerRef)
+      );
+    } else if (changes?.['showDropdown'].currentValue === false) {
       this.overlayRef?.detach();
-      this.onClose.emit(true);
     }
+  }
+
+  private updatePosition() {
+    this.domPosition = {
+      left: `${(this.position?.left || 0) + 15}px`,
+      top: `${(this.position?.top || 0) + 55}px`,
+    };
+  }
+
+  onCloseCallback() {
+    this.onClose.emit(true);
   }
 }
