@@ -14,7 +14,9 @@ import {
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { hospitalFormErrors } from 'src/app/errors/hospital-form.errors';
-import { SelectOption } from 'src/app/types/app.types';
+import { ErrorResponse } from 'src/app/types/api.response.types';
+import { APiResponseStatus, SelectOption } from 'src/app/types/app.types';
+import { HospitalEntity } from 'src/app/types/cms.response.types';
 import { HospitalFormDTO } from 'src/app/types/dto.types';
 import { clearSubscriptions } from 'src/app/utils/helpers';
 import { HospitalFormService } from './hospital-form.service';
@@ -49,6 +51,7 @@ export class HospitalFormPortalComponent {
   // Event Emitters
   @Output() onBackdropClick = new EventEmitter<void>();
   @Output() onSuccessCallback = new EventEmitter();
+  @Output() onAdded = new EventEmitter<HospitalEntity>();
 
   //   State
   overlayRef?: OverlayRef;
@@ -56,6 +59,8 @@ export class HospitalFormPortalComponent {
   errors = hospitalFormErrors;
   countriesOptions: SelectOption[] = [];
   showErrors = false;
+  response: APiResponseStatus | null = null;
+  submitting = false;
 
   constructor(
     private viewContainerRef: ViewContainerRef,
@@ -115,16 +120,35 @@ export class HospitalFormPortalComponent {
       return;
     }
 
+    this.submitting = true;
+
     this.subs$.push(
       this.hspFormService.addNewHospital(this.hospitalForm).subscribe({
         next: (res) => {
-          console.log(res);
+          this.submitting = false;
+          this.setResponse({ type: 'success', message: res.message }, () => {
+            this.onAdded.emit(res.result);
+          });
         },
-        error: (err) => {
-          console.log(err);
+        error: (err: ErrorResponse) => {
+          this.submitting = false;
+          this.setResponse({ type: 'error', message: err.error.message });
         },
       })
     );
+  }
+
+  private timeOutId: any;
+  private setResponse(res: APiResponseStatus, callback?: () => void) {
+    clearTimeout(this.timeOutId);
+    this.response = res;
+
+    setTimeout(() => {
+      this.response = null;
+      if (callback) {
+        callback();
+      }
+    }, 3000);
   }
 
   ngOnDestroy() {

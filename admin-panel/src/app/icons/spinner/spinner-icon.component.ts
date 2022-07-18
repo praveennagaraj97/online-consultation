@@ -14,5 +14,6 @@ import { Component, Input } from '@angular/core';
   </svg>`,
 })
 export class SpinnerIconComponent {
-  @Input() className: string = '';
+  @Input() className: string =
+    'fill-gray-50 stroke-gray-50 w-4 h-4 animate-spin';
 }

@@ -136,7 +136,6 @@ export class SelectInputOptionsComponent {
     }
 
     if (changes?.['showOptions']?.currentValue === false) {
-      this.onSearchChange('');
       this.overlayRef?.detach();
     }
   }
@@ -194,6 +193,7 @@ export class SelectInputOptionsComponent {
   }
 
   onSearchChange(term: string) {
+    this.searchFormValue = term;
     this.debouncer.next(term);
   }
 

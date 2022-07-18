@@ -16,6 +16,7 @@ import {
   ResponseMessageType,
   SelectOption,
 } from 'src/app/types/app.types';
+import { HospitalEntity } from 'src/app/types/cms.response.types';
 import type { DoctorFormDTO } from 'src/app/types/dto.types';
 import { clearSubscriptions } from 'src/app/utils/helpers';
 import { AddDoctorService } from './add-doctor.service';
@@ -70,6 +71,7 @@ export class AddNewDoctorViewComponent {
 
   // Portal State
   showHospitalForm = false;
+  autoSelectedHospital = '';
 
   // Input Form Group State
   profilePic: File | null = null;
@@ -309,6 +311,20 @@ export class AddNewDoctorViewComponent {
 
   handleProfilePicChange(files: File[]) {
     this.profilePic = files[0];
+  }
+
+  // On Hospital Added
+  onNewHospitalAdded(hospital: HospitalEntity) {
+    this.doctorForm.controls.hospital_id.setValue(hospital.id);
+    this.autoSelectedHospital = hospital.name;
+    this.showHospitalForm = false;
+
+    // Update Hospital List
+    this.hospitalOptions[0] = { title: hospital.name, value: hospital.id };
+    this.hospitalOptions = [
+      { title: 'Add new hospital', value: 'add_new' },
+      ...this.hospitalOptions,
+    ];
   }
 
   ngOnDestroy() {

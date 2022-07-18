@@ -138,6 +138,7 @@
           (loadMore)="loadMoreHospitals()"
           (onSearch)="onHospitalSearch($event)"
           (onChange)="onHospitalSelect($event)"
+          [value]="autoSelectedHospital"
         ></app-select-input>
 
         <app-common-input
@@ -208,7 +209,7 @@
           [fc]="doctorForm.controls.is_active"
           [options]="activeStatusOptions"
           (onChange)="doctorForm.controls.is_active.setValue($event.value)"
-          [defaultValue]="doctorForm.controls.is_active.value"
+          [value]="doctorForm.controls.is_active.value"
         >
         </app-select-input>
       </div>
@@ -234,4 +235,5 @@
   [showModal]="showHospitalForm"
   (onBackdropClick)="showHospitalForm = false"
   formType="add"
+  (onAdded)="onNewHospitalAdded($event)"
 ></app-hospital-form-portal>

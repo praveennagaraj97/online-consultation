@@ -10,11 +10,11 @@
       <p>
         {{ formType === "add" ? "Add New Hospital" : "Edit Hospital Details" }}
       </p>
-      <app-close-icon
-        role="button"
-        (click)="onBackdropClick.emit()"
-        className="fill-gray-50 stroke-gray-50 w-5 h-5 hover:scale-110 smooth-animate"
-      ></app-close-icon>
+      <button (click)="onBackdropClick.emit()" [disabled]="submitting">
+        <app-close-icon
+          className="fill-gray-50 stroke-gray-50 w-5 h-5 hover:scale-110 smooth-animate"
+        ></app-close-icon>
+      </button>
     </header>
     <form class="p-4" (ngSubmit)="handleSubmit()">
       <app-common-input
@@ -34,7 +34,7 @@
         [fc]="hospitalForm.controls.country"
         placeholder="Select country"
         [options]="countriesOptions"
-        defaultValue="India"
+        value="India"
       >
       </app-select-input>
 
@@ -56,11 +56,24 @@
         [errors]="errors.address"
       ></app-common-input>
 
-      <div class="flex space-x-2">
-        <button type="submit" class="action-btn px-4 py-1 rounded-md text-sm">
-          Sumit
+      <hr class="my-2 opacity-50" />
+      <app-message-tag
+        [response]="response"
+        (onEnd)="response = null"
+        className="text-center text-sm min-h-[20px]"
+      ></app-message-tag>
+
+      <div class="flex space-x-2 mt-2">
+        <button
+          [disabled]="submitting"
+          type="submit"
+          class="action-btn px-4 py-1 rounded-md text-sm flex items-center space-x-2"
+        >
+          <app-spinner-icon *ngIf="submitting"></app-spinner-icon>
+          <span> Sumit </span>
         </button>
         <button
+          [disabled]="submitting"
           type="button"
           (click)="onBackdropClick.emit()"
           class="ghost-btn px-4 py-1 rounded-md text-sm"
