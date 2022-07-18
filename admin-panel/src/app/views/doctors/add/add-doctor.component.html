@@ -138,7 +138,7 @@
           (loadMore)="loadMoreHospitals()"
           (onSearch)="onHospitalSearch($event)"
           (onChange)="onHospitalSelect($event)"
-          [value]="autoSelectedHospital"
+          [value]="selectedHospital"
         ></app-select-input>
 
         <app-common-input
@@ -177,6 +177,7 @@
           htmlFor="speciality_id"
           [fc]="doctorForm.controls?.['speciality_id']"
           [showError]="false"
+          [value]="selectedSpeciality"
         >
         </app-select-input>
 
@@ -230,10 +231,18 @@
   </div>
 </section>
 
-<!-- Portals -->
+<!-- New Hospital Portals -->
 <app-hospital-form-portal
   [showModal]="showHospitalForm"
   (onBackdropClick)="showHospitalForm = false"
   formType="add"
   (onAdded)="onNewHospitalAdded($event)"
 ></app-hospital-form-portal>
+
+<!-- New Speciality Portals -->
+<app-speciality-form-portal
+  [showModal]="showSpecialityForm"
+  (onBackdropClick)="showSpecialityForm = false"
+  formType="add"
+  (onAdded)="onNewSpecialityAdded($event)"
+></app-speciality-form-portal>

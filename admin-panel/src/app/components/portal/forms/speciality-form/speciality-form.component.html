@@ -1,0 +1,119 @@
+<ng-template #portalRef>
+  <div
+    class="fixed right-0 top-0 bottom-0 sm:w-96 w-full modal-container-bg shadow-t-3xl"
+    @swipeInOut
+    portalBackdropClick
+    [overlayRef]="overlayRef"
+    (callback)="onBackdropClick.emit()"
+  >
+    <header class="p-3 flex items-center justify-between modal-header-bg">
+      <p>
+        {{
+          formType === "add" ? "Add New Speciality" : "Edit Speciality Details"
+        }}
+      </p>
+      <button (click)="onBackdropClick.emit()" [disabled]="submitting">
+        <app-close-icon
+          className="fill-gray-50 stroke-gray-50 w-5 h-5 hover:scale-110 smooth-animate"
+        ></app-close-icon>
+      </button>
+    </header>
+    <form class="p-4" (ngSubmit)="handleOnSubmit()">
+      <div>
+        <label for="thumbnail" class="text-xs font-semibold"> Thumbnail </label>
+        <small class="block text-xs mb-2 opacity-70">
+          Thumbnail representing the speciality
+        </small>
+        <app-dropzone
+          [isMulti]="false"
+          dropfileType="image"
+          accept="image/*"
+          (onChange)="handleThumbnailChange($event)"
+          *ngIf="thumbnail == null"
+          @fadeIn
+        >
+          <div
+            class="w-48 h-48 shadow-md rounded-md p-2 dark:bg-gray-500 smooth-animate hover:scale-105 flex flex-col items-center justify-center"
+            role="button"
+          >
+            <p class="text-xs dark:text-gray-100 text-gray-900 text-center">
+              Speciality Thumbnail
+            </p>
+            <app-image-icon
+              className="w-12 h-12 dark:fill-gray-100 dark:stroke-gray-100 fill-gray-600 stroke-gray-600 mx-auto my-4"
+            ></app-image-icon>
+            <small
+              class="text-xs block dark:text-gray-300 text-gray-600 text-center"
+            >
+              Drop / click here to select
+            </small>
+            <small
+              class="text-xs block dark:text-gray-300 text-gray-600 text-center mt-2"
+            >
+              Remommended 192 x 192(px)
+            </small>
+          </div>
+        </app-dropzone>
+        <div
+          class="w-48 h-48 rounded-md shadow-md overflow-hidden relative"
+          @fadeIn
+          *ngIf="thumbnail"
+        >
+          <img
+            src="/assets/img-placeholder.png"
+            alt=""
+            blobImageViewer
+            [file]="thumbnail"
+            class="object-cover h-full w-full"
+          />
+          <div class="absolute bottom-0 left-0 right-0">
+            <button
+              class="action-btn px-4 py-1.5 text-xs rounded-md w-full"
+              (click)="thumbnail = null"
+            >
+              Remove / Change
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <br />
+
+      <app-common-input
+        labelName="Title"
+        guideLine="Title of the speciality"
+        [fc]="specialityForm.controls.title"
+        htmlFor="title"
+        placeholder="Enter speciality title"
+        [showError]="showErrors"
+        [errors]="errors.title"
+      >
+      </app-common-input>
+
+      <app-message-tag
+        [response]="response"
+        (onEnd)="response = null"
+        className="text-center text-sm min-h-[20px]"
+      ></app-message-tag>
+
+      <div class="flex space-x-2 mt-2">
+        <button
+          [disabled]="submitting"
+          type="submit"
+          class="action-btn px-4 py-1 rounded-md text-sm flex items-center space-x-2"
+        >
+          <app-spinner-icon *ngIf="submitting"></app-spinner-icon>
+          <span> Sumit </span>
+        </button>
+        <button
+          [disabled]="submitting"
+          type="button"
+          (click)="onBackdropClick.emit()"
+          class="ghost-btn px-4 py-1 rounded-md text-sm"
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+</ng-template>

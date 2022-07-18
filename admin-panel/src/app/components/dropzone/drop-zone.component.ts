@@ -4,7 +4,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
   selector: 'app-dropzone',
   template: `
     <div
-      class="w-full h-full"
+      class="max-w-fit"
       (drop)="handleOnDrop($event)"
       (dragover)="$event.preventDefault(); $event.stopPropagation()"
       (click)="inputRef.click()"

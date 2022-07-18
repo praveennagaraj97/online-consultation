@@ -21,3 +21,7 @@ export interface HospitalFormDTO {
   city: FormControl<string | null>;
   address: FormControl<string | null>;
 }
+
+export interface SpecialityFormDTO {
+  title: FormControl<string | null>;
+}

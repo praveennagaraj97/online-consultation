@@ -16,7 +16,10 @@ import {
   ResponseMessageType,
   SelectOption,
 } from 'src/app/types/app.types';
-import { HospitalEntity } from 'src/app/types/cms.response.types';
+import {
+  HospitalEntity,
+  SpecialityEntity,
+} from 'src/app/types/cms.response.types';
 import type { DoctorFormDTO } from 'src/app/types/dto.types';
 import { clearSubscriptions } from 'src/app/utils/helpers';
 import { AddDoctorService } from './add-doctor.service';
@@ -71,7 +74,9 @@ export class AddNewDoctorViewComponent {
 
   // Portal State
   showHospitalForm = false;
-  autoSelectedHospital = '';
+  selectedHospital = '';
+  showSpecialityForm = false;
+  selectedSpeciality = '';
 
   // Input Form Group State
   profilePic: File | null = null;
@@ -248,6 +253,11 @@ export class AddNewDoctorViewComponent {
   }
 
   onSpecialitySelect(opt: SelectOption) {
+    if (opt.value === 'add_new') {
+      this.showSpecialityForm = true;
+      return;
+    }
+
     this.doctorForm.controls?.['speciality_id'].setValue(opt.value);
   }
 
@@ -316,7 +326,7 @@ export class AddNewDoctorViewComponent {
   // On Hospital Added
   onNewHospitalAdded(hospital: HospitalEntity) {
     this.doctorForm.controls.hospital_id.setValue(hospital.id);
-    this.autoSelectedHospital = hospital.name;
+    this.selectedHospital = hospital.name;
     this.showHospitalForm = false;
 
     // Update Hospital List
@@ -324,6 +334,23 @@ export class AddNewDoctorViewComponent {
     this.hospitalOptions = [
       { title: 'Add new hospital', value: 'add_new' },
       ...this.hospitalOptions,
+    ];
+  }
+
+  // On Hospital Added
+  onNewSpecialityAdded(speciality: SpecialityEntity) {
+    this.doctorForm.controls.speciality_id.setValue(speciality.id);
+    this.selectedSpeciality = speciality.title;
+    this.showSpecialityForm = false;
+
+    // Update Hospital List
+    this.specialityOptions[0] = {
+      title: speciality.title,
+      value: speciality.id,
+    };
+    this.specialityOptions = [
+      { title: 'Add new speciality', value: 'add_new' },
+      ...this.specialityOptions,
     ];
   }
 

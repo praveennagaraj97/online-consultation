@@ -14,6 +14,7 @@ export const doctorRoutes = {
 
 export const adminCMSRoutes = {
   Hospital: `/admin/hospital`,
+  Speciality: `/admin/speciality`,
 };
 
 export const sharedRoutes = {
