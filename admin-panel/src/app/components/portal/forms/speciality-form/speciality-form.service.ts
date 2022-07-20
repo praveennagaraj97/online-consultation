@@ -6,12 +6,6 @@ import { BaseAPiResponse } from 'src/app/types/api.response.types';
 import { SpecialityEntity } from 'src/app/types/cms.response.types';
 import { SpecialityFormDTO } from 'src/app/types/dto.types';
 
-export const specialityErrors = {
-  title: {
-    required: 'Speciality title cannot be empty',
-  },
-};
-
 @Injectable({ providedIn: 'any' })
 export class SpecialityFormService {
   constructor(private http: HttpClient) {}

@@ -13,7 +13,7 @@ import {
 } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { hospitalFormErrors } from 'src/app/errors/hospital-form.errors';
+import { hospitalFormErrors } from 'src/app/errors/cms-form.errors';
 import { ErrorResponse } from 'src/app/types/api.response.types';
 import { APiResponseStatus, SelectOption } from 'src/app/types/app.types';
 import { HospitalEntity } from 'src/app/types/cms.response.types';
@@ -125,9 +125,10 @@ export class HospitalFormPortalComponent {
     this.subs$.push(
       this.hspFormService.addNewHospital(this.hospitalForm).subscribe({
         next: (res) => {
-          this.submitting = false;
           this.setResponse({ type: 'success', message: res.message }, () => {
             this.onAdded.emit(res.result);
+            this.submitting = false;
+            this.hospitalForm.reset();
           });
         },
         error: (err: ErrorResponse) => {

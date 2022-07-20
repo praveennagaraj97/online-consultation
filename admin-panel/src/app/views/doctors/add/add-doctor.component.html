@@ -199,6 +199,7 @@
           [fc]="doctorForm.controls?.['spoken_language_id']"
           [showError]="shouldShowError"
           [errors]="errors.spoken_language_id"
+          [value]="selectedLanguage"
         >
         </app-select-input>
 
@@ -210,7 +211,7 @@
           [fc]="doctorForm.controls.is_active"
           [options]="activeStatusOptions"
           (onChange)="doctorForm.controls.is_active.setValue($event.value)"
-          [value]="doctorForm.controls.is_active.value"
+          [value]="{ value: 'false', title: 'In Active' }"
         >
         </app-select-input>
       </div>
@@ -246,3 +247,11 @@
   formType="add"
   (onAdded)="onNewSpecialityAdded($event)"
 ></app-speciality-form-portal>
+
+<!-- New Language Portals -->
+<app-language-form-portal
+  [showModal]="showLanguageForm"
+  (onBackdropClick)="showLanguageForm = false"
+  formType="add"
+  (onAdded)="onNewLanguageAdded($event)"
+></app-language-form-portal>

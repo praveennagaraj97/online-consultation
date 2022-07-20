@@ -25,10 +25,10 @@ type DoctorEntity struct {
 	IsActive          bool                  `json:"is_active" bson:"is_active"`
 
 	// Populate fields
-	Speciality        string                                      `json:"speciality,omitempty" bson:"speciality,omitempty"`
-	ConsultationType  string                                      `json:"consultation_type,omitempty" bson:"consultation_type,omitempty"`
-	Hospital          *hospitalmodel.HospitalEntity               `json:"hospital,omitempty" bson:"hospital,omitempty"`
-	SpokenLanguages   []languagesmodel.LanguageEntity             `json:"spoken_languages,omitempty" bson:"spoken_languages,omitempty"`
+	Speciality        string                                      `json:"-" bson:"speciality,omitempty"`
+	ConsultationType  string                                      `json:"-" bson:"consultation_type,omitempty"`
+	Hospital          *hospitalmodel.HospitalEntity               `json:"hospital" bson:"hospital,omitempty"`
+	SpokenLanguages   []languagesmodel.LanguageEntity             `json:"spoken_languages" bson:"spoken_languages,omitempty"`
 	NextAvailableSlot *appointmentslotmodel.AppointmentSlotEntity `json:"next_available_slot" bson:"next_available_slot,omitempty"`
 
 	// reference fields
@@ -48,9 +48,14 @@ func (a *DoctorEntity) GetAccessAndRefreshToken(acessExpires bool) (string, stri
 		accessTime = constants.CookieAccessExpiryTime
 		access, err = tokens.GenerateTokenWithExpiryTimeAndType(a.ID.Hex(),
 			time.Now().Add(time.Minute*constants.JWT_AccessTokenExpiry).Unix(), "access", "doctor")
+		if err != nil {
+			return "", "", 0, err
+		}
 	} else {
 		access, err = tokens.GenerateNoExpiryTokenWithCustomType(a.ID.Hex(), "access", "doctor")
-
+		if err != nil {
+			return "", "", 0, err
+		}
 	}
 	refresh, err = tokens.GenerateNoExpiryTokenWithCustomType(a.ID.Hex(), "refresh", "doctor")
 

@@ -8,7 +8,7 @@
   >
     <header class="p-3 flex items-center justify-between modal-header-bg">
       <p>
-        {{ formType === "add" ? "Add New Hospital" : "Edit Hospital Details" }}
+        {{ formType === "add" ? "Add New Language" : "Edit Language Details" }}
       </p>
       <button (click)="onBackdropClick.emit()" [disabled]="submitting">
         <app-close-icon
@@ -16,45 +16,30 @@
         ></app-close-icon>
       </button>
     </header>
-
-    <form class="p-4" (ngSubmit)="handleSubmit()">
+    <div class="p-3">
+      <small>
+        If you would like to
+        {{ formType === "add" ? "add new" : "edit" }} language spoken by doctor,
+        you can {{ formType === "add" ? "fill" : "make changes to" }} the form
+        below and submit.
+      </small>
+    </div>
+    <form class="p-4" (ngSubmit)="handleOnSubmit()">
       <app-common-input
         [showError]="showErrors"
         labelName="Name"
-        guideLine="Name of the hospital"
-        placeholder="Enter hospital name"
-        [fc]="hospitalForm.controls.name"
+        guideLine="Name of the language"
+        placeholder="Enter language name"
+        [fc]="languageForm.controls.name"
         [errors]="errors.name"
       ></app-common-input>
-
-      <app-select-input
-        [errors]="errors.country"
-        [showError]="showErrors"
-        labelName="Country"
-        guideLine="Which country hospital is located"
-        [fc]="hospitalForm.controls.country"
-        placeholder="Select country"
-        [options]="countriesOptions"
-        [value]="{ value: 'India', title: 'India' }"
-      >
-      </app-select-input>
-
       <app-common-input
         [showError]="showErrors"
-        labelName="City"
-        guideLine="Which city hospital is located"
-        placeholder="Enter city name"
-        [fc]="hospitalForm.controls.city"
-        [errors]="errors.city"
-      ></app-common-input>
-
-      <app-common-input
-        [showError]="showErrors"
-        labelName="Address"
-        guideLine="Address of the hospital"
-        placeholder="Enter hospital address"
-        [fc]="hospitalForm.controls.address"
-        [errors]="errors.address"
+        labelName="Localised text"
+        guideLine="Localised text of the language"
+        placeholder="Enter localised text for the language"
+        [fc]="languageForm.controls.locale_name"
+        [errors]="errors.locale_name"
       ></app-common-input>
 
       <hr class="my-2 opacity-50" />

@@ -12,3 +12,18 @@ export const hospitalFormErrors = {
     required: 'Hospital address cannot be empty',
   },
 };
+
+export const specialityErrors = {
+  title: {
+    required: 'Speciality title cannot be empty',
+  },
+};
+
+export const languageErrors = {
+  name: {
+    required: 'Language name cannot be empty',
+  },
+  locale_name: {
+    required: 'Localised text of the language cannot be empty',
+  },
+};

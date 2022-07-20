@@ -18,6 +18,7 @@ import {
 } from 'src/app/types/app.types';
 import {
   HospitalEntity,
+  LanguageEntity,
   SpecialityEntity,
 } from 'src/app/types/cms.response.types';
 import type { DoctorFormDTO } from 'src/app/types/dto.types';
@@ -74,9 +75,11 @@ export class AddNewDoctorViewComponent {
 
   // Portal State
   showHospitalForm = false;
-  selectedHospital = '';
+  selectedHospital: SelectOption | null = null;
   showSpecialityForm = false;
-  selectedSpeciality = '';
+  selectedSpeciality: SelectOption | null = null;
+  showLanguageForm = false;
+  selectedLanguage: SelectOption | null = null;
 
   // Input Form Group State
   profilePic: File | null = null;
@@ -298,6 +301,11 @@ export class AddNewDoctorViewComponent {
   }
 
   onLanguageSelect(opt: SelectOption) {
+    if (opt.value == 'add_new') {
+      this.showLanguageForm = true;
+      return;
+    }
+
     const input = this.doctorForm.controls?.['spoken_language_id'] as FormArray;
 
     if (input.value?.includes(opt.value)) {
@@ -325,33 +333,57 @@ export class AddNewDoctorViewComponent {
 
   // On Hospital Added
   onNewHospitalAdded(hospital: HospitalEntity) {
+    const addHospitaloption = { title: hospital.name, value: hospital.id };
+
     this.doctorForm.controls.hospital_id.setValue(hospital.id);
-    this.selectedHospital = hospital.name;
+    this.selectedHospital = addHospitaloption;
     this.showHospitalForm = false;
 
     // Update Hospital List
-    this.hospitalOptions[0] = { title: hospital.name, value: hospital.id };
-    this.hospitalOptions = [
-      { title: 'Add new hospital', value: 'add_new' },
-      ...this.hospitalOptions,
-    ];
+    this.hospitalOptions[0] = addHospitaloption;
+    this.hospitalOptions.unshift({
+      title: 'Add new hospital',
+      value: 'add_new',
+    });
   }
 
-  // On Hospital Added
+  // On Speciality Added
   onNewSpecialityAdded(speciality: SpecialityEntity) {
-    this.doctorForm.controls.speciality_id.setValue(speciality.id);
-    this.selectedSpeciality = speciality.title;
-    this.showSpecialityForm = false;
-
-    // Update Hospital List
-    this.specialityOptions[0] = {
+    const newOption = {
       title: speciality.title,
       value: speciality.id,
     };
-    this.specialityOptions = [
-      { title: 'Add new speciality', value: 'add_new' },
-      ...this.specialityOptions,
-    ];
+
+    this.doctorForm.controls.speciality_id.setValue(speciality.id);
+    this.selectedSpeciality = newOption;
+    this.showSpecialityForm = false;
+
+    // Update Speciality List
+    this.specialityOptions[0] = newOption;
+    this.specialityOptions.unshift({
+      title: 'Add new speciality',
+      value: 'add_new',
+    });
+  }
+
+  // On Language Added
+  onNewLanguageAdded(lng: LanguageEntity) {
+    const newOption = {
+      title: lng.name,
+      value: lng.id,
+    };
+
+    const spokenLngIds = this.doctorForm.controls
+      .spoken_language_id as FormArray;
+    spokenLngIds.push(new FormControl(newOption.value));
+    this.selectedLanguage = newOption;
+    this.showLanguageForm = false;
+
+    this.languagesOptions[0] = newOption;
+    this.languagesOptions.unshift({
+      title: 'Add new language',
+      value: 'add_new',
+    });
   }
 
   ngOnDestroy() {

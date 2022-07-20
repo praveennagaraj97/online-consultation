@@ -50,8 +50,8 @@ export class SelectInputComponent {
   @Input() isMulti = false;
   // Optional
   @Input() inputIgnoreKeys: string[] = [];
-  // Optional
-  @Input() value: string | null = null;
+  // Optional - Value From Parent Form
+  @Input() value: SelectOption | null = null;
 
   // State
   multipleOptions: SelectOption[] = [];
@@ -83,13 +83,25 @@ export class SelectInputComponent {
 
   ngOnInit() {
     if (this.value) {
-      this.selectOptionValue = this.value;
+      if (this.isMulti) {
+        this.multipleOptions.unshift(this.value);
+        return;
+      }
+
+      this.selectOptionValue = this.value.title;
     }
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes?.['value']?.currentValue) {
-      this.selectOptionValue = changes?.['value']?.currentValue;
+    const value = changes?.['value']?.currentValue as SelectOption;
+
+    if (value) {
+      if (this.isMulti) {
+        this.multipleOptions.unshift(value);
+        return;
+      }
+
+      this.selectOptionValue = value?.title;
     }
   }
 
@@ -100,19 +112,19 @@ export class SelectInputComponent {
     if (this.inputIgnoreKeys.includes(opt.value)) {
       this.showOptions = false;
       this.selectOptionValue = '';
-      if (this.fc) {
+      if (this.fc && !this.isMulti) {
         this.fc.setValue('');
       }
       return;
     }
 
     if (this.isMulti) {
-      if (this.multipleOptions.find((mo) => mo.value == opt.value)) {
+      if (this.multipleOptions?.find((mo) => mo.value == opt.value)) {
         this.multipleOptions = this.multipleOptions.filter(
           (option) => option.value != opt.value
         );
       } else {
-        this.multipleOptions = [...this.multipleOptions, opt];
+        this.multipleOptions.push(opt);
       }
       return;
     }

@@ -1,10 +1,4 @@
-import {
-  animate,
-  style,
-  transition,
-  trigger,
-  useAnimation,
-} from '@angular/animations';
+import { animate, style, transition, trigger } from '@angular/animations';
 import { Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
 import {
@@ -19,18 +13,16 @@ import {
 } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { fadeInTransformAnimation } from 'src/app/animations';
-import { specialityErrors } from 'src/app/errors/cms-form.errors';
+import { languageErrors } from 'src/app/errors/cms-form.errors';
 import { ErrorResponse } from 'src/app/types/api.response.types';
 import { APiResponseStatus } from 'src/app/types/app.types';
-import { SpecialityEntity } from 'src/app/types/cms.response.types';
-import { SpecialityFormDTO } from 'src/app/types/dto.types';
+import { LanguageEntity } from 'src/app/types/cms.response.types';
 import { clearSubscriptions } from 'src/app/utils/helpers';
-import { SpecialityFormService } from './speciality-form.service';
+import { LanguageFormService } from './language-form.service';
 
 @Component({
-  selector: 'app-speciality-form-portal',
-  templateUrl: 'speciality-form.component.html',
+  selector: 'app-language-form-portal',
+  templateUrl: 'language-form.component.html',
   animations: [
     trigger('swipeInOut', [
       transition('void => *', [
@@ -42,12 +34,9 @@ import { SpecialityFormService } from './speciality-form.service';
         animate('0.5s', style({ transform: 'translateX(100%)' })),
       ]),
     ]),
-    trigger('fadeIn', [
-      transition('void => *', [useAnimation(fadeInTransformAnimation())]),
-    ]),
   ],
 })
-export class SpecialityFormPortalComponent {
+export class LanguageFormPortalComponent {
   // Refs
   @ViewChild('portalRef') portalRef?: TemplateRef<HTMLDivElement>;
 
@@ -61,26 +50,25 @@ export class SpecialityFormPortalComponent {
   // Event Emitters
   @Output() onBackdropClick = new EventEmitter<void>();
   @Output() onSuccessCallback = new EventEmitter();
-  @Output() onAdded = new EventEmitter<SpecialityEntity>();
+  @Output() onAdded = new EventEmitter<LanguageEntity>();
 
   //   State
   overlayRef?: OverlayRef;
   private templateRef?: TemplatePortal<HTMLDivElement>;
-  errors = specialityErrors;
+  errors = languageErrors;
   showErrors = false;
   response: APiResponseStatus | null = null;
   submitting = false;
 
-  // FormData
-  thumbnail: File | null = null;
-  specialityForm = new FormGroup<SpecialityFormDTO>({
-    title: new FormControl('', { validators: [Validators.required] }),
+  languageForm = new FormGroup({
+    name: new FormControl('', { validators: [Validators.required] }),
+    locale_name: new FormControl('', { validators: [Validators.required] }),
   });
 
   constructor(
     private viewContainerRef: ViewContainerRef,
     private overlay: Overlay,
-    private specialityService: SpecialityFormService
+    private langFormService: LanguageFormService
   ) {}
 
   ngOnChanges(changes: SimpleChanges) {
@@ -106,41 +94,28 @@ export class SpecialityFormPortalComponent {
   }
 
   handleOnSubmit() {
-    if (this.specialityForm.invalid) {
+    if (this.languageForm.invalid) {
       this.showErrors = true;
       return;
-    }
-
-    if (!this.thumbnail) {
-      return this.setResponse({
-        message: 'Thumbnail cannot be empty',
-        type: 'error',
-      });
     }
 
     this.submitting = true;
 
     this.subs$.push(
-      this.specialityService
-        .addNewSpeciality(this.specialityForm, this.thumbnail)
-        .subscribe({
-          next: (res) => {
-            this.setResponse({ message: res.message, type: 'success' }, () => {
-              this.onAdded.emit(res.result);
-              this.submitting = false;
-              this.specialityForm.reset();
-            });
-          },
-          error: (err: ErrorResponse) => {
-            this.setResponse({ message: err.error.message, type: 'error' });
+      this.langFormService.addNewLanguage(this.languageForm).subscribe({
+        next: (res) => {
+          this.setResponse({ message: res.message, type: 'success' }, () => {
             this.submitting = false;
-          },
-        })
+            this.onAdded.emit(res.result);
+            this.languageForm.reset();
+          });
+        },
+        error: ({ error }: ErrorResponse) => {
+          this.setResponse({ message: error.message, type: 'error' });
+          this.submitting = false;
+        },
+      })
     );
-  }
-
-  handleThumbnailChange(file: File[]) {
-    this.thumbnail = file[0];
   }
 
   private timeOutId: any;

@@ -49,6 +49,7 @@ import { clearSubscriptions } from 'src/app/utils/helpers';
             *ngFor="let option of options"
             [title]="option.title"
             (click)="handleOnSelect(option)"
+            tabindex="-1"
           >
             {{ option.title }}
           </button>

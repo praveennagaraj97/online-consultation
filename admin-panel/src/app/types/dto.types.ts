@@ -25,3 +25,9 @@ export interface HospitalFormDTO {
 export interface SpecialityFormDTO {
   title: FormControl<string | null>;
 }
+
+
+export interface LanguageFormDTO {
+  name: FormControl<string | null>;
+  locale_name: FormControl<string | null>;
+}
