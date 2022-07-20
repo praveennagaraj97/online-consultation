@@ -7,13 +7,14 @@ import {
   FormGroup,
   Validators,
 } from '@angular/forms';
+import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { fadeInTransformAnimation } from 'src/app/animations';
 import { doctorFormErrors } from 'src/app/errors/doctor-form.errors';
 import { ErrorResponse } from 'src/app/types/api.response.types';
 import {
+  APiResponseStatus,
   BreadcrumbPath,
-  ResponseMessageType,
   SelectOption,
 } from 'src/app/types/app.types';
 import {
@@ -43,7 +44,8 @@ export class AddNewDoctorViewComponent {
 
   constructor(
     private fb: FormBuilder,
-    private addNewDocService: AddDoctorService
+    private addNewDocService: AddDoctorService,
+    private router: Router
   ) {}
 
   // State
@@ -71,7 +73,7 @@ export class AddNewDoctorViewComponent {
   languagesLoading = false;
   languagesSearchTerm = '';
   submitting = false;
-  response: ResponseMessageType | null = null;
+  response: APiResponseStatus | null = null;
 
   // Portal State
   showHospitalForm = false;
@@ -139,18 +141,20 @@ export class AddNewDoctorViewComponent {
       };
       this.shouldShowError = true;
     } else {
+      this.doctorForm.disable();
+      this.shouldShowError = false;
+      this.submitting = true;
       this.addNewDocService.handleAddDoctor(form, this.profilePic).subscribe({
         next: (val) => {
-          this.response = {
-            message: val.message,
-            type: 'success',
-          };
+          this.setResponse({ message: val.message, type: 'success' }, () => {
+            this.submitting = false;
+            this.doctorForm.reset();
+            this.router.navigateByUrl('/doctors');
+          });
         },
-        error: (err: ErrorResponse) => {
-          this.response = {
-            message: err.error.message,
-            type: 'success',
-          };
+        error: ({ error }: ErrorResponse) => {
+          this.setResponse({ message: error.message, type: 'error' });
+          this.submitting = false;
         },
       });
     }
@@ -384,6 +388,19 @@ export class AddNewDoctorViewComponent {
       title: 'Add new language',
       value: 'add_new',
     });
+  }
+
+  private timeOutId: any;
+  private setResponse(res: APiResponseStatus, callback?: () => void) {
+    clearTimeout(this.timeOutId);
+    this.response = res;
+
+    setTimeout(() => {
+      this.response = null;
+      if (callback) {
+        callback();
+      }
+    }, 3000);
   }
 
   ngOnDestroy() {

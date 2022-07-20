@@ -3,16 +3,14 @@
   <small class="block text-xs mb-2 opacity-70" *ngIf="guideLine">
     {{ guideLine }}
   </small>
-  <div
-    class="relative"
-    (click)="$event.stopPropagation(); showOptions = !showOptions"
-    #portalPostionRef
-  >
+  <div class="relative" #portalPostionRef>
     <input
       [type]="type"
       name="htmlFor"
       [ngModel]="isMulti ? '' : selectOptionValue"
       autocomplete="off"
+      [disabled]="fc?.disabled ? 'true' : 'false'"
+      (click)="$event.stopPropagation(); showOptions = !showOptions"
       readonly
       class="common-input w-full input-focus input-colors p-2 rounded-md text-sm shadow-md"
       [placeholder]="multipleOptions.length ? '' : placeholder"

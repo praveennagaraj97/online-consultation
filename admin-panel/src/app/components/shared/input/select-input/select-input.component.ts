@@ -24,7 +24,7 @@ export class SelectInputComponent {
   // Errors Messages for this input
   @Input() errors: { [key: string]: string } = {};
   // FormControl on which input will error existence will be checked
-  @Input() fc?: AbstractControl<any, any> | undefined;
+  @Input() fc: AbstractControl<any, any> | undefined | FormControl<any>;
   // COndition for when to display the errors
   @Input() showError = false;
   // Label name for input - Optional

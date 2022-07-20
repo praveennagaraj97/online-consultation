@@ -224,9 +224,11 @@
       ></app-message-tag>
       <button
         type="submit"
-        class="action-btn text-sm px-4 py-1.5 rounded-md mx-auto block mt-2"
+        class="action-btn text-sm px-4 py-1.5 rounded-md mx-auto items-center space-x-2 mt-2 flex"
+        [disabled]="submitting"
       >
-        Add Doctor
+        <app-spinner-icon *ngIf="submitting"></app-spinner-icon>
+        <span> Add Doctor </span>
       </button>
     </form>
   </div>
