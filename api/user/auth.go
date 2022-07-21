@@ -9,7 +9,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/praveennagaraj97/online-consultation/api"
-	"github.com/praveennagaraj97/online-consultation/constants"
 	userdto "github.com/praveennagaraj97/online-consultation/dto/user"
 	"github.com/praveennagaraj97/online-consultation/interfaces"
 	usermodel "github.com/praveennagaraj97/online-consultation/models/user"
@@ -83,16 +82,7 @@ func (a *UserAPI) Register() gin.HandlerFunc {
 
 		a.userRepo.UpdateRefreshToken(&document.ID, refresh)
 
-		ctx.SetSameSite(http.SameSiteNoneMode)
-		// Set Access Token
-		ctx.SetCookie(string(constants.AUTH_TOKEN),
-			access,
-			accessTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
-
-		// Set Refresh Token
-		ctx.SetCookie(string(constants.REFRESH_TOKEN),
-			refresh,
-			constants.CookieRefreshExpiryTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
+		utils.SetAuthCookie(ctx, access, refresh, accessTime, a.appConf.Domain, a.appConf.Environment)
 
 		if err != nil {
 			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, nil)
@@ -182,16 +172,7 @@ func (a *UserAPI) SignInWithPhoneNumber() gin.HandlerFunc {
 			return
 		}
 
-		ctx.SetSameSite(http.SameSiteNoneMode)
-		// Set Access Token
-		ctx.SetCookie(string(constants.AUTH_TOKEN),
-			access,
-			accessTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
-
-		// Set Refresh Token
-		ctx.SetCookie(string(constants.REFRESH_TOKEN),
-			refresh,
-			constants.CookieRefreshExpiryTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
+		utils.SetAuthCookie(ctx, access, refresh, accessTime, a.appConf.Domain, a.appConf.Environment)
 
 		if err != nil {
 			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, nil)
@@ -327,16 +308,7 @@ func (a *UserAPI) SendLoginCredentialsForEmailLink() gin.HandlerFunc {
 
 		a.userRepo.UpdateRefreshToken(&res.ID, refresh)
 
-		ctx.SetSameSite(http.SameSiteNoneMode)
-		// Set Access Token
-		ctx.SetCookie(string(constants.AUTH_TOKEN),
-			access,
-			accessTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
-
-		// Set Refresh Token
-		ctx.SetCookie(string(constants.REFRESH_TOKEN),
-			refresh,
-			constants.CookieRefreshExpiryTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
+		utils.SetAuthCookie(ctx, access, refresh, accessTime, a.appConf.Domain, a.appConf.Environment)
 
 		if err != nil {
 			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, nil)
@@ -489,9 +461,8 @@ func (a *UserAPI) Logout() gin.HandlerFunc {
 			api.SendErrorResponse(c, err.Error(), http.StatusUnauthorized, nil)
 			return
 		}
-		c.SetSameSite(http.SameSiteNoneMode)
-		c.SetCookie(string(constants.AUTH_TOKEN), "", 0, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
-		c.SetCookie(string(constants.REFRESH_TOKEN), "", 0, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
+
+		utils.SetAuthCookie(c, "", "", 0, a.appConf.Domain, a.appConf.Environment)
 
 		c.JSON(http.StatusOK, serialize.Response{
 			StatusCode: http.StatusOK,
@@ -550,16 +521,7 @@ func (a *UserAPI) RefreshToken() gin.HandlerFunc {
 
 		a.userRepo.UpdateRefreshToken(&user.ID, refresh)
 
-		c.SetSameSite(http.SameSiteNoneMode)
-		// Set Access Token
-		c.SetCookie(string(constants.AUTH_TOKEN),
-			access,
-			accessTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
-
-		// Set Refresh Token
-		c.SetCookie(string(constants.REFRESH_TOKEN),
-			refresh,
-			constants.CookieRefreshExpiryTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
+		utils.SetAuthCookie(c, access, refresh, accessTime, a.appConf.Domain, a.appConf.Environment)
 
 		if err != nil {
 			api.SendErrorResponse(c, "Something went wrong", http.StatusInternalServerError, nil)

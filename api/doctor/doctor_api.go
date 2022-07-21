@@ -276,10 +276,8 @@ func (a *DoctorAPI) FindAllDoctors(showInActive bool) gin.HandlerFunc {
 		if sortByAvailability && populateNextAvailable {
 			sortOpts["next_available_slot.is_available"] = -1
 			sortOpts["next_available_slot.start"] = 1
-		} else {
-			// Else default by ID
-			sortOpts["_id"] = -1
 		}
+		sortOpts["_id"] = -1
 
 		res, err := a.repo.FindAll(pgOpts, fltrOpts, &sortOpts, ketSortBy,
 			showInActive, slotsExistsOn, populateNextAvailable)
@@ -297,7 +295,6 @@ func (a *DoctorAPI) FindAllDoctors(showInActive bool) gin.HandlerFunc {
 		var lastId *primitive.ObjectID
 
 		if pgOpts.PaginateId == nil {
-			fmt.Println("called")
 			docCount, err = a.repo.GetDocumentsCount(fltrOpts, showInActive, slotsExistsOn)
 			if err != nil {
 				api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, &map[string]string{

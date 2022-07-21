@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/rand"
+	"net/http"
 	"net/url"
 	"strings"
 	"time"
@@ -95,4 +96,26 @@ func DecodeVerificationID(verification_query_str string) (*primitive.ObjectID, *
 
 func GetTimeZone(ctx *gin.Context) string {
 	return ctx.Request.Header.Get(constants.TimeZoneHeaderKey)
+}
+
+// Sets Authentication Cookie
+func SetAuthCookie(ctx *gin.Context, access, refresh string, accessTime int, domain string, env string) {
+
+	var production = env == "production"
+
+	if production {
+		ctx.SetSameSite(http.SameSiteNoneMode)
+	} else {
+		ctx.SetSameSite(http.SameSiteLaxMode)
+	}
+
+	// Set Access Token
+	ctx.SetCookie(string(constants.AUTH_TOKEN),
+		access,
+		accessTime, "/", domain, production, true)
+
+	// Set Refresh Token
+	ctx.SetCookie(string(constants.REFRESH_TOKEN),
+		refresh,
+		constants.CookieRefreshExpiryTime, "/", domain, production, true)
 }

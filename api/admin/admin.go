@@ -19,6 +19,7 @@ import (
 	"github.com/praveennagaraj97/online-consultation/pkg/validator"
 	adminrepository "github.com/praveennagaraj97/online-consultation/repository/admin"
 	"github.com/praveennagaraj97/online-consultation/serialize"
+	"github.com/praveennagaraj97/online-consultation/utils"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -111,16 +112,8 @@ func (a *AdminAPI) Login() gin.HandlerFunc {
 
 		a.adminRepo.UpdateRefreshToken(&user.ID, refresh)
 
-		ctx.SetSameSite(http.SameSiteNoneMode)
-		// Set Access Token
-		ctx.SetCookie(string(constants.AUTH_TOKEN),
-			access,
-			accessTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
-
-		// Set Refresh Token
-		ctx.SetCookie(string(constants.REFRESH_TOKEN),
-			refresh,
-			constants.CookieRefreshExpiryTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
+		// Set Cookies
+		utils.SetAuthCookie(ctx, access, refresh, accessTime, a.appConf.Domain, a.appConf.Environment)
 
 		if err != nil {
 			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, nil)
@@ -353,17 +346,8 @@ func (a *AdminAPI) RefreshToken() gin.HandlerFunc {
 			return
 		}
 
-		c.SetSameSite(http.SameSiteNoneMode)
-
-		// Set Access Token
-		c.SetCookie(string(constants.AUTH_TOKEN),
-			access,
-			accessTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
-
-		// Set Refresh Token
-		c.SetCookie(string(constants.REFRESH_TOKEN),
-			refresh,
-			constants.CookieRefreshExpiryTime, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
+		// Set Auth Cookie
+		utils.SetAuthCookie(c, access, refresh, accessTime, a.appConf.Domain, a.appConf.Environment)
 
 		if err != nil {
 			api.SendErrorResponse(c, "Something went wrong", http.StatusInternalServerError, nil)
@@ -430,9 +414,9 @@ func (a *AdminAPI) Logout() gin.HandlerFunc {
 			api.SendErrorResponse(ctx, err.Error(), http.StatusUnauthorized, nil)
 			return
 		}
-		ctx.SetSameSite(http.SameSiteNoneMode)
-		ctx.SetCookie(string(constants.AUTH_TOKEN), "", 0, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
-		ctx.SetCookie(string(constants.REFRESH_TOKEN), "", 0, "/", a.appConf.Domain, a.appConf.Environment == "production", true)
+
+		// Remove / Set Cookie to expire
+		utils.SetAuthCookie(ctx, "", "", 0, a.appConf.Domain, a.appConf.Environment)
 
 		ctx.JSON(http.StatusOK, serialize.Response{
 			StatusCode: http.StatusOK,
