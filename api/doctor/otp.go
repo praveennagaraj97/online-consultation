@@ -59,13 +59,19 @@ func (a *DoctorAPI) SendVerificationCode() gin.HandlerFunc {
 		}
 
 		// Send OTP
-		if err := twiliopkg.SendMessage(&interfaces.SMSType{
-			Message: fmt.Sprintf("%s is your verification code for Online Consultation", verifyCode),
-			To:      fmt.Sprintf("%s%s", payload.Code, payload.Number),
-		}); err != nil {
-			log.Default().Println(err.Error())
-			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, nil)
-			return
+
+		if a.appConf.Environment == "production" {
+
+			if err := twiliopkg.SendMessage(&interfaces.SMSType{
+				Message: fmt.Sprintf("%s is your verification code for Online Consultation", verifyCode),
+				To:      fmt.Sprintf("%s%s", payload.Code, payload.Number),
+			}); err != nil {
+				log.Default().Println(err.Error())
+				api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, nil)
+				return
+			}
+		} else {
+			fmt.Println(verifyCode)
 		}
 
 		ctx.JSON(http.StatusCreated, serialize.DataResponse[*otpmodel.OneTimePasswordEntity]{

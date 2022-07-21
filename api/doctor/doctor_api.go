@@ -252,13 +252,6 @@ func (a *DoctorAPI) FindAllDoctors(showInActive bool) gin.HandlerFunc {
 		var slotsExistsOn *primitive.DateTime = nil
 		availableOn := ctx.Query("available_on")
 
-		// Sort By Availability
-		sortByAvailability := ctx.Query("next_available_slot")
-		if sortByAvailability != "" {
-			sortOpts["next_available_slot"] = -1
-		}
-		sortOpts["_id"] = -1
-
 		if availableOn != "" {
 			t, err := time.Parse("2006-01-02", availableOn)
 			if err != nil {
@@ -278,6 +271,16 @@ func (a *DoctorAPI) FindAllDoctors(showInActive bool) gin.HandlerFunc {
 			populateNextAvailable = true
 		}
 
+		// Sort By Availability
+		sortByAvailability, _ := strconv.ParseBool(ctx.Query("next_available_slot"))
+		if sortByAvailability && populateNextAvailable {
+			sortOpts["next_available_slot.is_available"] = -1
+			sortOpts["next_available_slot.start"] = 1
+		} else {
+			// Else default by ID
+			sortOpts["_id"] = -1
+		}
+
 		res, err := a.repo.FindAll(pgOpts, fltrOpts, &sortOpts, ketSortBy,
 			showInActive, slotsExistsOn, populateNextAvailable)
 		if err != nil {
@@ -294,6 +297,7 @@ func (a *DoctorAPI) FindAllDoctors(showInActive bool) gin.HandlerFunc {
 		var lastId *primitive.ObjectID
 
 		if pgOpts.PaginateId == nil {
+			fmt.Println("called")
 			docCount, err = a.repo.GetDocumentsCount(fltrOpts, showInActive, slotsExistsOn)
 			if err != nil {
 				api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, &map[string]string{
