@@ -139,6 +139,7 @@ type EditDoctorDTO struct {
 	Experience        uint8  `json:"experience,omitempty" form:"experience,omitempty" bson:"experience,omitempty"`
 	ProfilePicWidth   uint64 `json:"profile_pic_width,omitempty" form:"profile_pic_width,omitempty" bson:"profile_pic_width,omitempty"`
 	ProfilePicHeight  uint64 `json:"profile_pic_height,omitempty" form:"profile_pic_height,omitempty" bson:"profile_pic_height,omitempty"`
+	IsActive          *bool  `json:"is_active,omitempty" form:"is_active,omitempty" bson:"is_active,omitempty"`
 
 	// Input ref fields
 	HospitalId         string   `json:"hospital_id,omitempty" form:"hospital_id,omitempty" bson:"-"`
