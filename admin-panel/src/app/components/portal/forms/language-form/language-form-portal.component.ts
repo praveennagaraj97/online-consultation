@@ -133,5 +133,6 @@ export class LanguageFormPortalComponent {
 
   ngOnDestroy() {
     clearSubscriptions(this.subs$);
+    this.overlayRef?.dispose();
   }
 }

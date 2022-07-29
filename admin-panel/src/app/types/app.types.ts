@@ -28,3 +28,5 @@ export type ResponseMessageType = {
   type: 'error' | 'success' | 'info';
   timeOut?: number;
 };
+
+export type ConfirmPortalEventTypes = 'confirm' | 'cancel';

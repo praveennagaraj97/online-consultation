@@ -28,7 +28,7 @@ import { DoctorsEntity } from 'src/app/types/doctor.response.types';
           <th class="text-sm font-medium p-2 whitespace-nowrap text-left">
             languages
           </th>
-          <th class="text-sm font-medium p-2 whitespace-nowrap text-left">
+          <th class="text-sm font-medium p-2 whitespace-nowrap text-center">
             Status
           </th>
           <th class="text-sm font-medium p-2 whitespace-nowrap text-center">
@@ -90,7 +90,11 @@ import { DoctorsEntity } from 'src/app/types/doctor.response.types';
               </select>
             </td>
             <td class="text-xs p-2 whitespace-nowrap">
-              {{ doctor.is_active ? 'active' : 'inactive' }}
+              <div class="flex justify-center">
+                <app-doctor-status
+                  [isActive]="doctor.is_active"
+                ></app-doctor-status>
+              </div>
             </td>
             <td class="text-xs p-2 whitespace-nowrap">
               <app-three-dots-icon

@@ -27,7 +27,7 @@ import { Component } from '@angular/core';
           <th class="text-sm font-medium p-2 whitespace-nowrap text-left">
             languages
           </th>
-          <th class="text-sm font-medium p-2 whitespace-nowrap text-left">
+          <th class="text-sm font-medium p-2 whitespace-nowrap text-center">
             Status
           </th>
           <th class="text-sm font-medium p-2 whitespace-nowrap text-center">

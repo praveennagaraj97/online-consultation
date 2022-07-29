@@ -47,7 +47,7 @@ import { UserOptionsService } from './user-options.service';
 })
 export class UserOptionsComponent {
   // Subscriptions
-  private subs: Subscription[] = [];
+  private subs$: Subscription[] = [];
 
   // State
   user: UserEntity | null = null;
@@ -63,7 +63,7 @@ export class UserOptionsComponent {
   ngOnInit() {
     this.loading = true;
 
-    this.subs.push(
+    this.subs$.push(
       this.userService.getProfileDetails().subscribe({
         next: (user) => {
           this.loading = false;
@@ -87,6 +87,6 @@ export class UserOptionsComponent {
   }
 
   ngOnDestroy() {
-    clearSubscriptions(this.subs);
+    clearSubscriptions(this.subs$);
   }
 }

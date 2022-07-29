@@ -22,6 +22,8 @@ import { PreviousIconComponent } from './paginate/prev-icon.component';
 import { SearchIconComponent } from './search/search-icon.component';
 import { SpecialityIconComponent } from './speciality/speciality-icon.component';
 import { SpinnerIconComponent } from './spinner/spinner-icon.component';
+import { ActiveStatusIconComponent } from './status/active-status-icon.component';
+import { InActiveStatusIconComponent } from './status/inactive-status-icon.component';
 import { UserRoundedIconComponent } from './user-rounded/user-rounded.component';
 import { UserIconComponent } from './user/user-icon.component';
 
@@ -52,6 +54,8 @@ import { UserIconComponent } from './user/user-icon.component';
     SearchIconComponent,
     CloseIconComponent,
     ImageIconComponent,
+    ActiveStatusIconComponent,
+    InActiveStatusIconComponent,
   ],
   exports: [
     MailIconComponent,
@@ -78,6 +82,8 @@ import { UserIconComponent } from './user/user-icon.component';
     SearchIconComponent,
     CloseIconComponent,
     ImageIconComponent,
+    ActiveStatusIconComponent,
+    InActiveStatusIconComponent,
   ],
 })
 export class IconsModule {}

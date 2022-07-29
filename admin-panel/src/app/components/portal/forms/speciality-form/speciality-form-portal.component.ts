@@ -158,5 +158,6 @@ export class SpecialityFormPortalComponent {
 
   ngOnDestroy() {
     clearSubscriptions(this.subs$);
+    this.overlayRef?.dispose();
   }
 }

@@ -11,6 +11,8 @@ import {
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { clearSubscriptions } from 'src/app/utils/helpers';
 
 @Component({
   selector: 'app-user-options-dropdown',
@@ -34,6 +36,9 @@ import {
   ],
 })
 export class UserOptionsDropdownComponent {
+  // Subs
+  private subs$: Subscription[] = [];
+
   // Props
   @Input() position: DOMRect | null = null;
   @Input() showDropdown = false;
@@ -63,24 +68,25 @@ export class UserOptionsDropdownComponent {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes?.['showDropdown'].currentValue) {
+    if (changes?.['showDropdown']?.currentValue) {
       this.updatePosition();
       this.overlayRef?.attach(
         new TemplatePortal(this.dropdownRef!, this.viewContainerRef)
       );
-    } else if (changes?.['showDropdown'].currentValue === false) {
+    } else if (!changes?.['showDropdown']?.currentValue) {
       this.overlayRef?.detach();
     }
   }
 
   private updatePosition() {
     this.domPosition = {
-      left: `${(this.position?.left || 0) + 15}px`,
-      top: `${(this.position?.top || 0) + 55}px`,
+      left: `${this.position?.left || 0}px`,
+      top: `${(this.position?.top || 0) + (this.position?.height || 0) + 15}px`,
     };
   }
 
   onCloseCallback() {
     this.onClose.emit(true);
+    clearSubscriptions(this.subs$);
   }
 }

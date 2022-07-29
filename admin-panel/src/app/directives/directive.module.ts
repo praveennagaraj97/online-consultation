@@ -4,6 +4,7 @@ import { ClickOutsideDirective } from './click-outside.directive';
 import { IntersectionObserverDirective } from './intersection-observe.directive';
 import { PortalBackdropClickDirective } from './portal-backdrop-click.directive';
 import { ScrollIntoViewDirective } from './scroll-into-view.directive';
+import { StopPropagationDirective } from './stop-propagation.directive';
 
 @NgModule({
   declarations: [
@@ -12,6 +13,7 @@ import { ScrollIntoViewDirective } from './scroll-into-view.directive';
     ScrollIntoViewDirective,
     BlobImageViewerDirective,
     PortalBackdropClickDirective,
+    StopPropagationDirective,
   ],
   exports: [
     ClickOutsideDirective,
@@ -19,6 +21,7 @@ import { ScrollIntoViewDirective } from './scroll-into-view.directive';
     ScrollIntoViewDirective,
     BlobImageViewerDirective,
     PortalBackdropClickDirective,
+    StopPropagationDirective,
   ],
 })
 export class DirectiveModule {}

@@ -154,5 +154,7 @@ export class HospitalFormPortalComponent {
 
   ngOnDestroy() {
     clearSubscriptions(this.subs$);
+
+    this.overlayRef?.dispose();
   }
 }
