@@ -55,7 +55,6 @@ export class ConfirmDialogPortalComponent {
 
     this.overlayRef = this.overlay.create({
       disposeOnNavigation: true,
-      panelClass: 'modal-container',
     });
 
     this.subs$.push(

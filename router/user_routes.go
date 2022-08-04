@@ -30,6 +30,7 @@ func (r *Router) userRoutes() {
 	authRoutes.GET("/verify_email/:token", userAPI.ConfirmEmail())
 	authRoutes.POST("/check_email_taken", userAPI.CheckUserExistsByEmail())
 	authRoutes.POST("/check_phone_taken", userAPI.CheckUserExistsByPhoneNumber())
+	authRoutes.GET("/resend_verification_code/:id", userAPI.ResendVerificationCode())
 
 	authRoutes.GET("/refresh_token", r.middlewares.IsAuthorized(), r.middlewares.UserRole([]constants.UserType{constants.USER}), userAPI.RefreshToken())
 	authRoutes.GET("/logout", r.middlewares.IsAuthorized(), r.middlewares.UserRole([]constants.UserType{constants.USER}), userAPI.Logout())

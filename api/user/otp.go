@@ -158,3 +158,68 @@ func (a *UserAPI) VerifyCode() gin.HandlerFunc {
 
 	}
 }
+
+// Resend verification code once code is expired
+func (a *UserAPI) ResendVerificationCode() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		// Verification ID
+		vId, exists := ctx.Params.Get("id")
+		if !exists {
+			api.SendErrorResponse(ctx, "Verification Id is required", http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		objectId, phone, err := utils.DecodeVerificationID(vId)
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+		}
+
+		data, err := a.otpRepo.FindById(objectId)
+		if err != nil {
+			api.SendErrorResponse(ctx, "Couldn't find any matching reference with given verification ID", http.StatusNotFound, nil)
+			return
+		}
+
+		if data.ExpiryTime > primitive.NewDateTimeFromTime(time.Now()) {
+			api.SendErrorResponse(ctx, "Verification is not expired", http.StatusNotAcceptable, nil)
+			return
+		}
+
+		// Delete the reference
+		if err := a.otpRepo.DeleteById(objectId); err != nil {
+			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, &map[string]string{
+				"reason": err.Error(),
+			})
+			return
+		}
+
+		// Generate OTP
+		verifyCode := utils.GenerateRandomCode(6)
+
+		res, err := a.otpRepo.CreateOne(phone, &verifyCode)
+
+		if err != nil {
+			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, nil)
+			return
+		}
+
+		// Send OTP
+		if err := twiliopkg.SendMessage(&interfaces.SMSType{
+			Message: fmt.Sprintf("%s is your verification code for Online Consultation", verifyCode),
+			To:      fmt.Sprintf("%s%s", phone.Code, phone.Number),
+		}); err != nil {
+			log.Default().Println(err.Error())
+			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, nil)
+			return
+		}
+
+		ctx.JSON(http.StatusCreated, serialize.DataResponse[*otpmodel.OneTimePasswordEntity]{
+			Data: res,
+			Response: serialize.Response{
+				StatusCode: http.StatusCreated,
+				Message:    "A text with verification code has been sent to your mobile number",
+			},
+		})
+
+	}
+}
