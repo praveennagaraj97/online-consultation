@@ -110,8 +110,14 @@ func encodeKeySetPaginationID(count uint64, paginateId *primitive.ObjectID, page
 	if paginateId == nil {
 		return nil
 	}
-	paginateString := fmt.Sprintf("nextId=%s&count=%d&pageNum=%d&cursor=%s", paginateId.Hex(), count, pageNum, cursorRef)
-	encryptedID := base64.StdEncoding.EncodeToString([]byte(paginateString))
+
+	params := url.Values{}
+	params.Add("nextId", paginateId.Hex())
+	params.Add("count", fmt.Sprintf("%v", count))
+	params.Add("pageNum", fmt.Sprintf("%v", pageNum))
+	params.Add("cursor", cursorRef)
+
+	encryptedID := base64.StdEncoding.EncodeToString([]byte(params.Encode()))
 
 	return &encryptedID
 }

@@ -8,7 +8,6 @@ import (
 	"math/rand"
 	"net/http"
 	"net/url"
-	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -87,7 +86,7 @@ func DecodeVerificationID(verification_query_str string) (*primitive.ObjectID, *
 	}
 
 	phone := interfaces.PhoneType{
-		Code:   strings.Replace("+"+parsedQuery.Get("phone_code"), " ", "", 1),
+		Code:   parsedQuery.Get("phone_code"),
 		Number: parsedQuery.Get("phone_number"),
 	}
 

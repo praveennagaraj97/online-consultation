@@ -2,7 +2,7 @@ package otpmodel
 
 import (
 	"encoding/base64"
-	"fmt"
+	"net/url"
 	"time"
 
 	"github.com/praveennagaraj97/online-consultation/interfaces"
@@ -31,11 +31,13 @@ func (otp *OneTimePasswordEntity) Init(verifyCode *string, phoneNumber *interfac
 	}
 
 	otp.VerifyCode = string(encryptedCode)
-	otp.VerificationID = base64.StdEncoding.
-		EncodeToString([]byte(fmt.Sprintf("_id=%s&phone_code=%s&phone_number=%s",
-			otp.ID.Hex(),
-			phoneNumber.Code,
-			phoneNumber.Number)))
+
+	params := url.Values{}
+	params.Add("_id", otp.ID.Hex())
+	params.Add("phone_code", phoneNumber.Code)
+	params.Add("phone_number", phoneNumber.Number)
+
+	otp.VerificationID = base64.StdEncoding.EncodeToString([]byte(params.Encode()))
 
 	otp.Attempts = 0
 	otp.ExpiryTime = primitive.NewDateTimeFromTime(time.Now().Add(time.Minute * 1))
