@@ -32,7 +32,7 @@ func (r *Router) userRoutes() {
 	authRoutes.POST("/check_phone_taken", userAPI.CheckUserExistsByPhoneNumber())
 	authRoutes.GET("/resend_verification_code/:id", userAPI.ResendVerificationCode())
 
-	authRoutes.GET("/refresh_token", r.middlewares.IsAuthorized(), r.middlewares.UserRole([]constants.UserType{constants.USER}), userAPI.RefreshToken())
+	authRoutes.GET("/refresh_token", userAPI.RefreshToken())
 	authRoutes.GET("/logout", r.middlewares.IsAuthorized(), r.middlewares.UserRole([]constants.UserType{constants.USER}), userAPI.Logout())
 
 	userRoutes.Use(r.middlewares.IsAuthorized(), r.middlewares.UserRole([]constants.UserType{constants.USER}))

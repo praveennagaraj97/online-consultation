@@ -8,7 +8,8 @@ import (
 )
 
 var trustedDomains map[string]bool = map[string]bool{
-	"https://online-consultation.vercel.app": true,
+	"https://online-consultation.vercel.app":  true,
+	"https://get-med-go-user-web.vercel.app/": true,
 }
 
 var allowedHeaders = []string{
@@ -22,6 +23,7 @@ var allowedHeaders = []string{
 	"Accept",
 	"Time-Zone",
 	"Content-Type",
+	"Authorization",
 }
 
 func (m *Middlewares) CORSMiddleware() gin.HandlerFunc {
