@@ -28,7 +28,7 @@ var allowedHeaders = []string{
 
 func (m *Middlewares) CORSMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE, OPTIONS, PUT")
 		c.Writer.Header().Set("Access-Control-Allow-Headers", strings.Join(allowedHeaders, ","))
 
 		origin := c.Request.Header.Get("Origin")
