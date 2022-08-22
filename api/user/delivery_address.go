@@ -97,7 +97,7 @@ func (a *UserAPI) GetAllAddress() gin.HandlerFunc {
 			Next:             next,
 			Prev:             prev,
 			PaginateKeySetID: paginateKeySetID,
-			DataResponse: serialize.DataResponse[[]usermodel.UserDeliveryAddressEntity]{
+			PaginatedData: serialize.PaginatedData[[]usermodel.UserDeliveryAddressEntity]{
 				Data: res,
 				Response: serialize.Response{
 					StatusCode: http.StatusOK,

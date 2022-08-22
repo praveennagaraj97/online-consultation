@@ -15,12 +15,17 @@ type DataResponse[T interface{}] struct {
 	Response
 }
 
+type PaginatedData[T interface{}] struct {
+	Data T `json:"results"`
+	Response
+}
+
 type PaginatedDataResponse[T interface{}] struct {
 	Count            *uint64 `json:"count"`
 	Next             *bool   `json:"next"`
 	Prev             *bool   `json:"prev"`
 	PaginateKeySetID *string `json:"paginate_id"`
-	DataResponse[T]
+	PaginatedData[T]
 }
 
 type InvalidVerificationCodeErrorResponse struct {

@@ -132,7 +132,7 @@ func (a *UserAPI) GetListOfRelatives() gin.HandlerFunc {
 			Next:             next,
 			Prev:             prev,
 			PaginateKeySetID: paginateKeySetID,
-			DataResponse: serialize.DataResponse[[]usermodel.RelativeEntity]{
+			PaginatedData: serialize.PaginatedData[[]usermodel.RelativeEntity]{
 				Data: res,
 				Response: serialize.Response{
 					StatusCode: http.StatusOK,

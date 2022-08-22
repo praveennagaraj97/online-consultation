@@ -136,7 +136,7 @@ func (a *ConsultationAPI) GetAll() gin.HandlerFunc {
 			Next:             next,
 			Prev:             prev,
 			PaginateKeySetID: paginateKeySetID,
-			DataResponse: serialize.DataResponse[[]consultationmodel.ConsultationEntity]{
+			PaginatedData: serialize.PaginatedData[[]consultationmodel.ConsultationEntity]{
 				Data: res,
 				Response: serialize.Response{
 					StatusCode: http.StatusOK,

@@ -209,7 +209,7 @@ func (a *HospitalAPI) GetAllHospitals() gin.HandlerFunc {
 			Next:             next,
 			Prev:             prev,
 			PaginateKeySetID: paginateKeySetID,
-			DataResponse: serialize.DataResponse[[]hospitalmodel.HospitalEntity]{
+			PaginatedData: serialize.PaginatedData[[]hospitalmodel.HospitalEntity]{
 				Data: res,
 				Response: serialize.Response{
 					StatusCode: http.StatusOK,

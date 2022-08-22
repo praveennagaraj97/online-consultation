@@ -104,7 +104,7 @@ func (a *LanguageAPI) GetAllLanguages() gin.HandlerFunc {
 			Next:             next,
 			Prev:             prev,
 			PaginateKeySetID: paginateKeySetID,
-			DataResponse: serialize.DataResponse[[]languagesmodel.LanguageEntity]{
+			PaginatedData: serialize.PaginatedData[[]languagesmodel.LanguageEntity]{
 				Data: res,
 				Response: serialize.Response{
 					StatusCode: http.StatusOK,

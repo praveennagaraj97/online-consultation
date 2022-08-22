@@ -313,7 +313,7 @@ func (a *DoctorAPI) GetAllSlotSets() gin.HandlerFunc {
 			Next:             next,
 			Prev:             prev,
 			PaginateKeySetID: paginateKeySetID,
-			DataResponse: serialize.DataResponse[[]doctormodel.AppointmentSlotSetEntity]{
+			PaginatedData: serialize.PaginatedData[[]doctormodel.AppointmentSlotSetEntity]{
 				Data: res,
 				Response: serialize.Response{
 					StatusCode: http.StatusOK,

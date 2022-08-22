@@ -329,7 +329,7 @@ func (a *SpecialityAPI) GetAll() gin.HandlerFunc {
 			Next:             next,
 			Prev:             prev,
 			PaginateKeySetID: paginateKeySetID,
-			DataResponse: serialize.DataResponse[[]specialitymodel.SpecialityEntity]{
+			PaginatedData: serialize.PaginatedData[[]specialitymodel.SpecialityEntity]{
 				Data: res,
 				Response: serialize.Response{
 					StatusCode: http.StatusOK,

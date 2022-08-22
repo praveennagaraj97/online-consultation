@@ -315,7 +315,7 @@ func (a *DoctorAPI) FindAllDoctors(showInActive bool) gin.HandlerFunc {
 			Next:             next,
 			Prev:             prev,
 			PaginateKeySetID: paginateKeySetID,
-			DataResponse: serialize.DataResponse[[]doctormodel.DoctorEntity]{
+			PaginatedData: serialize.PaginatedData[[]doctormodel.DoctorEntity]{
 				Data: res,
 				Response: serialize.Response{
 					StatusCode: http.StatusOK,
