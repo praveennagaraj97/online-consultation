@@ -49,8 +49,8 @@ export class AddDoctorService {
           if (shouldReset) {
             this.hospitals = [];
           }
-          if (res.result) {
-            this.hospitals = [...this.hospitals, ...res.result];
+          if (res.results) {
+            this.hospitals = [...this.hospitals, ...res.results];
           }
 
           const hospitals: SelectOption[] =
@@ -77,7 +77,7 @@ export class AddDoctorService {
       )
       .pipe(
         map((res) => {
-          return res.result?.map((type) => ({
+          return res.results?.map((type) => ({
             title: type.type,
             value: type.id,
           }));
@@ -110,8 +110,8 @@ export class AddDoctorService {
           if (shouldReset) {
             this.specialities = [];
           }
-          if (res.result) {
-            this.specialities = [...this.specialities, ...res.result];
+          if (res.results) {
+            this.specialities = [...this.specialities, ...res.results];
           }
 
           const specialities: SelectOption[] =
@@ -156,8 +156,8 @@ export class AddDoctorService {
             this.languages = [];
           }
 
-          if (res.result) {
-            this.languages = [...this.languages, ...res.result];
+          if (res.results) {
+            this.languages = [...this.languages, ...res.results];
           }
 
           const langauges: SelectOption[] =

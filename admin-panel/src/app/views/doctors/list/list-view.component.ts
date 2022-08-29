@@ -75,7 +75,7 @@ export class DoctorsListViewComponent {
         .subscribe({
           next: (res) => {
             this.isLoading = false;
-            this.doctors = res.result || [];
+            this.doctors = res.results || [];
             this.totalCount = res.count;
             this.paginateId = res.paginate_id || '';
           },

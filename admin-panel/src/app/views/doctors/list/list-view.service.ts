@@ -66,7 +66,7 @@ export class DoctorsListViewService {
       .pipe(
         map((res) => {
           const data =
-            res.result?.map((res) => ({
+            res.results?.map((res) => ({
               title: res.title,
               value: res.id,
             })) || [];
@@ -84,7 +84,7 @@ export class DoctorsListViewService {
       .pipe(
         map((res) => {
           const data =
-            res.result?.map((res) => ({
+            res.results?.map((res) => ({
               title: res.type,
               value: res.id,
             })) || [];
