@@ -52,7 +52,7 @@ func (r *ConsultationRepository) CheckIfConsultationTypeExists(consultationType 
 
 func (r *ConsultationRepository) FindAll(
 	pgnOpt *api.PaginationOptions,
-	sortOpts *map[string]int8,
+	sortOpts *bson.D,
 	filterOpts *map[string]primitive.M,
 	keySetSortby string,
 ) ([]consultationmodel.ConsultationEntity, error) {

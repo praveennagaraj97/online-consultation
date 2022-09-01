@@ -248,17 +248,27 @@ func (r *DoctorRepository) UpdateDoctorStatus(id *primitive.ObjectID, state bool
 
 func (r *DoctorRepository) FindAll(pgOpts *api.PaginationOptions,
 	fltrOpts *map[string]primitive.M,
-	srtOpts *map[string]int8,
+	srtOpts *bson.D,
 	keySortBy string,
 	showInActive bool,
 	slotsExistsOn *primitive.DateTime,
 	populateNextAvailable bool,
 ) ([]doctormodel.DoctorEntity, error) {
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*20)
 	defer cancel()
 
 	pipeline := mongo.Pipeline{}
+
+	// Filter Options
+	if len(*fltrOpts) != 0 {
+		fltr := bson.D{{Key: "$match", Value: *fltrOpts}}
+		pipeline = append(pipeline, fltr)
+	}
+
+	if !showInActive {
+		pipeline = append(pipeline, bson.D{{Key: "$match", Value: bson.M{"is_active": true}}})
+	}
 
 	// Filter Doctor By Appointment Slot Availability
 	if slotsExistsOn != nil {
@@ -293,16 +303,6 @@ func (r *DoctorRepository) FindAll(pgOpts *api.PaginationOptions,
 		pipeline = append(pipeline, apptAvailLookup, apptAvailMatch, apptAvailAdddFields)
 	}
 
-	// Filter Options
-	if len(*fltrOpts) != 0 {
-		fltr := bson.D{{Key: "$match", Value: *fltrOpts}}
-		pipeline = append(pipeline, fltr)
-	}
-
-	if !showInActive {
-		pipeline = append(pipeline, bson.D{{Key: "$match", Value: bson.M{"is_active": true}}})
-	}
-
 	if slotsExistsOn == nil && populateNextAvailable {
 		// Next Available Slot
 		nextAvailableLookUp := bson.D{{Key: "$lookup", Value: bson.M{
@@ -329,10 +329,6 @@ func (r *DoctorRepository) FindAll(pgOpts *api.PaginationOptions,
 
 	pipeline = append(pipeline, unwindNextAvailableSlot)
 
-	// Sort Options
-	sortBy := bson.D{{Key: "$sort", Value: *srtOpts}}
-	pipeline = append(pipeline, sortBy)
-
 	// Pagination Options
 	if pgOpts.PaginateId != nil {
 		filter := bson.D{{Key: "$match", Value: bson.M{"_id": bson.M{keySortBy: pgOpts.PaginateId}}}}
@@ -341,6 +337,10 @@ func (r *DoctorRepository) FindAll(pgOpts *api.PaginationOptions,
 		skip := bson.D{{Key: "$skip", Value: (pgOpts.PerPage * (pgOpts.PageNum - 1))}}
 		pipeline = append(pipeline, skip)
 	}
+
+	// Sort Options
+	sortBy := bson.D{{Key: "$sort", Value: *srtOpts}}
+	pipeline = append(pipeline, sortBy)
 
 	// Limit
 	limit := bson.D{{Key: "$limit", Value: pgOpts.PerPage}}
@@ -388,6 +388,7 @@ func (r *DoctorRepository) FindAll(pgOpts *api.PaginationOptions,
 			{Key: "else", Value: "$profile_pic"},
 		}},
 	}}}
+
 	pipeline = append(pipeline, setImagePrefixPipe, setBlurImagePrefixPipe, resetNullImagePipe)
 
 	cur, err := r.colln.Aggregate(ctx, pipeline)

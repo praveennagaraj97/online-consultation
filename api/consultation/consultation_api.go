@@ -13,6 +13,7 @@ import (
 	awspkg "github.com/praveennagaraj97/online-consultation/pkg/aws"
 	consultationrepository "github.com/praveennagaraj97/online-consultation/repository/consultation"
 	"github.com/praveennagaraj97/online-consultation/serialize"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -101,7 +102,7 @@ func (a *ConsultationAPI) GetAll() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		// get pagination/sort/filter options.
 		pgOpts := api.ParsePaginationOptions(ctx, "consultation_type")
-		srtOpts := map[string]int8{"_id": -1}
+		srtOpts := bson.D{{Key: "_id", Value: -1}}
 		filterOpts := api.ParseFilterByOptions(ctx)
 		keySetSortby := "$lt"
 

@@ -20,6 +20,7 @@ import (
 	doctorrepo "github.com/praveennagaraj97/online-consultation/repository/doctor"
 	onetimepasswordrepository "github.com/praveennagaraj97/online-consultation/repository/onetimepassword"
 	"github.com/praveennagaraj97/online-consultation/serialize"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -244,7 +245,7 @@ func (a *DoctorAPI) FindAllDoctors(showInActive bool) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
 		pgOpts := api.ParsePaginationOptions(ctx, "doctors")
-		sortOpts := map[string]int8{}
+		sortOpts := bson.D{}
 		fltrOpts := api.ParseFilterByOptions(ctx)
 		ketSortBy := "$lt"
 
@@ -274,10 +275,13 @@ func (a *DoctorAPI) FindAllDoctors(showInActive bool) gin.HandlerFunc {
 		// Sort By Availability
 		sortByAvailability, _ := strconv.ParseBool(ctx.Query("next_available_slot"))
 		if sortByAvailability && populateNextAvailable {
-			sortOpts["next_available_slot.is_available"] = -1
-			sortOpts["next_available_slot.start"] = 1
+			sortOpts = bson.D{
+				{Key: "next_available_slot.is_available", Value: -1},
+				{Key: "next_available_slot.start", Value: 1},
+				{Key: "_id", Value: -1}}
+		} else {
+			sortOpts = bson.D{{Key: "_id", Value: -1}}
 		}
-		sortOpts["_id"] = -1
 
 		res, err := a.repo.FindAll(pgOpts, fltrOpts, &sortOpts, ketSortBy,
 			showInActive, slotsExistsOn, populateNextAvailable)
