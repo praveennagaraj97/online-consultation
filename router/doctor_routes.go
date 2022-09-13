@@ -40,7 +40,7 @@ func (r *Router) doctorRoutes() {
 	routes.GET("/slot_sets", api.GetAllSlotSets())
 	routes.POST("/slot_set", api.AddNewSlotSet())
 	routes.GET("/slot_set/:id", api.GetSlotSetById())
-	routes.PATCH("/slot_set/:id", api.UpdateSlotSetById())
+	routes.PUT("/slot_set/:id", api.UpdateSlotSetById())
 	routes.DELETE("/slot_set/:id", api.DeleteSlotById())
 
 	// Auth Routes
