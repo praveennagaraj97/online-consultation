@@ -174,3 +174,30 @@ func (a *AppointmentSlotsAPI) GetAppointmentSlotsByDocIdAndDate() gin.HandlerFun
 
 	}
 }
+
+func (a *AppointmentSlotsAPI) GetAppointmentSlotDetailsById() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		slotId := ctx.Param("id")
+
+		objectId, err := primitive.ObjectIDFromHex(slotId)
+		if err != nil {
+			api.SendErrorResponse(ctx, "Provided slot Id is not valid", http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		res, err := a.repo.FindById(&objectId)
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusNotFound, nil)
+			return
+		}
+
+		ctx.JSON(http.StatusOK, serialize.DataResponse[appointmentslotmodel.AppointmentSlotEntity]{
+			Data: *res,
+			Response: serialize.Response{
+				StatusCode: http.StatusOK,
+				Message:    "Appointment slot details retrieved successfully",
+			},
+		})
+
+	}
+}
