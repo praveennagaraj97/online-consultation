@@ -23,6 +23,7 @@ func (a *AdditionalAPI) Initailize(appConf *app.ApplicationConfig) {
 	a.appConf = appConf
 }
 
+// Check Auth Token Status without database comparison.
 func (a *AdditionalAPI) CheckJWTStatus() gin.HandlerFunc {
 	return func(c *gin.Context) {
 

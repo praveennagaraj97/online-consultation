@@ -10,13 +10,13 @@ import (
 )
 
 type AddConsultationDTO struct {
-	Title       string  `json:"title" form:"title"`
-	Description string  `json:"description" form:"description"`
-	Price       float64 `json:"price" form:"price"`
-	ActionName  string  `json:"action_name" form:"action_name"`
-	Type        string  `json:"type" form:"type"`
-	IconWidth   uint64  `json:"icon_width" form:"icon_width"`
-	IconHeight  uint64  `json:"icon_height" form:"icon_height"`
+	Title       string                             `json:"title" form:"title"`
+	Description string                             `json:"description" form:"description"`
+	Price       float64                            `json:"price" form:"price"`
+	ActionName  string                             `json:"action_name" form:"action_name"`
+	Type        consultationmodel.ConsultationType `json:"type" form:"type"`
+	IconWidth   uint64                             `json:"icon_width" form:"icon_width"`
+	IconHeight  uint64                             `json:"icon_height" form:"icon_height"`
 }
 
 func (a *AddConsultationDTO) ValidateAddConsultationDTO() *serialize.ErrorResponse {

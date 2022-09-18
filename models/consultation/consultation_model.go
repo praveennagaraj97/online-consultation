@@ -8,8 +8,8 @@ import (
 type ConsultationType string
 
 const (
-	Instant  = "Instant"
-	Schedule = "Schedule"
+	Instant  ConsultationType = "Instant"
+	Schedule ConsultationType = "Schedule"
 )
 
 type ConsultationEntity struct {
@@ -19,5 +19,5 @@ type ConsultationEntity struct {
 	Description string                `json:"description" bson:"description"`
 	Price       float64               `json:"price" bson:"price"`
 	ActionName  string                `json:"action_name" bson:"action_name"`
-	Type        string                `json:"type" bson:"type"`
+	Type        ConsultationType      `json:"type" bson:"type"`
 }

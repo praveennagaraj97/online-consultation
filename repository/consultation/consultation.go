@@ -38,7 +38,7 @@ func (r *ConsultationRepository) CreateOne(payload *consultationmodel.Consultati
 	return nil
 }
 
-func (r *ConsultationRepository) CheckIfConsultationTypeExists(consultationType string) bool {
+func (r *ConsultationRepository) CheckIfConsultationTypeExists(consultationType consultationmodel.ConsultationType) bool {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 

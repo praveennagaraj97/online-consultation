@@ -46,6 +46,7 @@ func (router *Router) ListenAndServe(conf *app.ApplicationConfig) {
 	router.appointmentSlotsRoutes()
 	router.appointmentRoutes()
 	router.additionalRoutes()
+	router.discountCouponRoutes()
 
 	// 404
 	r.Use(func(ctx *gin.Context) {

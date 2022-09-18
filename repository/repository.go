@@ -7,6 +7,7 @@ import (
 	appointmentrepository "github.com/praveennagaraj97/online-consultation/repository/appointment"
 	appointmentslotsrepo "github.com/praveennagaraj97/online-consultation/repository/appointment_slots"
 	consultationrepository "github.com/praveennagaraj97/online-consultation/repository/consultation"
+	discountcouponrepository "github.com/praveennagaraj97/online-consultation/repository/discount_coupon"
 	doctorrepo "github.com/praveennagaraj97/online-consultation/repository/doctor"
 	hospitalrepo "github.com/praveennagaraj97/online-consultation/repository/hospital"
 	languagerepo "github.com/praveennagaraj97/online-consultation/repository/language"
@@ -31,6 +32,7 @@ type Repository struct {
 	apptSlotsRepo           *appointmentslotsrepo.AppointmentSlotsRepository
 	apptRepo                *appointmentrepository.AppointmentRepository
 	apptReminderRepo        *appointmentrepository.AppointmentScheduleReminderRepository
+	discountCouponRepo      *discountcouponrepository.DiscountCouponRespository
 }
 
 func (r *Repository) Initialize(mgoClient *mongo.Client, dbName string) {
@@ -91,6 +93,11 @@ func (r *Repository) Initialize(mgoClient *mongo.Client, dbName string) {
 	r.apptReminderRepo = &appointmentrepository.AppointmentScheduleReminderRepository{}
 	r.apptReminderRepo.Initialize(db.OpenCollection(mgoClient, dbName, "appointment_schedule_reminder"))
 
+	// Discount Coupon Repo
+	r.discountCouponRepo = &discountcouponrepository.DiscountCouponRespository{}
+	r.discountCouponRepo.Initialize(db.OpenCollection(mgoClient, dbName, "discount_coupon"),
+		db.OpenCollection(mgoClient, dbName, "discount_offer"))
+
 	logger.PrintLog("Repositories initialized 📜")
 }
 
@@ -148,4 +155,8 @@ func (r *Repository) GetAppointmentRepository() *appointmentrepository.Appointme
 
 func (r *Repository) GetAppointmentScheduleReminderRepository() *appointmentrepository.AppointmentScheduleReminderRepository {
 	return r.apptReminderRepo
+}
+
+func (r *Repository) GetDiscountCouponRepository() *discountcouponrepository.DiscountCouponRespository {
+	return r.discountCouponRepo
 }

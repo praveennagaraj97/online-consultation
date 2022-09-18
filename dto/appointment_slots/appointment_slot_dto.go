@@ -9,7 +9,7 @@ import (
 
 type AddAppointmentSlotDTO struct {
 	Dates       []primitive.DateTime `json:"-" form:"-"`
-	SlotSetId   *primitive.ObjectID  `json:"" form:"-"`
+	SlotSetId   *primitive.ObjectID  `json:"-" form:"-"`
 	Days        uint16               `json:"days" form:"days"`
 	ExcludeDays []string             `json:"exclude_days" form:"exclude_days"`
 

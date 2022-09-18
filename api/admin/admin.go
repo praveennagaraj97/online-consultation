@@ -51,6 +51,7 @@ func (a *AdminAPI) AddNewAdmin(role constants.UserType) gin.HandlerFunc {
 			return
 		}
 
+		// Role is set based on api route
 		payload.Role = role
 
 		user, err := a.adminRepo.CreateOne(&payload)
@@ -69,6 +70,7 @@ func (a *AdminAPI) AddNewAdmin(role constants.UserType) gin.HandlerFunc {
 	}
 }
 
+// Login Admin | Adminstative users with email/username and password
 func (a *AdminAPI) Login() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var payload admindto.LoginDTO
@@ -135,6 +137,7 @@ func (a *AdminAPI) Login() gin.HandlerFunc {
 	}
 }
 
+// Update Password by providing existing password
 func (a *AdminAPI) UpdatePassword() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var payload admindto.UpdatePasswordDTO
@@ -182,6 +185,7 @@ func (a *AdminAPI) UpdatePassword() gin.HandlerFunc {
 	}
 }
 
+// Send Email to reset password.
 func (a *AdminAPI) ForgotPassword() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var payload admindto.ForgotPasswordDTO
@@ -230,6 +234,7 @@ func (a *AdminAPI) ForgotPassword() gin.HandlerFunc {
 	}
 }
 
+// Reset password with token recieved on mail.
 func (a *AdminAPI) ResetPassword() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		token, exists := ctx.Params.Get("token")
@@ -262,6 +267,7 @@ func (a *AdminAPI) ResetPassword() gin.HandlerFunc {
 			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
 			return
 		}
+		defer ctx.Request.Body.Close()
 
 		if err := payload.ValidateResetPasswordDTO(); err != nil {
 			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
@@ -292,6 +298,7 @@ func (a *AdminAPI) ResetPassword() gin.HandlerFunc {
 	}
 }
 
+// Refresh authentication token with valid refresh token.
 func (a *AdminAPI) RefreshToken() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token, refreshToken, err := tokens.GetAccessAndRefreshTokenFromRequest(c)
@@ -365,6 +372,7 @@ func (a *AdminAPI) RefreshToken() gin.HandlerFunc {
 	}
 }
 
+// Delete Admin by admin ID.
 func (a *AdminAPI) DeleteUser() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var payload admindto.AdminIdDTO
@@ -391,6 +399,7 @@ func (a *AdminAPI) DeleteUser() gin.HandlerFunc {
 	}
 }
 
+// Change Role of the adminstative user
 func (a *AdminAPI) ChangeRole() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, map[string]string{
@@ -399,6 +408,7 @@ func (a *AdminAPI) ChangeRole() gin.HandlerFunc {
 	}
 }
 
+// Logout user - Remove cookie from browser and remove refresh token from db.
 func (a *AdminAPI) Logout() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
@@ -425,6 +435,7 @@ func (a *AdminAPI) Logout() gin.HandlerFunc {
 	}
 }
 
+// Get Currently logged in admin details.
 func (a *AdminAPI) GetMe() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
