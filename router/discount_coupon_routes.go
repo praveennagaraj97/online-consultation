@@ -22,5 +22,6 @@ func (r *Router) discountCouponRoutes() {
 		}))
 
 	adminRoutes.POST("/offer", api.CreateNewOffer())
+	adminRoutes.PATCH("/offer/:id", api.UpdateOfferById())
 
 }
