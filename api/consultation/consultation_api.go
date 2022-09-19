@@ -54,6 +54,7 @@ func (a *ConsultationAPI) AddNewConsultationType() gin.HandlerFunc {
 			Price:       payload.Price,
 			ActionName:  payload.ActionName,
 			Type:        payload.Type,
+			Discount:    payload.Discount,
 		}
 
 		var ch chan *awspkg.S3UploadChannelResponse = make(chan *awspkg.S3UploadChannelResponse, 1)
