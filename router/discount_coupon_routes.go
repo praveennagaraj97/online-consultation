@@ -21,7 +21,12 @@ func (r *Router) discountCouponRoutes() {
 			constants.EDITOR,
 		}))
 
-	adminRoutes.POST("/offer", api.CreateNewOffer())
-	adminRoutes.PATCH("/offer/:id", api.UpdateOfferById())
+	offerRoutes := adminRoutes.Group("/offer")
+
+	offerRoutes.POST("", api.CreateNewOffer())
+	offerRoutes.PATCH(":id", api.UpdateOfferById())
+	offerRoutes.GET("", api.GetAllOffers())
+	offerRoutes.GET(":id", api.GetOfferById())
+	offerRoutes.DELETE(":id", api.DeleteOfferById())
 
 }
