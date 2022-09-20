@@ -10,12 +10,13 @@ type PrefillData struct {
 
 // Razor Pay Output
 type RazorPayPaymentOutput struct {
-	OrderId     *string     `json:"order_id"`
-	Prefill     PrefillData `json:"prefill"`
-	Name        string      `json:"name"`
-	Description string      `json:"description"`
-	Amount      uint64      `json:"amount"`
-	Currency    string      `json:"currency"`
+	AppointmentId string      `json:"appointment_id"` // Used for cancellation.
+	OrderId       *string     `json:"order_id"`
+	Prefill       PrefillData `json:"prefill"`
+	Name          string      `json:"name"`
+	Description   string      `json:"description"`
+	Amount        uint64      `json:"amount"`
+	Currency      string      `json:"currency"`
 }
 
 type CreateRazorPayOrder struct {

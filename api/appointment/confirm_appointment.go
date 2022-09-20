@@ -21,6 +21,8 @@ func (a *AppointmentAPI) ConfirmScheduledAppointmentFromWebhook() gin.HandlerFun
 		var body razorpaypayment.RazorPayWebHook
 		ctx.ShouldBind(&body)
 
+		defer ctx.Request.Body.Close()
+
 		switch body.Payload.Payment.Entity.Status {
 		//  Handle Captured Event
 		case "captured":
@@ -51,9 +53,18 @@ func (a *AppointmentAPI) ConfirmScheduledAppointmentFromWebhook() gin.HandlerFun
 	}
 }
 
-func (a *AppointmentAPI) confirmScheduledAppointment(ctx *gin.Context, details *razorpaypayment.RazorPayOrderDetails) {
+func (a *AppointmentAPI) confirmScheduledAppointment(
+	ctx *gin.Context,
+	details *razorpaypayment.RazorPayOrderDetails) {
 
-	var refId string = details.Notes.RefID
+	timeZone := ctx.Request.Header.Get(constants.TimeZoneHeaderKey)
+
+	timeLoc, err := time.LoadLocation(timeZone)
+	if err != nil {
+		timeLoc = time.FixedZone("IST", 0)
+	}
+
+	var refId = details.Notes.RefID
 
 	appointmentSlotId, err := primitive.ObjectIDFromHex(refId)
 	if err != nil {
@@ -72,8 +83,8 @@ func (a *AppointmentAPI) confirmScheduledAppointment(ctx *gin.Context, details *
 		return
 	}
 
-	// If payment status has changed return
-	if apptRes.Status != appointmentmodel.Pending {
+	// If payment status has changed by webhook or cancelled by browser close.
+	if apptRes.Status != appointmentmodel.Pending && apptRes.Status != appointmentmodel.Cancelled {
 		ctx.JSON(http.StatusOK, serialize.Response{
 			StatusCode: http.StatusOK,
 			Message:    "Appointment slot has been booked successfully",
@@ -135,8 +146,8 @@ func (a *AppointmentAPI) confirmScheduledAppointment(ctx *gin.Context, details *
 		}
 	}
 
-	// var ch chan bool = make(chan bool, 1)
-	// go a.sendEmailAndSMSForBooking(ch, apptRes.UserId, apptSheduleDoc.InvokeTime.Time())
+	var ch chan bool = make(chan bool, 1)
+	go a.sendEmailAndSMSForBooking(ch, apptRes.UserId, apptSheduleDoc.InvokeTime.Time(), timeLoc)
 
 	ctx.JSON(http.StatusOK, serialize.Response{
 		StatusCode: http.StatusOK,

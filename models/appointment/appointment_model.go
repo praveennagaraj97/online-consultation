@@ -23,5 +23,5 @@ type AppointmentEntity struct {
 	AppointmentSlot *primitive.ObjectID `json:"appointment_slot" bson:"appointment_slot"`
 	BookedDate      primitive.DateTime  `json:"booked_date" bson:"booked_date"`
 	Status          AppointmentStatus   `json:"status" bson:"status"`
-	// Payment          primitive.ObjectID                 `json:"payment" bson:"payment"`
+	RelativeId      *primitive.ObjectID `json:"relative_id" bson:"relative_id"`
 }

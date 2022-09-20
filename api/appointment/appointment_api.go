@@ -53,7 +53,7 @@ func (a *AppointmentAPI) Initialize(conf *app.ApplicationConfig,
 }
 
 // Takes input and create payment intent
-func (a *AppointmentAPI) BookAnScheduledAppointment() gin.HandlerFunc {
+func (a *AppointmentAPI) BookScheduledAppointment() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		userId, err := api.GetUserIdFromContext(ctx)
 		if err != nil {
@@ -102,6 +102,14 @@ func (a *AppointmentAPI) BookAnScheduledAppointment() gin.HandlerFunc {
 			return
 		}
 
+		// Check if relative belongs to user booking.
+		if payload.RelativeId != nil {
+			if _, err := a.rltvRepo.FindById(userId, payload.RelativeId); err != nil {
+				api.SendErrorResponse(ctx, "Provided relative ID is not valid", http.StatusUnprocessableEntity, nil)
+				return
+			}
+		}
+
 		doc := appointmentmodel.AppointmentEntity{
 			ID:              primitive.NewObjectID(),
 			DoctorId:        apptSlotRes.DoctorId,
@@ -111,6 +119,7 @@ func (a *AppointmentAPI) BookAnScheduledAppointment() gin.HandlerFunc {
 			AppointmentSlot: payload.AppointmentSlotId,
 			BookedDate:      primitive.NewDateTimeFromTime(time.Now()),
 			Status:          appointmentmodel.Pending,
+			RelativeId:      payload.RelativeId,
 		}
 
 		if err != nil {
@@ -129,6 +138,7 @@ func (a *AppointmentAPI) BookAnScheduledAppointment() gin.HandlerFunc {
 			return
 		}
 
+		// Create appointment booking history for user.
 		if err := a.apptRepo.Create(&doc); err != nil {
 			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, &map[string]string{
 				"reason": err.Error(),
@@ -145,8 +155,10 @@ func (a *AppointmentAPI) BookAnScheduledAppointment() gin.HandlerFunc {
 			return
 		}
 
+		// Discount Check
+
 		orderData := razorpaypayment.CreateRazorPayOrder{
-			Amount:         uint64(consRes.Price),
+			Amount:         uint64(consRes.Price - consRes.Discount),
 			Currency:       "INR",
 			Receipt:        doc.ID.Hex(),
 			PartialPayment: false,
@@ -175,22 +187,84 @@ func (a *AppointmentAPI) BookAnScheduledAppointment() gin.HandlerFunc {
 
 		ctx.JSON(http.StatusCreated, serialize.DataResponse[*razorpaypayment.RazorPayPaymentOutput]{
 			Data: &razorpaypayment.RazorPayPaymentOutput{
-				Amount:   orderData.Amount,
-				Currency: orderData.Currency,
-				OrderId:  orderId,
+				AppointmentId: doc.ID.Hex(),
+				Amount:        orderData.Amount,
+				Currency:      orderData.Currency,
+				OrderId:       orderId,
 				Prefill: razorpaypayment.PrefillData{
 					Name:    userRes.Name,
 					Email:   userRes.Email,
 					Contact: fmt.Sprintf("%s %s", userRes.PhoneNumber.Code, userRes.PhoneNumber.Number),
 				},
 				Name:        "Online Consultation | Schedule Booking",
-				Description: fmt.Sprintf("Pay Rs. %.2f for your appointment booking", consRes.Price),
+				Description: fmt.Sprintf("Pay Rs. %.2f for your appointment booking", float64(orderData.Amount)),
 			},
 			Response: serialize.Response{
 				StatusCode: http.StatusCreated,
 				Message:    "Appointment slot has been blocked, pay to confirm the slot",
 			},
 		})
+
+	}
+}
+
+// Called from frontend - by default invoked by webhook. - Just a fallback api if webhook fails or delays.
+func (a *AppointmentAPI) ConfirmScheduledAppointmentPaymentIntent() gin.HandlerFunc {
+	return func(ctx *gin.Context) {}
+}
+
+// Release blocked slot if user cancels payment or leaves the browser (Recieved as beacon)
+func (a *AppointmentAPI) CancelApponintmentBooking() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+
+		userId, err := api.GetUserIdFromContext(ctx)
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusBadRequest, nil)
+			return
+		}
+
+		id := ctx.Param("id")
+
+		apptId, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		// get Appointment details.
+		apptRes, err := a.apptRepo.FindByIdAndUserId(&apptId, userId)
+		if err != nil {
+			api.SendErrorResponse(ctx, "Couldn't find any appointment matching", http.StatusNotFound, nil)
+			return
+		}
+
+		if apptRes.Status == appointmentmodel.Cancelled {
+			api.SendErrorResponse(ctx, "Appointment has been already cancelled", http.StatusNotAcceptable, nil)
+			return
+		}
+
+		if apptRes.Status != appointmentmodel.Pending {
+			api.SendErrorResponse(ctx, "This appointment cannot be cancelled", http.StatusNotAcceptable, nil)
+			return
+		}
+
+		// Mark appointent entity as cancelled
+		if err := a.apptRepo.UpdateById(userId, &apptId, appointmentmodel.Cancelled); err != nil {
+			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, &map[string]string{
+				"reason": err.Error(),
+			})
+			return
+		}
+
+		// Release slot for booking
+		if err := a.apptSlotRepo.UpdateSlotAvailability(apptRes.AppointmentSlot, true, ""); err != nil {
+			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, &map[string]string{
+				"reason": err.Error(),
+			})
+			return
+		}
+
+		ctx.JSON(http.StatusNoContent, nil)
 
 	}
 }

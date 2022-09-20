@@ -58,6 +58,24 @@ func (r *AppointmentRepository) FindById(id *primitive.ObjectID) (*appointmentmo
 
 }
 
+func (r *AppointmentRepository) FindByIdAndUserId(id, userId *primitive.ObjectID) (*appointmentmodel.AppointmentEntity, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	res := r.colln.FindOne(ctx, bson.M{"$and": bson.A{bson.M{"_id": id}, bson.M{"user_id": userId}}})
+
+	if res.Err() != nil {
+		return nil, errors.New("couldn't find any appointment details")
+	}
+
+	var result appointmentmodel.AppointmentEntity
+
+	res.Decode(&result)
+
+	return &result, nil
+
+}
+
 func (r *AppointmentRepository) UpdateById(userId, id *primitive.ObjectID, status appointmentmodel.AppointmentStatus) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
