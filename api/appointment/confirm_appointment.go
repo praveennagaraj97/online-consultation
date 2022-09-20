@@ -12,6 +12,7 @@ import (
 	razorpaypayment "github.com/praveennagaraj97/online-consultation/pkg/razorpay"
 	"github.com/praveennagaraj97/online-consultation/pkg/scheduler"
 	"github.com/praveennagaraj97/online-consultation/serialize"
+	"github.com/praveennagaraj97/online-consultation/utils"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -57,11 +58,11 @@ func (a *AppointmentAPI) confirmScheduledAppointment(
 	ctx *gin.Context,
 	details *razorpaypayment.RazorPayOrderDetails) {
 
-	timeZone := ctx.Request.Header.Get(constants.TimeZoneHeaderKey)
+	timeZone := utils.GetTimeZone(ctx)
 
 	timeLoc, err := time.LoadLocation(timeZone)
 	if err != nil {
-		timeLoc = time.FixedZone("IST", 0)
+		timeLoc = time.Now().Local().Location()
 	}
 
 	var refId = details.Notes.RefID
@@ -147,7 +148,7 @@ func (a *AppointmentAPI) confirmScheduledAppointment(
 	}
 
 	var ch chan bool = make(chan bool, 1)
-	go a.sendEmailAndSMSForBooking(ch, apptRes.UserId, apptSheduleDoc.InvokeTime.Time(), timeLoc)
+	go a.sendEmailAndSMSForBooking(ch, apptRes.UserId, appSlotRes.Start.Time(), timeLoc)
 
 	ctx.JSON(http.StatusOK, serialize.Response{
 		StatusCode: http.StatusOK,

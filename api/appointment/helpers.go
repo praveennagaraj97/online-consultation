@@ -11,7 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func (a *AppointmentAPI) sendEmailAndSMSForBooking(ch chan bool, userId *primitive.ObjectID, invokeTime time.Time, timezone *time.Location) {
+func (a *AppointmentAPI) sendEmailAndSMSForBooking(ch chan bool, userId *primitive.ObjectID, apptTime time.Time, timezone *time.Location) {
 	// Get User Details
 	userRes, err := a.userRepo.FindById(userId)
 	if err != nil {
@@ -20,7 +20,8 @@ func (a *AppointmentAPI) sendEmailAndSMSForBooking(ch chan bool, userId *primiti
 		return
 	}
 
-	message := fmt.Sprintf("Your appointment has been scheduled for %s", invokeTime.In(timezone).Format(time.RFC1123))
+	message := fmt.Sprintf("Your appointment has been scheduled on %s",
+		apptTime.In(timezone).Format("Monday, January 2 2006 at 15:04:05 MST -07:00"))
 
 	// Send Confirmation Mail and SMS to user
 	if err := a.conf.EmailClient.SendNoReplyMail([]string{userRes.Email}, message, "appointment", "appointment",
