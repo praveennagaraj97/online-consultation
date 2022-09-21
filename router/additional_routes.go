@@ -14,4 +14,6 @@ func (r *Router) additionalRoutes() {
 	router.GET("/jwt/status", api.CheckJWTStatus())
 	router.StaticFile("/countries.json", "./static/countries.json")
 	router.StaticFile("/states.json", "./static/states.json")
+
+	router.GET("/monitor", api.MonitorServerStatus())
 }

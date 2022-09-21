@@ -2,6 +2,7 @@ package additionalapi
 
 import (
 	"net/http"
+	"runtime/pprof"
 	"strings"
 	"time"
 
@@ -73,5 +74,26 @@ func (a *AdditionalAPI) CheckJWTStatus() gin.HandlerFunc {
 			},
 		})
 
+	}
+}
+
+// Monitor consumed resources
+func (a *AdditionalAPI) MonitorServerStatus() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		p := pprof.Profiles()
+
+		res := map[string]int{}
+
+		for _, value := range p {
+			res[value.Name()] = value.Count()
+		}
+
+		ctx.JSON(http.StatusOK, serialize.DataResponse[map[string]int]{
+			Data: res,
+			Response: serialize.Response{
+				StatusCode: http.StatusOK,
+				Message:    "System profiles retrieved successfully",
+			},
+		})
 	}
 }
