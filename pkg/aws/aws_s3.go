@@ -19,7 +19,7 @@ type S3DeleteObjectAPI interface {
 }
 
 func (a *AWSConfiguration) configS3() {
-	creds := credentials.NewStaticCredentialsProvider(a.options.S3_ACCESS_KEY_ID, a.options.S3_SECRET_ACCESS, "")
+	creds := credentials.NewStaticCredentialsProvider(a.options.AWS_ACCESS_KEY_ID, a.options.AWS_SECRET_ACCESS, "")
 
 	config, err := awsconf.LoadDefaultConfig(context.TODO(), awsconf.WithCredentialsProvider(creds),
 		awsconf.WithRegion(a.options.S3_BUCKET_REGION))
