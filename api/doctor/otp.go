@@ -59,9 +59,7 @@ func (a *DoctorAPI) SendVerificationCode() gin.HandlerFunc {
 		}
 
 		// Send OTP
-
 		if a.appConf.Environment == "production" {
-
 			if err := twiliopkg.SendMessage(&interfaces.SMSType{
 				Message: fmt.Sprintf("%s is your verification code for Online Consultation", verifyCode),
 				To:      fmt.Sprintf("%s%s", payload.Code, payload.Number),

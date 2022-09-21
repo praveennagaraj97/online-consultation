@@ -9,6 +9,7 @@ import (
 	"github.com/praveennagaraj97/online-consultation/api"
 	"github.com/praveennagaraj97/online-consultation/constants"
 	appointmentmodel "github.com/praveennagaraj97/online-consultation/models/appointment"
+	appointmentslotmodel "github.com/praveennagaraj97/online-consultation/models/appointment_slot"
 	razorpaypayment "github.com/praveennagaraj97/online-consultation/pkg/razorpay"
 	"github.com/praveennagaraj97/online-consultation/pkg/scheduler"
 	"github.com/praveennagaraj97/online-consultation/serialize"
@@ -94,7 +95,7 @@ func (a *AppointmentAPI) confirmScheduledAppointment(
 	}
 
 	// Change Slot Booked reason
-	if err := a.apptSlotRepo.UpdateSlotAvailability(apptRes.AppointmentSlot, false, "Booked"); err != nil {
+	if err := a.apptSlotRepo.UpdateSlotAvailability(apptRes.AppointmentSlot, false, appointmentslotmodel.Confirmed); err != nil {
 		api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, &map[string]string{
 			"reason": err.Error(),
 		})

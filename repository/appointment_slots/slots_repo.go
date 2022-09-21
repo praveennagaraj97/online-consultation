@@ -87,7 +87,7 @@ func (r *AppointmentSlotsRepository) FindById(id *primitive.ObjectID) (*appointm
 }
 
 func (r *AppointmentSlotsRepository) FindByDoctorIdAndDate(docId *primitive.ObjectID, date *primitive.DateTime) ([]appointmentslotmodel.AppointmentSlotEntity, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
 	cur, err := r.colln.Find(ctx, bson.M{"$and": bson.A{bson.M{"doctor_id": docId}, bson.M{"date": date}}})
@@ -105,7 +105,9 @@ func (r *AppointmentSlotsRepository) FindByDoctorIdAndDate(docId *primitive.Obje
 	return results, nil
 }
 
-func (r *AppointmentSlotsRepository) UpdateSlotAvailability(id *primitive.ObjectID, isAvailable bool, reason string) error {
+func (r *AppointmentSlotsRepository) UpdateSlotAvailability(id *primitive.ObjectID,
+	isAvailable bool,
+	reason appointmentslotmodel.BookingStatusMessages) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
@@ -113,11 +115,19 @@ func (r *AppointmentSlotsRepository) UpdateSlotAvailability(id *primitive.Object
 		return errors.New("reason cannot be empty")
 	}
 
-	if isAvailable {
-		reason = ""
+	updateDoc := map[string]interface{}{}
+
+	updateDoc["is_available"] = isAvailable
+	updateDoc["reason_of_unavailablity"] = reason
+
+	// Set release time if reason is payment processing
+	if reason == appointmentslotmodel.PaymentProcessing {
+		updateDoc["slot_release_at"] = time.Now().UTC().Add(time.Minute * 5)
+	} else {
+		updateDoc["slot_release_at"] = nil
 	}
 
-	_, err := r.colln.UpdateByID(ctx, id, bson.M{"$set": bson.M{"is_available": isAvailable, "reason_of_unavailablity": reason}})
+	_, err := r.colln.UpdateByID(ctx, id, bson.M{"$set": updateDoc})
 
 	return err
 

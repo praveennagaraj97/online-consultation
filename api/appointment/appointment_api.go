@@ -11,6 +11,7 @@ import (
 	"github.com/praveennagaraj97/online-consultation/constants"
 	appointmentdto "github.com/praveennagaraj97/online-consultation/dto/appointment"
 	appointmentmodel "github.com/praveennagaraj97/online-consultation/models/appointment"
+	appointmentslotmodel "github.com/praveennagaraj97/online-consultation/models/appointment_slot"
 	consultationmodel "github.com/praveennagaraj97/online-consultation/models/consultation"
 	razorpaypayment "github.com/praveennagaraj97/online-consultation/pkg/razorpay"
 	appointmentrepository "github.com/praveennagaraj97/online-consultation/repository/appointment"
@@ -81,13 +82,25 @@ func (a *AppointmentAPI) BookScheduledAppointment() gin.HandlerFunc {
 			return
 		}
 
-		if !apptSlotRes.IsAvailable {
-			api.SendErrorResponse(ctx, "We are sorry requested slot is not available", http.StatusNotFound, &map[string]string{
-				"reason": apptSlotRes.Reason,
+		// If slot is booked
+		if !apptSlotRes.IsAvailable && apptSlotRes.Reason == appointmentslotmodel.Confirmed {
+			api.SendErrorResponse(ctx, "We are sorry requested slot has been booked by someone", http.StatusUnprocessableEntity, &map[string]string{
+				"reason": string(apptSlotRes.Reason),
 			})
 			return
 		}
 
+		// Not Available and release time is more than current time
+		if !apptSlotRes.IsAvailable && apptSlotRes.Reason == appointmentslotmodel.PaymentProcessing {
+			if *apptSlotRes.SlotReleaseAt >= primitive.NewDateTimeFromTime(time.Now()) {
+				api.SendErrorResponse(ctx, "We are sorry requested slot is not available", http.StatusUnprocessableEntity, &map[string]string{
+					"reason": string(apptSlotRes.Reason),
+				})
+				return
+			}
+		}
+
+		// If start time has expired
 		if *apptSlotRes.Start <= primitive.NewDateTimeFromTime(time.Now()) {
 			api.SendErrorResponse(ctx, "You are trying to book a slot from past time", http.StatusUnprocessableEntity, nil)
 			return
@@ -147,7 +160,7 @@ func (a *AppointmentAPI) BookScheduledAppointment() gin.HandlerFunc {
 		}
 
 		// Block the slot
-		if err = a.apptSlotRepo.UpdateSlotAvailability(payload.AppointmentSlotId, false, "Blocked for booking"); err != nil {
+		if err = a.apptSlotRepo.UpdateSlotAvailability(payload.AppointmentSlotId, false, appointmentslotmodel.PaymentProcessing); err != nil {
 			a.apptRepo.DeleteById(userId, &doc.ID)
 			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, &map[string]string{
 				"reason": err.Error(),
@@ -238,6 +251,7 @@ func (a *AppointmentAPI) CancelApponintmentBooking() gin.HandlerFunc {
 			return
 		}
 
+		// Slot has been already cancelled
 		if apptRes.Status == appointmentmodel.Cancelled {
 			api.SendErrorResponse(ctx, "Appointment has been already cancelled", http.StatusNotAcceptable, nil)
 			return
@@ -252,6 +266,20 @@ func (a *AppointmentAPI) CancelApponintmentBooking() gin.HandlerFunc {
 		if err := a.apptRepo.UpdateById(userId, &apptId, appointmentmodel.Cancelled); err != nil {
 			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, &map[string]string{
 				"reason": err.Error(),
+			})
+			return
+		}
+
+		// Ignore if slot is booked by someone else within payment processing timestamp
+		apptSlotRes, err := a.apptSlotRepo.FindById(apptRes.AppointmentSlot)
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusNotFound, nil)
+			return
+		}
+
+		if !apptSlotRes.IsAvailable && apptSlotRes.Reason == appointmentslotmodel.Confirmed {
+			api.SendErrorResponse(ctx, "Slot cannot be released", http.StatusBadRequest, &map[string]string{
+				"reason": string(apptSlotRes.Reason),
 			})
 			return
 		}
