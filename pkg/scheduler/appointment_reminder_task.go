@@ -16,26 +16,37 @@ const (
 	AppointmentReminderTask TasksTypes = "AppointmentReminderTask"
 )
 
-func (s *Scheduler) scheduleUpcomingAppointmentReminders(apptReminderChan chan bool) {
+// Run EveryDay once
+func (s *Scheduler) runEveryDay(ch chan bool) {
 
+	// Initail set time until mid night 1 (IST)
 	t := time.NewTicker(time.Until(getNextDateWithZeroTime()))
 	s.jobs["appointment_reminder_job"] = t
 
+	// Resent the timer when it reached it delivery time
 	for range t.C {
-		nextDate := getNextDateWithZeroTime()
-		t.Reset(time.Until(nextDate))
+
+		// Fire Tasks
+		tim := time.NewTimer(time.Second * 3)
+
+		go s.appointmentReminderTask(tim, s.appointmentReminderTasks, time.Now())
+
+		t.Reset(time.Until(getNextDateWithZeroTime()))
 
 	}
 
-	apptReminderChan <- true
+	ch <- true
 
 }
 
-// Get
-func (s *Scheduler) appointmentReminderTask(timer *time.Timer, appointmentReminderTasks map[time.Time]*Task, invokeTime time.Time) {
+// Send Reminders to Users
+func (s *Scheduler) appointmentReminderTask(timer *time.Timer,
+	appointmentReminderTasks map[time.Time]*Task, invokeTime time.Time) {
 
+	// Wait till the timer reach given invoke time.
 	<-timer.C
 
+	// Send Email and SMS once timer is released
 	invokeT := primitive.NewDateTimeFromTime(invokeTime)
 
 	results, err := s.apptScheduledRepo.FindAllByInvokeTime(&invokeT)
@@ -44,11 +55,9 @@ func (s *Scheduler) appointmentReminderTask(timer *time.Timer, appointmentRemind
 	}
 
 	fmt.Println(results)
-	if timer.Stop() {
-		delete(appointmentReminderTasks, invokeTime)
-	} else {
-		<-timer.C
-		timer.Stop()
-	}
+
+	delete(appointmentReminderTasks, invokeTime)
+
+	defer timer.Reset(0)
 
 }

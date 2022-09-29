@@ -27,7 +27,8 @@ func InitializeMongoDatabase(uri *string) *mongo.Client {
 	err = client.Connect(ctx)
 
 	if err != nil {
-		log.Fatal(err)
+		InitializeMongoDatabase(uri)
+		log.Println("Failed to connect retrying....", "reason", err.Error())
 	}
 
 	logger.PrintLog("Connected to MongoDB 🗄")

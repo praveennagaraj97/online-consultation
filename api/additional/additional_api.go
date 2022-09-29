@@ -88,6 +88,8 @@ func (a *AdditionalAPI) MonitorServerStatus() gin.HandlerFunc {
 			res[value.Name()] = value.Count()
 		}
 
+		defer pprof.StopCPUProfile()
+
 		ctx.JSON(http.StatusOK, serialize.DataResponse[map[string]int]{
 			Data: res,
 			Response: serialize.Response{

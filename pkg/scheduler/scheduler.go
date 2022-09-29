@@ -2,8 +2,6 @@ package scheduler
 
 import (
 	"errors"
-	"fmt"
-	"runtime"
 	"time"
 
 	appointmentrepository "github.com/praveennagaraj97/online-consultation/repository/appointment"
@@ -18,24 +16,28 @@ type Scheduler struct {
 	jobs map[string]*time.Ticker
 }
 
+// Starts when the app starts
 func (s *Scheduler) Initialize() {
 
+	// Appointment Schedule reminder tasks
 	s.appointmentReminderTasks = make(map[time.Time]*Task, 0)
 	s.jobs = make(map[string]*time.Ticker, 0)
 
-	apptReminderChan := make(chan bool, 1)
-	go s.scheduleUpcomingAppointmentReminders(apptReminderChan)
+	// Start Remider tasks when app starts
+	everyDayTaskChan := make(chan bool, 1)
+	go s.runEveryDay(everyDayTaskChan)
 
 	select {
-	case <-apptReminderChan:
-		close(apptReminderChan)
+	case <-everyDayTaskChan:
+		close(everyDayTaskChan)
 	default:
-		close(apptReminderChan)
+		close(everyDayTaskChan)
 	}
 
 }
 
-func (s *Scheduler) InitializeAppointmentRemainderPersistRepo(apptScheduledRepo *appointmentrepository.AppointmentScheduleReminderRepository) {
+func (s *Scheduler) InitializeAppointmentRemainderPersistRepo(
+	apptScheduledRepo *appointmentrepository.AppointmentScheduleReminderRepository) {
 	s.apptScheduledRepo = apptScheduledRepo
 }
 
@@ -46,21 +48,22 @@ func (s *Scheduler) NewSchedule(invokeTime time.Time, name TasksTypes) error {
 		return errors.New("scheduling time is invalid")
 	}
 
-	fmt.Printf("Number of open channels %v\n", runtime.NumGoroutine())
-
+	// Create a invoke timer.
 	timer := time.NewTimer(time.Until(invokeTime))
 
 	switch name {
 	case AppointmentReminderTask:
+		// If an reminder is already assigned at invoke time stop the created timer.
 		if s.appointmentReminderTasks[invokeTime] != nil {
 			timer.Stop()
 			return nil
 		}
 
+		// Create a new task with given time
 		s.appointmentReminderTasks[invokeTime] = &Task{
 			timer: timer,
 		}
-
+		// Fire the go routine which will end once invoke time is over
 		go s.appointmentReminderTask(timer, s.appointmentReminderTasks, invokeTime)
 	default:
 		timer.Stop()
