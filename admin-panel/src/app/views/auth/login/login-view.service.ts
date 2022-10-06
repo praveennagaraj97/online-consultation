@@ -7,7 +7,6 @@ import { APP_STORAGE_NAMES } from 'src/app/constants';
 import { loginAction } from 'src/app/store/auth/auth.actions';
 import { AuthState } from 'src/app/store/auth/auth.types';
 import { LoginResponse } from 'src/app/types/auth.response.types';
-import { addDaysToDate, addMinutesToDate } from 'src/app/utils/date.utils';
 import { validateEmail } from 'src/app/utils/validators';
 
 @Injectable({ providedIn: 'any' })
@@ -17,6 +16,7 @@ export class LoginService {
     private http: HttpClient
   ) {}
 
+  // Login user using email/username and password
   login(email: string, password: string, rememberMe: boolean) {
     const formData = new FormData();
     formData.append(validateEmail(email) ? 'email' : 'user_name', email);
@@ -29,34 +29,21 @@ export class LoginService {
       .pipe(
         tap((res) => {
           if (res) {
-            const authState = {
-              expiresAt: rememberMe
-                ? addDaysToDate(30).toISOString()
-                : addMinutesToDate(30).toISOString(),
-              isLogged: true,
-              rememberMe: rememberMe,
-            };
             this.setAuthTokenIfCookieDisabled(
               res.access_token,
               res.refresh_token,
               rememberMe
             );
-            this.persistState(authState);
-            this.store.dispatch(loginAction(authState));
+
+            this.store.dispatch(
+              loginAction({
+                rememberMe,
+                token: { access: res.access_token, refresh: res.refresh_token },
+              })
+            );
           }
         })
       );
-  }
-
-  private persistState(state: AuthState) {
-    if (state.rememberMe) {
-      localStorage.setItem(APP_STORAGE_NAMES.AUTH_STATE, JSON.stringify(state));
-    } else {
-      sessionStorage.setItem(
-        APP_STORAGE_NAMES.AUTH_STATE,
-        JSON.stringify(state)
-      );
-    }
   }
 
   private setAuthTokenIfCookieDisabled(

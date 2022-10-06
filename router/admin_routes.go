@@ -20,6 +20,7 @@ func (r *Router) adminRoutes() {
 	routes.POST("/login", api.Login())
 	routes.POST("/forgot_password", api.ForgotPassword())
 	routes.POST("/reset_password/:token", api.ResetPassword())
+	routes.GET("/refresh_token", api.RefreshToken())
 
 	routes.Use(r.middlewares.IsAuthorized())
 
@@ -33,7 +34,7 @@ func (r *Router) adminRoutes() {
 
 	routes.Use(r.middlewares.UserRole([]constants.UserType{constants.ADMIN, constants.EDITOR, constants.SUPER_ADMIN}))
 	routes.GET("/me", api.GetMe())
-	routes.GET("/refresh_token", api.RefreshToken())
+
 	routes.PATCH("/update_password", api.UpdatePassword())
 	routes.GET("/logout", api.Logout())
 }

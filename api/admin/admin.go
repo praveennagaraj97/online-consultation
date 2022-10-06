@@ -366,7 +366,7 @@ func (a *AdminAPI) RefreshToken() gin.HandlerFunc {
 				StatusCode: http.StatusOK,
 				Message:    "Token refreshed successfully",
 			},
-			Token:        token,
+			Token:        access,
 			RefreshToken: refresh,
 		})
 	}

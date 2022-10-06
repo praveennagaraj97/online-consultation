@@ -3,6 +3,7 @@ export const authRoutes = {
   ForgotPassword: '/admin/forgot_password',
   ResetPassword: '/admin/reset_password/',
   CheckTokenStatus: '/additional/jwt/status',
+  RefreshToken: `/admin/refresh_token`,
 };
 
 export const adminRoutes = { ProfileDetails: '/admin/me' };

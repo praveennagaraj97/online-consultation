@@ -21,3 +21,10 @@ export type JWTTokenStatus = {
 };
 
 export interface ProfileResponse extends BaseAPiResponse<UserEntity> {}
+
+export interface RefreshTokenResponse {
+  status_code: number;
+  message: string;
+  access_token: string;
+  refresh_token: string;
+}

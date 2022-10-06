@@ -1,41 +1,48 @@
 import { createReducer, on } from '@ngrx/store';
-import { APP_STORAGE_NAMES } from 'src/app/constants';
+import { addDaysToDate } from 'src/app/utils/date.utils';
 import {
   loginAction,
   refreshAuthStateAction,
   rehydrateAuthState,
 } from './auth.actions';
-import { AuthState } from './auth.types';
+import {
+  getAuthSession,
+  setAuthSession,
+  _nextAutoRefreshToken,
+} from './auth.helpers';
 
-const initialState: AuthState = {
-  expiresAt: '',
+const initialState = {
   isLogged: false,
-  rememberMe: false,
 };
 
 export const authReducer = createReducer(
   initialState,
   on(loginAction, (_, props) => {
+    setAuthSession(
+      props.rememberMe || false,
+      props.token.access,
+      props.token.refresh
+    );
+    _nextAutoRefreshToken();
+
     return {
-      expiresAt: props.expiresAt,
-      isLogged: props.isLogged,
-      rememberMe: props.rememberMe,
+      isLogged: true,
     };
   }),
-  on(rehydrateAuthState, () => {
-    let data: string;
-    data = localStorage.getItem(APP_STORAGE_NAMES.AUTH_STATE) || '';
+  on(rehydrateAuthState, (state) => {
+    const session = getAuthSession();
+    if (session) {
+      // Logout if login was 29 days before. | Refresh Token Expired
+      if (addDaysToDate(29, new Date(session.loggedAt)) < new Date()) {
+        return { ...state, isLogged: false };
+      }
 
-    if (!data) {
-      data = sessionStorage.getItem(APP_STORAGE_NAMES.AUTH_STATE) || '';
+      _nextAutoRefreshToken();
+
+      return { ...state, isLogged: true };
     }
 
-    if (data) {
-      const authState = JSON.parse(data) as AuthState;
-      return authState;
-    }
-
-    return initialState;
+    return { ...state, ...initialState };
   }),
   on(refreshAuthStateAction, (state, props) => ({ ...state }))
 );
