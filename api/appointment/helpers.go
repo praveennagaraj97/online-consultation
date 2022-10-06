@@ -7,7 +7,6 @@ import (
 
 	"github.com/praveennagaraj97/online-consultation/interfaces"
 	mailer "github.com/praveennagaraj97/online-consultation/pkg/email"
-	twiliopkg "github.com/praveennagaraj97/online-consultation/pkg/sms/twilio"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -29,9 +28,9 @@ func (a *AppointmentAPI) sendEmailAndSMSForBooking(ch chan bool, userId *primiti
 		log.Default().Println(err.Error())
 	}
 
-	if err := twiliopkg.SendMessage(&interfaces.SMSType{
+	if _, err := a.conf.AwsUtils.SendTextSMS(&interfaces.SMSType{
 		Message: message,
-		To:      fmt.Sprintf("%s%s", userRes.PhoneNumber.Code, userRes.PhoneNumber.Number),
+		To:      &userRes.PhoneNumber,
 	}); err != nil {
 		log.Default().Println(err.Error())
 	}

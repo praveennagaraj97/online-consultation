@@ -7,7 +7,6 @@ import (
 	mailer "github.com/praveennagaraj97/online-consultation/pkg/email"
 	"github.com/praveennagaraj97/online-consultation/pkg/env"
 	"github.com/praveennagaraj97/online-consultation/pkg/scheduler"
-	twiliopkg "github.com/praveennagaraj97/online-consultation/pkg/sms/twilio"
 	stripepayment "github.com/praveennagaraj97/online-consultation/pkg/stripe"
 	"github.com/praveennagaraj97/online-consultation/router"
 )
@@ -38,9 +37,6 @@ func main() {
 	// AWS Utility Package
 	app.AwsUtils = &awspkg.AWSConfiguration{}
 	app.AwsUtils.Initialize()
-
-	// Initialize Twilio SMS Package | Global instance is not available!
-	twiliopkg.Initialize()
 
 	// Stripe Package
 	stripepayment.Initialize()

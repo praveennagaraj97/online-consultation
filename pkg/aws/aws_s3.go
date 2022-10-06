@@ -5,11 +5,8 @@ import (
 	"io"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-	awsconf "github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	logger "github.com/praveennagaraj97/online-consultation/pkg/log"
 )
 
 type S3DeleteObjectAPI interface {
@@ -19,16 +16,7 @@ type S3DeleteObjectAPI interface {
 }
 
 func (a *AWSConfiguration) configS3() {
-	creds := credentials.NewStaticCredentialsProvider(a.options.AWS_ACCESS_KEY_ID, a.options.AWS_SECRET_ACCESS, "")
-
-	config, err := awsconf.LoadDefaultConfig(context.TODO(), awsconf.WithCredentialsProvider(creds),
-		awsconf.WithRegion(a.options.S3_BUCKET_REGION))
-	if err != nil {
-		logger.ErrorLogFatal(err)
-	}
-
-	a.s3Client = s3.NewFromConfig(config)
-
+	a.s3Client = s3.NewFromConfig(*a.defaultConfig)
 }
 
 func (a *AWSConfiguration) UploadAsset(body io.Reader, fileKeyName string, contentType *string) (*s3.PutObjectOutput, error) {

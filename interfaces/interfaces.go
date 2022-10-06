@@ -7,7 +7,7 @@ type PhoneType struct {
 
 type SMSType struct {
 	Message string
-	To      string
+	To      *PhoneType
 }
 
 type ImageType struct {

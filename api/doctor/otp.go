@@ -12,7 +12,6 @@ import (
 	userdto "github.com/praveennagaraj97/online-consultation/dto/user"
 	"github.com/praveennagaraj97/online-consultation/interfaces"
 	otpmodel "github.com/praveennagaraj97/online-consultation/models/otp"
-	twiliopkg "github.com/praveennagaraj97/online-consultation/pkg/sms/twilio"
 	"github.com/praveennagaraj97/online-consultation/pkg/validator"
 	"github.com/praveennagaraj97/online-consultation/serialize"
 	"github.com/praveennagaraj97/online-consultation/utils"
@@ -60,9 +59,9 @@ func (a *DoctorAPI) SendVerificationCode() gin.HandlerFunc {
 
 		// Send OTP
 		if a.appConf.Environment == "production" {
-			if err := twiliopkg.SendMessage(&interfaces.SMSType{
+			if _, err := a.appConf.AwsUtils.SendTextSMS(&interfaces.SMSType{
 				Message: fmt.Sprintf("%s is your verification code for Online Consultation", verifyCode),
-				To:      fmt.Sprintf("%s%s", payload.Code, payload.Number),
+				To:      usr.Phone,
 			}); err != nil {
 				log.Default().Println(err.Error())
 				api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, nil)
