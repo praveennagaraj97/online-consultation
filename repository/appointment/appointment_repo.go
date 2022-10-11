@@ -86,3 +86,14 @@ func (r *AppointmentRepository) UpdateById(userId, id *primitive.ObjectID, statu
 
 	return err
 }
+
+func (r *AppointmentRepository) CheckIfAppointmentExistsByDoctorId(id *primitive.ObjectID) (int64, error) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	filter := bson.M{"doctor_id": id, "status": "upcoming"}
+
+	return r.colln.CountDocuments(ctx, filter)
+
+}

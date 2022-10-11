@@ -10,6 +10,7 @@ import { DoctorIconComponent } from './doctor/doctor-icon.component';
 import { DotsIconComponent } from './dots/dots-icon.component';
 import { ThreeDotsIconComponent } from './dots/three-dots.component';
 import { EditorIconComponent } from './editor/editor-icon.component';
+import { RoundedExclamationIconComponent } from './exclamation/rounded-circel.component';
 import { HomeIconComponent } from './home/home-icon.component';
 import { HospitalIconComponent } from './hospital/hospital-icon.component';
 import { ImageIconComponent } from './image/image-icon.component';
@@ -56,6 +57,7 @@ import { UserIconComponent } from './user/user-icon.component';
     ImageIconComponent,
     ActiveStatusIconComponent,
     InActiveStatusIconComponent,
+    RoundedExclamationIconComponent,
   ],
   exports: [
     MailIconComponent,
@@ -84,6 +86,7 @@ import { UserIconComponent } from './user/user-icon.component';
     ImageIconComponent,
     ActiveStatusIconComponent,
     InActiveStatusIconComponent,
+    RoundedExclamationIconComponent,
   ],
 })
 export class IconsModule {}

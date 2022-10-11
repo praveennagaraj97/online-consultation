@@ -8,15 +8,22 @@ import { ConfirmPortalEventTypes } from 'src/app/types/app.types';
         isActive ? 'click to mark as inactive' : 'click to mark as active'
       "
       [isActive]="isActive"
-      (onToggle)="showConfirmModal = true"
+      (onToggle)="showConfirmModal = true; isActive = !isActive"
       [isLoading]="isLoading"
       stopPropagation
     ></app-toggle-input>
 
     <app-confirm-dialog-portal
-      (onConfirm)="onConfirm($event)"
+      (onConfirm)="onAction($event)"
       [showModal]="showConfirmModal"
-    ></app-confirm-dialog-portal> `,
+      [title]="isActive ? 'Update doctor status' : 'Are you sure ?'"
+      [description]="
+        isActive
+          ? 'Doctor will be able to access his account and manage appointments.'
+          : 'This will restrict doctor from accessing their account and managing appointments.'
+      "
+    >
+    </app-confirm-dialog-portal> `,
 })
 export class DoctorStatusToggleComponent {
   @Input() isActive = false;
@@ -28,7 +35,7 @@ export class DoctorStatusToggleComponent {
     this.isLoading = true;
   }
 
-  onConfirm(reason: ConfirmPortalEventTypes) {
+  onAction(reason: ConfirmPortalEventTypes) {
     if (reason == 'cancel') {
       this.showConfirmModal = false;
     }

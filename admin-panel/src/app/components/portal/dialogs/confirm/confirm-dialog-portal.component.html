@@ -1,10 +1,37 @@
 <ng-template #portalRef>
-  <div class="modal-container">
+  <div class="modal-container flex items-center justify-center">
     <div
-      @swipeInOut
-      class="w-96 h-96 bg-white shadow-2xl rounded-xl translate-y-20 mx-auto"
       clickOutside
       (callback)="onClickOutSide($event)"
-    ></div>
+      @swipeInOut
+      class="relative sm:rounded-xl rounded-t-xl shadow-2xl m-auto dark:bg-gray-600 bg-gray-50 p-3"
+    >
+      <div
+        class="sm:w-96 border-blue-zodiac rounded-xl border p-2 dark:text-gray-50 text-gray-900"
+      >
+        <app-rounded-circle-icon
+          className="w-12 h-12 mx-auto dark:stroke-gray-50 dark:fill-gray-50"
+        ></app-rounded-circle-icon>
+        <h1 class="text-xl text-center my-2">
+          {{ title }}
+        </h1>
+        <p class="opacity-80 sm:text-sm text-center whitespace-pre-line">
+          {{ description }}
+        </p>
+        <hr class="my-4 dark:border-gray-100/30 border-gray-600/30" />
+        <app-message-tag></app-message-tag>
+        <div class="flex flex-wrap space-x-2 my-2 justify-center">
+          <button
+            (click)="onClickOutSide(true)"
+            class="secondary-btn text-sm py-1 px-4 rounded-full"
+          >
+            {{ cancelName }}
+          </button>
+          <button class="primary-btn text-sm py-1 px-4 rounded-full">
+            {{ confirmName }}
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </ng-template>

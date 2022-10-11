@@ -20,12 +20,8 @@ import { ConfirmPortalEventTypes } from 'src/app/types/app.types';
   animations: [
     trigger('swipeInOut', [
       transition('void => *', [
-        style({ transform: 'translateY(-200%)', opacity: 0 }),
-        animate('0.5s', style({ transform: 'translateY(80px)', opacity: 1 })),
-      ]),
-      transition('* => void', [
-        style({ transform: 'translateY(80px)', opacity: 1 }),
-        animate('0.5s', style({ transform: 'translateY(-200%)', opacity: 0 })),
+        style({ opacity: 0 }),
+        animate('0.5s', style({ opacity: 1 })),
       ]),
     ]),
   ],
@@ -43,6 +39,12 @@ export class ConfirmDialogPortalComponent {
   @Output() onConfirm = new EventEmitter<ConfirmPortalEventTypes>();
   @Input() showModal = false;
 
+  // Props
+  @Input() title?: string = 'Are you sure you want to continue ?';
+  @Input() description?: string = '';
+  @Input() cancelName?: string = 'Cancel';
+  @Input() confirmName?: string = 'Confirm';
+
   constructor(
     private overlay: Overlay,
     private viewContainerRef: ViewContainerRef
@@ -57,13 +59,13 @@ export class ConfirmDialogPortalComponent {
       disposeOnNavigation: true,
     });
 
-    this.subs$.push(
-      this.overlayRef.outsidePointerEvents().subscribe({
-        next: () => {
-          this.onConfirm.emit('cancel');
-        },
-      })
-    );
+    // this.subs$.push(
+    //   this.overlayRef.outsidePointerEvents().subscribe({
+    //     next: () => {
+    //       this.onConfirm.emit('cancel');
+    //     },
+    //   })
+    // );
 
     this.templatePortal = new TemplatePortal<HTMLDivElement>(
       this.portalRef,
@@ -74,15 +76,13 @@ export class ConfirmDialogPortalComponent {
   ngOnChanges(changes: SimpleChanges) {
     if (changes?.['showModal'].currentValue) {
       this.overlayRef?.attach(this.templatePortal);
-    }
-
-    if (!changes?.['showModal'].currentValue) {
+    } else {
       this.overlayRef?.detach();
     }
   }
 
   onClickOutSide(state: boolean) {
-    if (!state) {
+    if (state) {
       this.onConfirm.emit('cancel');
     }
   }

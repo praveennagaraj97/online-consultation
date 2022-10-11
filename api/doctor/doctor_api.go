@@ -17,6 +17,7 @@ import (
 	mailer "github.com/praveennagaraj97/online-consultation/pkg/email"
 	"github.com/praveennagaraj97/online-consultation/pkg/env"
 	"github.com/praveennagaraj97/online-consultation/pkg/tokens"
+	appointmentrepository "github.com/praveennagaraj97/online-consultation/repository/appointment"
 	doctorrepo "github.com/praveennagaraj97/online-consultation/repository/doctor"
 	onetimepasswordrepository "github.com/praveennagaraj97/online-consultation/repository/onetimepassword"
 	"github.com/praveennagaraj97/online-consultation/serialize"
@@ -28,19 +29,20 @@ type DoctorAPI struct {
 	repo            *doctorrepo.DoctorRepository
 	apptSlotSetRepo *doctorrepo.DoctorAppointmentSlotSetRepository
 	otpRepo         *onetimepasswordrepository.OneTimePasswordRepository
+	apptRepo        *appointmentrepository.AppointmentRepository
 	appConf         *app.ApplicationConfig
 }
 
 func (a *DoctorAPI) Initialize(conf *app.ApplicationConfig,
 	repo *doctorrepo.DoctorRepository,
 	otpRepo *onetimepasswordrepository.OneTimePasswordRepository,
-	apptSlotSetRepo *doctorrepo.DoctorAppointmentSlotSetRepository) {
+	apptSlotSetRepo *doctorrepo.DoctorAppointmentSlotSetRepository, apptRepo *appointmentrepository.AppointmentRepository) {
 
 	a.repo = repo
 	a.appConf = conf
 	a.otpRepo = otpRepo
 	a.apptSlotSetRepo = apptSlotSetRepo
-
+	a.apptRepo = apptRepo
 }
 
 func (a *DoctorAPI) AddNewDoctor() gin.HandlerFunc {
@@ -451,6 +453,60 @@ func (a *DoctorAPI) UpdateById() gin.HandlerFunc {
 
 		if err = a.repo.UpdateById(objectId, &payload); err != nil {
 			api.SendErrorResponse(ctx, "Something went wrong", http.StatusBadRequest, &map[string]string{
+				"reason": err.Error(),
+			})
+			return
+		}
+
+		ctx.JSON(http.StatusNoContent, nil)
+
+	}
+}
+
+// Update Doctor Status | Active or Inactive.
+func (a *DoctorAPI) UpdateDoctorStatus() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+
+		// Get Doctor ID From Param
+		id := ctx.Param("id")
+
+		docId, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		var payload struct {
+			Status bool `form:"status"`
+		}
+
+		// Get Status from query | body
+		if err := ctx.ShouldBindQuery(&payload); err != nil {
+			api.SendErrorResponse(ctx, err.Error(), http.StatusUnprocessableEntity, nil)
+			return
+		}
+
+		fmt.Println(payload.Status, docId)
+
+		// If the status is false check if any appointments are booked for this doctor.
+		if !payload.Status {
+			count, err := a.apptRepo.CheckIfAppointmentExistsByDoctorId(&docId)
+			if err != nil {
+				api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, &map[string]string{
+					"reason": err.Error(),
+				})
+				return
+			}
+
+			if count > 0 {
+				api.SendErrorResponse(ctx, "Doctor has pending appointments to attend", http.StatusBadRequest, nil)
+				return
+			}
+
+		}
+
+		if err := a.repo.UpdateDoctorStatus(&docId, payload.Status); err != nil {
+			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, &map[string]string{
 				"reason": err.Error(),
 			})
 			return

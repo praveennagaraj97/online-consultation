@@ -10,7 +10,7 @@ func (r *Router) doctorRoutes() {
 	api.Initialize(r.app,
 		r.repos.GetDoctorRepository(),
 		r.repos.GetOneTimePasswordRepository(),
-		r.repos.GetDoctorAppointmentSlotSetRepository())
+		r.repos.GetDoctorAppointmentSlotSetRepository(), r.repos.GetAppointmentRepository())
 
 	adminRoutes := r.engine.Group("/api/v1/admin/doctor")
 	authRoutes := r.engine.Group("/api/v1/doctor/auth")
@@ -22,6 +22,7 @@ func (r *Router) doctorRoutes() {
 	adminRoutes.GET("/:id", api.GetDoctorById(false))
 	adminRoutes.GET("", api.FindAllDoctors(true))
 	adminRoutes.PATCH("/:id", api.UpdateById())
+	adminRoutes.PATCH("/status/:id", api.UpdateDoctorStatus())
 	adminRoutes.GET("/slot_sets/:doctor_id", api.GetAllSlotSets())
 	adminRoutes.POST("/slot_set/:doctor_id", api.AddNewSlotSet())
 	adminRoutes.GET("/slot_set/:id/:doctor_id", api.GetSlotSetById())

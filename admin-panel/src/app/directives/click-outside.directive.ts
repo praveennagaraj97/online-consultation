@@ -10,16 +10,10 @@ import {
 export class ClickOutsideDirective {
   @Output() callback: EventEmitter<boolean> = new EventEmitter();
 
-  constructor(private _el: ElementRef) {}
+  constructor(private _el: ElementRef<HTMLElement>) {}
 
   @HostListener('document:click', ['$event.target'])
-  onclickOutside(ev: EventTarget) {
-    try {
-      if (!this._el?.nativeElement.contains(ev as Element)) {
-        this.callback.emit(false);
-      } else {
-        this.callback.emit(true);
-      }
-    } catch (error) {}
+  onclickOutside(ev: Element) {
+    this.callback.emit(!this._el?.nativeElement?.contains(ev) || false);
   }
 }
