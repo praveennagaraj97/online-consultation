@@ -12,7 +12,12 @@ import {
   ViewContainerRef,
 } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { ConfirmPortalEventTypes } from 'src/app/types/app.types';
+import {
+  ConfirmPortalEventTypes,
+  ResponseMessageType,
+} from 'src/app/types/app.types';
+import { clearSubscriptions } from 'src/app/utils/helpers';
+import { ConfirmDialogPortalService } from './confirm-dialog-portal.service';
 
 @Component({
   selector: 'app-confirm-dialog-portal',
@@ -30,9 +35,13 @@ export class ConfirmDialogPortalComponent {
   // Subs
   private subs$: Subscription[] = [];
 
+  // State
+  isLoading = false;
+  response: ResponseMessageType | null = null;
+
   // Refs
   @ViewChild('portalRef') portalRef?: TemplateRef<HTMLDivElement>;
-  overlayRef!: OverlayRef;
+  private overlayRef!: OverlayRef;
   private templatePortal?: TemplatePortal<HTMLDivElement>;
 
   // Events
@@ -47,7 +56,8 @@ export class ConfirmDialogPortalComponent {
 
   constructor(
     private overlay: Overlay,
-    private viewContainerRef: ViewContainerRef
+    private viewContainerRef: ViewContainerRef,
+    private confirmPortalService: ConfirmDialogPortalService
   ) {}
 
   ngAfterViewInit() {
@@ -59,14 +69,6 @@ export class ConfirmDialogPortalComponent {
       disposeOnNavigation: true,
     });
 
-    // this.subs$.push(
-    //   this.overlayRef.outsidePointerEvents().subscribe({
-    //     next: () => {
-    //       this.onConfirm.emit('cancel');
-    //     },
-    //   })
-    // );
-
     this.templatePortal = new TemplatePortal<HTMLDivElement>(
       this.portalRef,
       this.viewContainerRef
@@ -74,17 +76,53 @@ export class ConfirmDialogPortalComponent {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes?.['showModal'].currentValue) {
+    if (changes?.['showModal']?.currentValue) {
       this.overlayRef?.attach(this.templatePortal);
-    } else {
-      this.overlayRef?.detach();
+    } else if (changes?.['showModal']?.currentValue == false) {
+      this.cleanUp();
     }
   }
 
   onClickOutSide(state: boolean) {
+    if (this.isLoading) {
+      return;
+    }
+
     if (state) {
       this.onConfirm.emit('cancel');
+    } else {
+      this.onConfirm.emit('confirm');
+      this.subs$.push(
+        this.confirmPortalService.listenToLoadingState.subscribe({
+          next: (loading) => {
+            this.isLoading = loading;
+          },
+        })
+      );
+
+      this.subs$.push(
+        this.confirmPortalService.listenToLoadingState.subscribe({
+          next: (loading) => {
+            this.isLoading = loading;
+          },
+        })
+      );
+
+      this.subs$.push(
+        this.confirmPortalService.listenToResponse.subscribe({
+          next: (res) => {
+            this.response = res;
+          },
+        })
+      );
     }
+  }
+
+  private cleanUp() {
+    clearSubscriptions(this.subs$);
+    this.response = null;
+    this.isLoading = false;
+    this.overlayRef?.detach();
   }
 
   ngOnDestroy() {

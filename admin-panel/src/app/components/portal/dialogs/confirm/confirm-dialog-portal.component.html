@@ -18,17 +18,29 @@
         <p class="opacity-80 sm:text-sm text-center whitespace-pre-line">
           {{ description }}
         </p>
-        <hr class="my-4 dark:border-gray-100/30 border-gray-600/30" />
-        <app-message-tag></app-message-tag>
+        <hr class="mt-4 mb-1 dark:border-gray-100/30 border-gray-600/30" />
+        <app-message-tag
+          (onEnd)="isLoading = false"
+          [response]="response"
+          className="text-center text-sm min-h-[20px]"
+        ></app-message-tag>
         <div class="flex flex-wrap space-x-2 my-2 justify-center">
           <button
+            [disabled]="isLoading"
             (click)="onClickOutSide(true)"
             class="secondary-btn text-sm py-1 px-4 rounded-full"
           >
             {{ cancelName }}
           </button>
-          <button class="primary-btn text-sm py-1 px-4 rounded-full">
-            {{ confirmName }}
+          <button
+            [disabled]="isLoading"
+            class="primary-btn text-sm py-1 px-4 rounded-full flex items-center"
+            [ngClass]="{ 'space-x-1': isLoading }"
+          >
+            <app-spinner-icon *ngIf="isLoading"></app-spinner-icon>
+            <span>
+              {{ isLoading ? "Please wait" : confirmName }}
+            </span>
           </button>
         </div>
       </div>

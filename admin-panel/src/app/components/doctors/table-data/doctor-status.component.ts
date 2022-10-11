@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { ConfirmPortalEventTypes } from 'src/app/types/app.types';
+import { ConfirmDialogPortalService } from '../../portal/dialogs/confirm/confirm-dialog-portal.service';
 
 @Component({
   selector: 'app-doctor-status',
@@ -8,8 +9,7 @@ import { ConfirmPortalEventTypes } from 'src/app/types/app.types';
         isActive ? 'click to mark as inactive' : 'click to mark as active'
       "
       [isActive]="isActive"
-      (onToggle)="showConfirmModal = true; isActive = !isActive"
-      [isLoading]="isLoading"
+      (onToggle)="showConfirmModal = true"
       stopPropagation
     ></app-toggle-input>
 
@@ -27,17 +27,28 @@ import { ConfirmPortalEventTypes } from 'src/app/types/app.types';
 })
 export class DoctorStatusToggleComponent {
   @Input() isActive = false;
-  isLoading = false;
 
   showConfirmModal = false;
 
-  updateDoctorStatus(status: boolean) {
-    this.isLoading = true;
-  }
+  constructor(private confirmPortalService: ConfirmDialogPortalService) {}
 
   onAction(reason: ConfirmPortalEventTypes) {
     if (reason == 'cancel') {
       this.showConfirmModal = false;
+    } else {
+      this.confirmPortalService.setLoadingState(true);
+
+      setTimeout(() => {
+        this.confirmPortalService.sendResponseStatus({
+          message: 'Status updated successfully',
+          type: 'success',
+          timeOut: 5000,
+          callback: () => {
+            this.isActive = !this.isActive;
+            this.showConfirmModal = false;
+          },
+        });
+      }, 2000);
     }
   }
 }

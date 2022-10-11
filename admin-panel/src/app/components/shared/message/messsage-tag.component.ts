@@ -34,9 +34,12 @@ export class MessageTagComponent {
   private timeId: any;
   ngOnChanges() {
     if (this.response) {
+      console.log(this.response);
       clearTimeout(this.timeId);
       this.timeId = setTimeout(() => {
         this.onEnd.emit();
+        this.response?.callback ? this.response?.callback() : {};
+        this.response = null;
       }, this.response?.timeOut || 3000);
     }
   }
