@@ -1,5 +1,7 @@
 import { Component, Input } from '@angular/core';
+import { ErrorResponse } from 'src/app/types/api.response.types';
 import { ConfirmPortalEventTypes } from 'src/app/types/app.types';
+import { EditDoctorService } from 'src/app/views/doctors/edit/edit-doctor.service';
 import { ConfirmDialogPortalService } from '../../portal/dialogs/confirm/confirm-dialog-portal.service';
 
 @Component({
@@ -27,10 +29,14 @@ import { ConfirmDialogPortalService } from '../../portal/dialogs/confirm/confirm
 })
 export class DoctorStatusToggleComponent {
   @Input() isActive = false;
+  @Input() docId: string = '';
 
   showConfirmModal = false;
 
-  constructor(private confirmPortalService: ConfirmDialogPortalService) {}
+  constructor(
+    private confirmPortalService: ConfirmDialogPortalService,
+    private editDocService: EditDoctorService
+  ) {}
 
   onAction(reason: ConfirmPortalEventTypes) {
     if (reason == 'cancel') {
@@ -38,17 +44,26 @@ export class DoctorStatusToggleComponent {
     } else {
       this.confirmPortalService.setLoadingState(true);
 
-      setTimeout(() => {
-        this.confirmPortalService.sendResponseStatus({
-          message: 'Status updated successfully',
-          type: 'success',
-          timeOut: 5000,
-          callback: () => {
-            this.isActive = !this.isActive;
-            this.showConfirmModal = false;
+      this.editDocService
+        .updateDoctorStatus(this.docId, !this.isActive)
+        .subscribe({
+          next: () => {
+            this.confirmPortalService.sendResponseStatus({
+              message: 'Status updated successfully',
+              type: 'success',
+              callback: () => {
+                this.isActive = !this.isActive;
+                this.showConfirmModal = false;
+              },
+            });
+          },
+          error: ({ error }: ErrorResponse) => {
+            this.confirmPortalService.sendResponseStatus({
+              message: error.message || 'Something went wrong',
+              type: 'error',
+            });
           },
         });
-      }, 2000);
     }
   }
 }

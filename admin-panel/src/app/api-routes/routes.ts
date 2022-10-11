@@ -11,6 +11,8 @@ export const adminRoutes = { ProfileDetails: '/admin/me' };
 export const doctorRoutes = {
   DoctorsList: `/admin/doctor`,
   AddDoctor: `/admin/doctor`,
+  UpdateDoctorStatus: (id: string, status: boolean) =>
+    `/admin/doctor/status/${id}?status=${status}`,
 };
 
 export const adminCMSRoutes = {

@@ -96,6 +96,7 @@ import { DoctorsEntity } from 'src/app/types/doctor.response.types';
               <div class="flex justify-center">
                 <app-doctor-status
                   [isActive]="doctor.is_active"
+                  [docId]="doctor.id"
                 ></app-doctor-status>
               </div>
             </td>
