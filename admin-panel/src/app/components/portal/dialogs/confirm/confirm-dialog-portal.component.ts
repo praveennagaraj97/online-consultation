@@ -90,32 +90,34 @@ export class ConfirmDialogPortalComponent {
 
     if (state) {
       this.onConfirm.emit('cancel');
-    } else {
-      this.onConfirm.emit('confirm');
-      this.subs$.push(
-        this.confirmPortalService.listenToLoadingState.subscribe({
-          next: (loading) => {
-            this.isLoading = loading;
-          },
-        })
-      );
-
-      this.subs$.push(
-        this.confirmPortalService.listenToLoadingState.subscribe({
-          next: (loading) => {
-            this.isLoading = loading;
-          },
-        })
-      );
-
-      this.subs$.push(
-        this.confirmPortalService.listenToResponse.subscribe({
-          next: (res) => {
-            this.response = res;
-          },
-        })
-      );
     }
+  }
+
+  onConfirmClick() {
+    this.onConfirm.emit('confirm');
+    this.subs$.push(
+      this.confirmPortalService.listenToLoadingState.subscribe({
+        next: (loading) => {
+          this.isLoading = loading;
+        },
+      })
+    );
+
+    this.subs$.push(
+      this.confirmPortalService.listenToLoadingState.subscribe({
+        next: (loading) => {
+          this.isLoading = loading;
+        },
+      })
+    );
+
+    this.subs$.push(
+      this.confirmPortalService.listenToResponse.subscribe({
+        next: (res) => {
+          this.response = res;
+        },
+      })
+    );
   }
 
   private cleanUp() {

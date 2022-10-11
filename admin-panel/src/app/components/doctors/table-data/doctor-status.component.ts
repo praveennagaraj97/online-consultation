@@ -16,9 +16,9 @@ import { ConfirmDialogPortalService } from '../../portal/dialogs/confirm/confirm
     <app-confirm-dialog-portal
       (onConfirm)="onAction($event)"
       [showModal]="showConfirmModal"
-      [title]="isActive ? 'Update doctor status' : 'Are you sure ?'"
+      [title]="!isActive ? 'Update doctor status' : 'Are you sure ?'"
       [description]="
-        isActive
+        !isActive
           ? 'Doctor will be able to access his account and manage appointments.'
           : 'This will restrict doctor from accessing their account and managing appointments.'
       "

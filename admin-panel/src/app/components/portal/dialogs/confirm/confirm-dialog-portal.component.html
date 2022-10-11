@@ -33,6 +33,7 @@
             {{ cancelName }}
           </button>
           <button
+            (click)="onConfirmClick()"
             [disabled]="isLoading"
             class="primary-btn text-sm py-1 px-4 rounded-full flex items-center"
             [ngClass]="{ 'space-x-1': isLoading }"
