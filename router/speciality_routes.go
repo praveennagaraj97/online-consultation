@@ -13,7 +13,7 @@ func (r *Router) specialityRoutes() {
 	adminRoutes := r.engine.Group("/api/v1/admin/speciality")
 	routes := r.engine.Group("/api/v1/speciality")
 
-	adminRoutes.Use(r.middlewares.IsAuthorized())
+	adminRoutes.Use(r.middlewares.IsAuthorized(constants.ADMIN_AUTH_TOKEN))
 
 	adminRoutes.POST("", r.middlewares.UserRole([]constants.UserType{constants.ADMIN, constants.SUPER_ADMIN}), api.AddNewSpeciality())
 	adminRoutes.DELETE("/:id", r.middlewares.UserRole([]constants.UserType{constants.ADMIN, constants.SUPER_ADMIN}), api.DeleteById())

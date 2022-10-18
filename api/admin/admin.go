@@ -115,7 +115,7 @@ func (a *AdminAPI) Login() gin.HandlerFunc {
 		a.adminRepo.UpdateRefreshToken(&user.ID, refresh)
 
 		// Set Cookies
-		utils.SetAuthCookie(ctx, access, refresh, accessTime, a.appConf.Domain, a.appConf.Environment)
+		utils.SetAuthCookie(ctx, access, refresh, accessTime, a.appConf.Domain, a.appConf.Environment, constants.ADMIN_AUTH_COOKIE)
 
 		if err != nil {
 			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, nil)
@@ -354,7 +354,7 @@ func (a *AdminAPI) RefreshToken() gin.HandlerFunc {
 		}
 
 		// Set Auth Cookie
-		utils.SetAuthCookie(c, access, refresh, accessTime, a.appConf.Domain, a.appConf.Environment)
+		utils.SetAuthCookie(c, access, refresh, accessTime, a.appConf.Domain, a.appConf.Environment, constants.ADMIN_AUTH_COOKIE)
 
 		if err != nil {
 			api.SendErrorResponse(c, "Something went wrong", http.StatusInternalServerError, nil)
@@ -426,7 +426,7 @@ func (a *AdminAPI) Logout() gin.HandlerFunc {
 		}
 
 		// Remove / Set Cookie to expire
-		utils.SetAuthCookie(ctx, "", "", 0, a.appConf.Domain, a.appConf.Environment)
+		utils.SetAuthCookie(ctx, "", "", 0, a.appConf.Domain, a.appConf.Environment, constants.ADMIN_AUTH_COOKIE)
 
 		ctx.JSON(http.StatusOK, serialize.Response{
 			StatusCode: http.StatusOK,

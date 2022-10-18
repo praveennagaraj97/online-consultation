@@ -21,7 +21,7 @@ func (r *Router) appointmentRoutes() {
 
 	routes := r.engine.Group("/api/v1/appointment")
 
-	routes.Use(r.middlewares.IsAuthorized())
+	routes.Use(r.middlewares.IsAuthorized(constants.AUTH_TOKEN))
 
 	routes.POST("/schedule", r.middlewares.UserRole([]constants.UserType{constants.USER}), api.BookScheduledAppointment())
 	routes.DELETE("/schedule/cancel/:id", r.middlewares.UserRole([]constants.UserType{constants.USER}), api.CancelApponintmentBooking())

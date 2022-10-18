@@ -33,9 +33,9 @@ func (r *Router) userRoutes() {
 	authRoutes.GET("/resend_verification_code/:id", userAPI.ResendVerificationCode())
 
 	authRoutes.GET("/refresh_token", userAPI.RefreshToken())
-	authRoutes.GET("/logout", r.middlewares.IsAuthorized(), r.middlewares.UserRole([]constants.UserType{constants.USER}), userAPI.Logout())
+	authRoutes.GET("/logout", r.middlewares.IsAuthorized(constants.AUTH_TOKEN), r.middlewares.UserRole([]constants.UserType{constants.USER}), userAPI.Logout())
 
-	userRoutes.Use(r.middlewares.IsAuthorized(), r.middlewares.UserRole([]constants.UserType{constants.USER}))
+	userRoutes.Use(r.middlewares.IsAuthorized(constants.AUTH_TOKEN), r.middlewares.UserRole([]constants.UserType{constants.USER}))
 	// user Routes
 	userRoutes.GET("", userAPI.GetUserDetails())
 	userRoutes.PATCH("", userAPI.UpdateUserDetails())

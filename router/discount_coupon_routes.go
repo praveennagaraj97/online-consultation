@@ -14,7 +14,7 @@ func (r *Router) discountCouponRoutes() {
 	adminRoutes := r.engine.Group("/api/v1/admin/discount_coupon")
 
 	// Editor and Super Admin have permission to manage coupons
-	adminRoutes.Use(r.middlewares.IsAuthorized(),
+	adminRoutes.Use(r.middlewares.IsAuthorized(constants.AUTH_TOKEN),
 		r.middlewares.UserRole([]constants.UserType{
 			constants.SUPER_ADMIN,
 			constants.ADMIN,

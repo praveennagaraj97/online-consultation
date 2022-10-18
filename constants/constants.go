@@ -4,14 +4,33 @@ const VerifyCodeAcceptedAttempts uint8 = 3
 
 type CookieNames string
 
+// Browser cookie names
 const (
-	AUTH_TOKEN              CookieNames = "AUTH_TOKEN"
-	REFRESH_TOKEN           CookieNames = "REFRESH_TOKEN"
+	// User Auth Cookie
+	AUTH_TOKEN    CookieNames = "AUTH_TOKEN"
+	REFRESH_TOKEN CookieNames = "REFRESH_TOKEN"
+	// Admin Auth Cookie
+	ADMIN_AUTH_TOKEN    CookieNames = "ADMIN_AUTH_TOKEN"
+	ADMIN_REFRESH_TOKEN CookieNames = "ADMIN_REFRESH_TOKEN"
+	// Doctor Auth Cookie
+	DOCTOR_AUTH_TOKEN    CookieNames = "DOCTOR_AUTH_TOKEN"
+	DOCTOR_REFRESH_TOKEN CookieNames = "DOCTOR_REFRESH_TOKEN"
+
 	CUSTOME_HEADER_LANG_KEY CookieNames = "LOCALE"
+)
+
+type CookieType string
+
+// User for setting cookie | Each type is used for different browser.
+const (
+	USER_AUTH_COOKIE   CookieType = "USER_AUTH_COOKIE"
+	ADMIN_AUTH_COOKIE  CookieType = "ADMIN_AUTH_COOKIE"
+	DOCTOR_AUTH_COOKIE CookieType = "DOCTOR_AUTH_COOKIE"
 )
 
 type UserType string
 
+// Type of user, set in JWT.
 const (
 	SUPER_ADMIN UserType = "super_admin"
 	ADMIN       UserType = "admin"

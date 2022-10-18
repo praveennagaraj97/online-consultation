@@ -98,9 +98,25 @@ func GetTimeZone(ctx *gin.Context) string {
 }
 
 // Sets Authentication Cookie
-func SetAuthCookie(ctx *gin.Context, access, refresh string, accessTime int, domain string, env string) {
+func SetAuthCookie(ctx *gin.Context, access, refresh string, accessTime int, domain string, env string, setFor constants.CookieType) {
 
 	var production = env == "production"
+
+	var accessTokenName constants.CookieNames
+	var refreshTokenName constants.CookieNames
+
+	// Assign dedicated cookie name for different browser.
+	switch setFor {
+	case constants.ADMIN_AUTH_COOKIE:
+		accessTokenName = constants.ADMIN_AUTH_TOKEN
+		refreshTokenName = constants.ADMIN_REFRESH_TOKEN
+	case constants.DOCTOR_AUTH_COOKIE:
+		accessTokenName = constants.DOCTOR_AUTH_TOKEN
+		refreshTokenName = constants.DOCTOR_REFRESH_TOKEN
+	default:
+		accessTokenName = constants.AUTH_TOKEN
+		refreshTokenName = constants.REFRESH_TOKEN
+	}
 
 	if production {
 		ctx.SetSameSite(http.SameSiteNoneMode)
@@ -109,12 +125,12 @@ func SetAuthCookie(ctx *gin.Context, access, refresh string, accessTime int, dom
 	}
 
 	// Set Access Token
-	ctx.SetCookie(string(constants.AUTH_TOKEN),
+	ctx.SetCookie(string(accessTokenName),
 		access,
 		accessTime, "/", domain, production, true)
 
 	// Set Refresh Token
-	ctx.SetCookie(string(constants.REFRESH_TOKEN),
+	ctx.SetCookie(string(refreshTokenName),
 		refresh,
 		constants.CookieRefreshExpiryTime, "/", domain, production, true)
 }

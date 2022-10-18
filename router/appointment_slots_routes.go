@@ -13,7 +13,7 @@ func (r *Router) appointmentSlotsRoutes() {
 	doctorRoutes := r.engine.Group("/api/v1/doctor/appointment_slots")
 	routes := r.engine.Group("/api/v1/appointment_slots")
 
-	doctorRoutes.Use(r.middlewares.IsAuthorized(), r.middlewares.UserRole([]constants.UserType{constants.DOCTOR}))
+	doctorRoutes.Use(r.middlewares.IsAuthorized(constants.DOCTOR_AUTH_TOKEN), r.middlewares.UserRole([]constants.UserType{constants.DOCTOR}))
 
 	doctorRoutes.POST("", api.AddNewSlots())
 	doctorRoutes.GET("/:id", api.GetAppointmentSlotById())

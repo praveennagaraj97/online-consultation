@@ -22,7 +22,7 @@ func (r *Router) adminRoutes() {
 	routes.POST("/reset_password/:token", api.ResetPassword())
 	routes.GET("/refresh_token", api.RefreshToken())
 
-	routes.Use(r.middlewares.IsAuthorized())
+	routes.Use(r.middlewares.IsAuthorized(constants.ADMIN_AUTH_TOKEN))
 
 	routes.POST("/add_admin", r.middlewares.UserRole([]constants.UserType{constants.SUPER_ADMIN}),
 		api.AddNewAdmin(constants.ADMIN))

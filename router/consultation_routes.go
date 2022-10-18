@@ -15,11 +15,12 @@ func (r *Router) consultationRoutes() {
 
 	adminRoutes := r.engine.Group("/api/v1/admin/consultation_type")
 
-	adminRoutes.POST("/add_new_type", r.middlewares.IsAuthorized(),
+	adminRoutes.Use(r.middlewares.IsAuthorized(constants.ADMIN_AUTH_TOKEN))
+	adminRoutes.POST("/add_new_type",
 		r.middlewares.UserRole([]constants.UserType{constants.SUPER_ADMIN}), api.AddNewConsultationType())
-	adminRoutes.DELETE("/:id", r.middlewares.IsAuthorized(),
+	adminRoutes.DELETE("/:id",
 		r.middlewares.UserRole([]constants.UserType{constants.SUPER_ADMIN}), api.DeleteConsultationType())
-	adminRoutes.PATCH("/:id", r.middlewares.IsAuthorized(), r.middlewares.UserRole([]constants.UserType{
+	adminRoutes.PATCH("/:id", r.middlewares.UserRole([]constants.UserType{
 		constants.ADMIN, constants.SUPER_ADMIN, constants.EDITOR}), api.UpdateById())
 
 	routes.GET("", api.GetAll())

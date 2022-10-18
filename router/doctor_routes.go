@@ -16,7 +16,7 @@ func (r *Router) doctorRoutes() {
 	authRoutes := r.engine.Group("/api/v1/doctor/auth")
 	routes := r.engine.Group("/api/v1/doctor")
 
-	adminRoutes.Use(r.middlewares.IsAuthorized(), r.middlewares.UserRole([]constants.UserType{
+	adminRoutes.Use(r.middlewares.IsAuthorized(constants.ADMIN_AUTH_TOKEN), r.middlewares.UserRole([]constants.UserType{
 		constants.ADMIN, constants.SUPER_ADMIN, constants.EDITOR}))
 	adminRoutes.POST("", api.AddNewDoctor())
 	adminRoutes.GET("/:id", api.GetDoctorById(false))
@@ -34,7 +34,7 @@ func (r *Router) doctorRoutes() {
 	routes.GET("", api.FindAllDoctors(false))
 
 	// Profile Options
-	routes.Use(r.middlewares.IsAuthorized(), r.middlewares.UserRole([]constants.UserType{constants.DOCTOR}))
+	routes.Use(r.middlewares.IsAuthorized(constants.DOCTOR_AUTH_TOKEN), r.middlewares.UserRole([]constants.UserType{constants.DOCTOR}))
 	routes.PATCH("", api.UpdateById())
 	routes.GET("/me", api.GetDoctorById(true))
 	// Appointment Slot Set
@@ -50,8 +50,8 @@ func (r *Router) doctorRoutes() {
 	authRoutes.POST("/signin_with_phonenumber", api.SignInWithPhoneNumber())
 	authRoutes.POST("/signin_with_emaillink", api.SignInWithEmailLink())
 	authRoutes.GET("/login_with_token/:token", api.SendLoginCredentialsForEmailLink())
-	authRoutes.GET("/logout", r.middlewares.IsAuthorized(), r.middlewares.UserRole([]constants.UserType{constants.DOCTOR}), api.Logout())
+	authRoutes.GET("/logout", r.middlewares.IsAuthorized(constants.DOCTOR_AUTH_TOKEN), r.middlewares.UserRole([]constants.UserType{constants.DOCTOR}), api.Logout())
 
-	authRoutes.GET("/refresh_token", r.middlewares.IsAuthorized(), r.middlewares.UserRole([]constants.UserType{constants.DOCTOR}), api.RefreshToken())
+	authRoutes.GET("/refresh_token", r.middlewares.IsAuthorized(constants.DOCTOR_AUTH_TOKEN), r.middlewares.UserRole([]constants.UserType{constants.DOCTOR}), api.RefreshToken())
 
 }

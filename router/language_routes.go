@@ -13,7 +13,7 @@ func (r *Router) languageRoutes() {
 	adminRoutes := r.engine.Group("/api/v1/admin/language")
 	routes := r.engine.Group("/api/v1/language")
 
-	adminRoutes.Use(r.middlewares.IsAuthorized(), r.middlewares.UserRole([]constants.UserType{constants.ADMIN, constants.EDITOR, constants.SUPER_ADMIN}))
+	adminRoutes.Use(r.middlewares.IsAuthorized(constants.ADMIN_AUTH_TOKEN), r.middlewares.UserRole([]constants.UserType{constants.ADMIN, constants.EDITOR, constants.SUPER_ADMIN}))
 
 	adminRoutes.POST("", api.AddNewLanguage())
 	adminRoutes.DELETE("/:id", api.DeleteLanguageById())

@@ -9,6 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/praveennagaraj97/online-consultation/api"
+	"github.com/praveennagaraj97/online-consultation/constants"
 	userdto "github.com/praveennagaraj97/online-consultation/dto/user"
 	"github.com/praveennagaraj97/online-consultation/interfaces"
 	usermodel "github.com/praveennagaraj97/online-consultation/models/user"
@@ -82,7 +83,7 @@ func (a *UserAPI) Register() gin.HandlerFunc {
 
 		a.userRepo.UpdateRefreshToken(&document.ID, refresh)
 
-		utils.SetAuthCookie(ctx, access, refresh, accessTime, a.appConf.Domain, a.appConf.Environment)
+		utils.SetAuthCookie(ctx, access, refresh, accessTime, a.appConf.Domain, a.appConf.Environment, constants.USER_AUTH_COOKIE)
 
 		if err != nil {
 			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, nil)
@@ -172,7 +173,7 @@ func (a *UserAPI) SignInWithPhoneNumber() gin.HandlerFunc {
 			return
 		}
 
-		utils.SetAuthCookie(ctx, access, refresh, accessTime, a.appConf.Domain, a.appConf.Environment)
+		utils.SetAuthCookie(ctx, access, refresh, accessTime, a.appConf.Domain, a.appConf.Environment, constants.USER_AUTH_COOKIE)
 
 		if err != nil {
 			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, nil)
@@ -308,7 +309,7 @@ func (a *UserAPI) SendLoginCredentialsForEmailLink() gin.HandlerFunc {
 
 		a.userRepo.UpdateRefreshToken(&res.ID, refresh)
 
-		utils.SetAuthCookie(ctx, access, refresh, accessTime, a.appConf.Domain, a.appConf.Environment)
+		utils.SetAuthCookie(ctx, access, refresh, accessTime, a.appConf.Domain, a.appConf.Environment, constants.USER_AUTH_COOKIE)
 
 		if err != nil {
 			api.SendErrorResponse(ctx, "Something went wrong", http.StatusInternalServerError, nil)
@@ -462,7 +463,7 @@ func (a *UserAPI) Logout() gin.HandlerFunc {
 			return
 		}
 
-		utils.SetAuthCookie(c, "", "", 0, a.appConf.Domain, a.appConf.Environment)
+		utils.SetAuthCookie(c, "", "", 0, a.appConf.Domain, a.appConf.Environment, constants.USER_AUTH_COOKIE)
 
 		c.JSON(http.StatusOK, serialize.Response{
 			StatusCode: http.StatusOK,
@@ -521,7 +522,7 @@ func (a *UserAPI) RefreshToken() gin.HandlerFunc {
 
 		a.userRepo.UpdateRefreshToken(&user.ID, refresh)
 
-		utils.SetAuthCookie(c, access, refresh, accessTime, a.appConf.Domain, a.appConf.Environment)
+		utils.SetAuthCookie(c, access, refresh, accessTime, a.appConf.Domain, a.appConf.Environment, constants.USER_AUTH_COOKIE)
 
 		if err != nil {
 			api.SendErrorResponse(c, "Something went wrong", http.StatusInternalServerError, nil)

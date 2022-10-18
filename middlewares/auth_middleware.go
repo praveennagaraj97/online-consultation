@@ -10,12 +10,12 @@ import (
 	"github.com/praveennagaraj97/online-consultation/pkg/tokens"
 )
 
-func (m *Middlewares) IsAuthorized() gin.HandlerFunc {
+func (m *Middlewares) IsAuthorized(cookieName constants.CookieNames) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var token string
 
 		// check if token exists in cookie
-		cookie, err := c.Request.Cookie(string(constants.AUTH_TOKEN))
+		cookie, err := c.Request.Cookie(string(cookieName))
 		if err != nil {
 			// check in auth header as bearer
 			authHeader := c.Request.Header.Get("Authorization")

@@ -13,7 +13,7 @@ func (r *Router) hospitalRoutes() {
 	adminRoutes := r.engine.Group("/api/v1/admin/hospital")
 	routes := r.engine.Group("/api/v1/hospital")
 
-	adminRoutes.Use(r.middlewares.IsAuthorized())
+	adminRoutes.Use(r.middlewares.IsAuthorized(constants.ADMIN_AUTH_TOKEN))
 
 	adminRoutes.POST("", r.middlewares.UserRole([]constants.UserType{
 		constants.ADMIN, constants.EDITOR, constants.SUPER_ADMIN,
